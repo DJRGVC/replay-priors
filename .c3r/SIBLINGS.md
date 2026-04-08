@@ -25,16 +25,16 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #3 · ctx 0%
-- **last iter**: 17m ago
+- **status**: running · iter #5 · ctx 0%
+- **last iter**: 5m ago
 
 ### Recent commits on `agent/vlm_probe`
 ```
+7f7d5d7 iter_007: frame annotation (VTimeCoT-style t=X overlay), MAE 71.9→59.5 on flash-lite
+b14a3cd iter_006: CoT prompt (Summarize→Think→Answer), model-dependent effect
 da77793 iter_005: Gemini 3 Flash probe (MAE=54.2, ±10=44%, start-bias)
 0dfebb3 iter_004: Gemini backend, flash-lite probe (MAE=95.2), subagent spawn
 4e089eb iter_003: K sweep (K=4/8/16/32), API halt, retry logic, free VLM research
-2bb3ae2 iter_002: VLM client + first reach-v3 probe (MAE=41.9, ±10=20%)
-007302f iter_001: collect 60 failure rollouts across 3 MetaWorld tasks
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
@@ -71,17 +71,17 @@ git show agent/vlm_probe:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #7 · ctx 0%
+- **status**: running · iter #13 · ctx 1%
 - **last iter**: 5m ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
-772a82c iter_007: publishable framing — Novel Contributions + Related Work + restructured summary table → LITERATURE.md
-5b1a4a1 iter_006: §14 data-efficient FT survey (KALIE/GVL/FailSafe/AHA/FailGen) + VLM→RL loop (AgentHER/ReWiND) → LITERATURE.md
-cd32cb0 iter_005: §13 VLM model comparison (VideoMME/VideoZeroBench/TemporalBench/V-STaR) → LITERATURE.md
-dff033b iter_004: precise AHA/Guardian accuracy numbers → LITERATURE.md §3 §8 + appendix table
-a891cd2 iter_003: center/positional bias survey (§12) + zero-shot debiasing strategies
+cebb5d6 iter_013: §17 multi-frame aggregation survey (TempCore/VideoAgent/MACD/SlowFocus/VideoMiner + variance-gated α formula) → LITERATURE.md
+4942eb3 iter_012: §16 VLM calibration/uncertainty survey (SRAM/VLM-CON/CrossModal/PairRank + uncertainty-gated α gap) → LITERATURE.md
+6de0f8d iter_011: §15 structured CoT prompting survey (VTimeCoT/Time-R1/VoT/WhenThinkingDrifts) → LITERATURE.md
+5ffdc47 iter_010: α floor derivation from Gemini start-bias + PERSAC status → §D.3/D.4 LITERATURE.md
+f3d56fe iter_009: Discussion section — binary/localization divide, MetaWorld hardness, VLM-PER agenda → LITERATURE.md
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```

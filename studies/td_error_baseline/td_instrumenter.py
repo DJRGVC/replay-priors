@@ -179,5 +179,6 @@ class TDInstrumentCallback(BaseCallback):
         )
 
     def _on_training_end(self):
-        """Take a final snapshot."""
-        self._take_snapshot(self.num_timesteps)
+        """Take a final snapshot (only if the interval didn't already trigger one)."""
+        if self.num_timesteps > self._last_snapshot_step:
+            self._take_snapshot(self.num_timesteps)

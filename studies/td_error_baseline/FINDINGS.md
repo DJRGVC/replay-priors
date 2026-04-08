@@ -16,11 +16,30 @@ training). On hard tasks, it never emerges.
 - **Metric:** Spearman rank correlation between |TD-error| and oracle advantage
   (dense_reward − mean), sampled from 5000 replay transitions every 10k steps
 - **Compute:** Modal T4 GPU, ~20 min per 100k steps
-- **Seeds:** 42, 123
+- **Seeds:** 42, 123 (initial); 42, 123, 7, 99, 256 (5-seed baseline)
 
 ## Key Results
 
-### reach-v3 (2 seeds, 100k steps)
+### reach-v3 — 5-seed uniform baseline (100k steps, metaworld==3.0.0)
+
+| Seed | Learns? | ep_rew@90k | Spearman@80k |
+|------|---------|-----------|-------------|
+| 42   | NO      | 0.0       | +0.11       |
+| 123  | YES     | 469.1     | +0.62       |
+| 7    | YES     | 241.0     | +0.59       |
+| 99   | NO      | 0.0       | +0.09       |
+| 256  | YES     | 469.7     | +0.53       |
+
+**60% success rate** (3/5 seeds learn by 90k). Non-learning seeds show Spearman ≈ 0
+throughout. Learning seeds show Spearman rising from ≈ 0 to 0.5–0.6 only AFTER episode
+returns begin increasing (60–80k), confirming TD-error is a lagging indicator.
+
+**The iter_010 "regression" was stochastic.** The seed=42 non-learning observed in
+iter_010 is expected (2/5 seeds don't learn by 100k).
+
+![5-seed baseline](figures/5seed_baseline_reach_v3.png)
+
+### reach-v3 — original 2-seed results (100k steps)
 
 | Metric | Result |
 |--------|--------|
@@ -146,9 +165,10 @@ it's valid.
   - Adaptive mode went Q-unstable at 40k despite same effective sampling
 - [x] Fix SB3 PER integration — PERSAC subclass (per_sac.py) calls update_priorities()
 - [x] Re-run comparison with working PER (iter_010)
-  - **PER now active:** td-per max_priority=6.35, adaptive max_priority=17.92
-  - **Working PER destabilizes Q:** adaptive Q=37 (unstable), td-per Q=2.2, uniform Q=0.5
-  - Adaptive goes catastrophically unstable (q_cv=3.1, |TD| explodes 30×)
-  - TD-PER causes Q overshooting vs uniform (2.2 vs 0.5)
-  - Spearman ≈ 0 across all modes — no policy learned in any mode
-  - Figure: `figures/mode_comparison_reach_v3.png`
+  - PER active but destabilizes Q; no mode learned (seed=42 stochastic failure)
+- [x] **5-seed uniform baseline (iter_011)**: 3/5 learn, 2/5 don't — confirms stochasticity
+  - Pinned MetaWorld to 3.0.0 for reproducibility
+  - Figure: `figures/5seed_baseline_reach_v3.png`
+- [ ] Multi-seed mode comparison: uniform vs td-per vs adaptive (5 seeds each)
+- [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
+- [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix

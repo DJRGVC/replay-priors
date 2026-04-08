@@ -30,7 +30,7 @@ image = (
         "torch==2.7.0",
         "stable-baselines3==2.7.1",
         "gymnasium==1.2.1",
-        "metaworld @ git+https://github.com/Farama-Foundation/Metaworld.git@master",
+        "metaworld==3.0.0",
         "mujoco==3.6.0",
         "scipy==1.15.3",
         "numpy<2",
@@ -287,7 +287,7 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
 @app.local_entrypoint()
 def main(seeds: str = "42", tasks: str = "reach-v3,pick-place-v3",
          total_steps: int = 100_000, modes: str = "",
-         compare: bool = False):
+         compare: bool = False, replicate: bool = False):
     """Run tasks in parallel on Modal.
 
     Args:
@@ -296,21 +296,49 @@ def main(seeds: str = "42", tasks: str = "reach-v3,pick-place-v3",
         total_steps: Steps per run
         modes: Comma-separated modes for mixer comparison (e.g. "adaptive,td-per,uniform")
         compare: If True, run all 3 modes for comparison
+        replicate: If True, run both train_task AND train_mixer_task(uniform) for A/B diagnosis
     """
     import json
 
     task_list = [t.strip() for t in tasks.split(",")]
     seed_list = [int(s.strip()) for s in seeds.split(",")]
 
-    if compare:
+    if replicate:
+        # A/B diagnostic: original train_task vs train_mixer_task(uniform)
+        handles = []
+        labels = []
+        for task in task_list:
+            for seed in seed_list:
+                print(f"Launching {task} ORIGINAL (seed={seed})...")
+                handles.append(train_task.spawn(task=task, total_steps=total_steps, seed=seed))
+                labels.append(f"{task}_s{seed}_ORIGINAL")
+                print(f"Launching {task} MIXER-UNIFORM (seed={seed})...")
+                handles.append(train_mixer_task.spawn(
+                    task=task, total_steps=total_steps, seed=seed, mode="uniform"
+                ))
+                labels.append(f"{task}_s{seed}_MIXER-UNIFORM")
+
+        for label, h in zip(labels, handles):
+            result = h.get()
+            print(f"\n=== {label} ===")
+            print(json.dumps(result, indent=2))
+    elif compare:
         mode_list = ["adaptive", "td-per", "uniform"]
+        handles = []
+        for task in task_list:
+            for seed in seed_list:
+                for mode in mode_list:
+                    print(f"Launching {task} mode={mode} ({total_steps} steps, seed={seed})...")
+                    handles.append(train_mixer_task.spawn(
+                        task=task, total_steps=total_steps, seed=seed, mode=mode
+                    ))
+
+        for h in handles:
+            result = h.get()
+            print(f"\n=== {result['task']} mode={result['mode']} (seed={result['seed']}) ===")
+            print(json.dumps(result, indent=2))
     elif modes:
         mode_list = [m.strip() for m in modes.split(",")]
-    else:
-        mode_list = []
-
-    if mode_list:
-        # Mixer comparison mode
         handles = []
         for task in task_list:
             for seed in seed_list:

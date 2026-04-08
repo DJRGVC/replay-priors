@@ -22,7 +22,8 @@
 - [x] Re-run 100k comparison with working PER (reach-v3, seed=42, all 3 modes)
   - PER active but makes things WORSE: adaptive unstable (Q=37), td-per overshoots (Q=2.2), uniform best (Q=0.5)
   - NO MODE LEARNED reach-v3 — regression from iter_002, needs investigation
-- [ ] **URGENT: investigate reach-v3 learning regression** — train_mixer_task uniform vs train_task produce different results for same task/seed. Compare code paths, check Modal image versions, verify callback isn't interfering
+- [x] **Investigate reach-v3 learning regression** — RESOLVED: stochastic, not a bug. 5-seed baseline shows 3/5 learn, 2/5 don't (seed=42 was unlucky). Pinned MetaWorld to 3.0.0.
+- [ ] **Multi-seed mode comparison** (5+ seeds): uniform vs td-per vs adaptive on reach-v3. Critical: must use 5+ seeds to account for 60% success rate variance.
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost

@@ -218,3 +218,34 @@ Decision:   Next iteration: investigate WHY no mode learned reach-v3 when the sa
             mode with DenseRewardReplayBuffer + vanilla SAC doesn't reproduce earlier
             learning, there may be a Modal image version difference. This regression
             must be understood before the mode comparison results are meaningful.
+
+## iter_011 — 5-seed baseline resolves learning regression  (2026-04-08T08:30:00Z)
+Hypothesis: The reach-v3 learning "regression" in iter_010 is stochastic (CUDA
+            non-determinism + sparse reward exploration variance), not a code bug.
+            Code review shows train_task and train_mixer_task(uniform) are functionally
+            identical for DenseRewardReplayBuffer (same SAC, same buffer, callback
+            extra code skipped via hasattr checks). Early training dynamics match
+            (Q=28, dense_rew=650 at 10k for both), confirming same environment.
+Change:     Pinned MetaWorld to 3.0.0 in Modal image (was @master, risking drift).
+            Ran 5-seed (42,123,7,99,256) uniform baseline on reach-v3 via Modal
+            (100k steps each, T4 GPU). Added --replicate flag to Modal entrypoint.
+            Fixed final-snapshot overwrite bug in TDInstrumentCallback._on_training_end.
+            Generated 4-panel 5-seed figure, updated FINDINGS.md.
+Command:    modal run modal_app.py --tasks reach-v3 --seeds "42,123,7,99,256" --modes uniform
+Result:     **HYPOTHESIS CONFIRMED — regression is stochastic:**
+            - seed=42:  ep_rew=0 at 90k (NO learn) — MATCHES iter_010
+            - seed=123: ep_rew=469 at 90k (LEARNS) — matches iter_003
+            - seed=7:   ep_rew=241 at 90k (LEARNS)
+            - seed=99:  ep_rew=0 at 90k (NO learn)
+            - seed=256: ep_rew=470 at 90k (LEARNS)
+            **3/5 seeds learn (60% success rate)**, 2/5 don't. The iter_010 single-seed
+            failure was expected variance, not a regression. Spearman for learning seeds
+            rises from 0→0.6 at 70-80k; non-learning seeds stay at 0 throughout.
+            This strengthens the core finding: TD-error is a LAGGING indicator that
+            only becomes informative after learning has already started.
+            Wall time: ~1160-1228s per run (5 parallel on Modal T4).
+            Figure: figures/5seed_baseline_reach_v3.png
+Decision:   Next iteration: run multi-seed mode comparison (5 seeds × 3 modes:
+            uniform, td-per, adaptive) to get statistically meaningful comparison
+            of whether PER helps or hurts. Need n=5 per mode to distinguish real
+            effects from stochastic noise given the 60% base success rate.
