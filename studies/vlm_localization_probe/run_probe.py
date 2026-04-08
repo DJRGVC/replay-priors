@@ -20,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-from vlm_client import predict_failure, sample_keyframes, TASK_DESCRIPTIONS, annotate_frame, extract_proprio_text
+from vlm_client import predict_failure, sample_keyframes, sample_keyframes_around, TASK_DESCRIPTIONS, annotate_frame, extract_proprio_text
 
 
 # ── Cost estimation (approximate, per 1M tokens) ──────────────────

@@ -25,16 +25,16 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: running · iter #10 · ctx 0%
-- **last iter**: 2h ago
+- **status**: running · iter #11 · ctx 0%
+- **last iter**: 19m ago
 
 ### Recent commits on `agent/td_baseline`
 ```
+0e9d017 iter_012: 5-seed mode comparison — TD-PER actively hurts (0/5 learn), uniform best (3/5), adaptive middling (2/5)
 12ceb16 iter_011: 5-seed baseline resolves reach-v3 learning regression — stochastic, not a bug
 8605f09 iter_010: 100k mode comparison with working PER — PER destabilizes Q, no mode learns reach-v3
 180bc8a iter_009: fix SB3 PER integration — PERSAC subclass calls update_priorities() with TD errors + IS-weighted critic loss
 9dfa19f iter_008: 100k mode comparison reveals PER integration bug — SB3 never calls update_priorities()
-b44306e iter_007: Adaptive Priority Mixer — regime-aware PER buffer + train_mixer.py + smoke test
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
@@ -56,6 +56,7 @@ studies/td_error_baseline/adaptive_priority_mixer.py
 studies/td_error_baseline/dense_reward_buffer.py
 studies/td_error_baseline/figures/5seed_baseline_reach_v3.pdf
 studies/td_error_baseline/figures/mode_comparison_reach_v3.pdf
+studies/td_error_baseline/figures/multiseed_mode_comparison.pdf
 studies/td_error_baseline/figures/td_correlation_over_training.json
 studies/td_error_baseline/figures/td_correlation_over_training.png
 studies/td_error_baseline/figures/td_per_regime_map.pdf
@@ -64,11 +65,10 @@ studies/td_error_baseline/modal_app.py
 studies/td_error_baseline/oracle_correlation.py
 studies/td_error_baseline/per_sac.py
 studies/td_error_baseline/plot_mode_comparison.py
+studies/td_error_baseline/plot_multiseed_comparison.py
 studies/td_error_baseline/plot_priority_quality.py
 studies/td_error_baseline/plot_regime_map.py
-studies/td_error_baseline/plot_td_correlation.py
-studies/td_error_baseline/snapshots/.gitignore
-... and 4 more
+... and 6 more
 ```
 ### Read one with:
 ```
@@ -82,17 +82,17 @@ git show agent/td_baseline:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #36 · ctx 0%
-- **last iter**: 28s ago
+- **status**: running · iter #40 · ctx 1%
+- **last iter**: 1m ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
+f8f371c iter_041: §40 episodic/trajectory-level replay prioritization survey (14 papers, HGR two-level hierarchy, VLM+episode-priority gap confirmed, two-level VLM-PER formulation) → LITERATURE.md (4716→4931 lines)
+26c30f8 iter_040: §39 vlm_probe empirical summary (9 subsections, MAE=41.9 baseline, bias taxonomy, theory-vs-empirical table) → LITERATURE.md (4382→4716 lines)
+0f1351d iter_039: §38 anomaly detection track survey (reconstruction/one-class/OOD/foundation) — gap confirmed: no per-timestep p_i use, MetaWorld gap, pixel-novelty failure, conformal-σ novel connection → LITERATURE.md (4280→4382 lines)
+0fc5625 iter_037: §37 action segmentation + keyframe + VTG + BOCPD survey — no VLM-free method satisfies all 3 t* conditions; NC6 (BOCPD+proprio) proposed → LITERATURE.md (4110→4280 lines)
 2e5ed86 iter_036: compaction (summarized iters 001-016 into archive; log shrunk 306→175 lines; fix_plan pruned)
-f3fd93f iter_035: cross-ref vlm_probe iter_008 proprio-as-text negative signal into §19h/§19i/§20 (MAE 59.5→107.5, n=2, rate-limit confound, LaRe symbolic-grounding mechanism) → LITERATURE.md (4101→4110 lines)
-b60e582 iter_034: §36 temporal credit assignment survey — GP-LRR Gaussian kernel formally justifies G_i formula (RUDDER/HCA/IRCR/DIASTER/COCOA/GRD/LaRe/GP-LRR — no return decomp paper uses replay priority p_i, σ estimation via leave-one-out GP-LRR, IRCR added as uniform-priority ablation baseline) → LITERATURE.md (3979→4101 lines)
-3f3bfa5 iter_033: §35 VLM-as-verifier + process reward model survey (Robo-Dopamine/Robometer/AgentPRM/VRPRM/OmegaPRM/RLVR — per-step signals never used as replay priority p_i, Robo-Dopamine closest rival, NC1 MAE unreported in PRM literature) → LITERATURE.md (3876→3979 lines)
-1e61fd1 iter_032: §34 world-model failure-proximity survey (DreamerV3/TD-MPC2/GWM/Curious-Replay — no per-transition MetaWorld+priority triple, WM error not failure-aligned, new Curious-Replay ablation baseline) → LITERATURE.md (3769→3876 lines)
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```

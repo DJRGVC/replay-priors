@@ -91,13 +91,13 @@ def annotate_frame(img: Image.Image, timestep: int, total_timesteps: int) -> Ima
 def sample_keyframes(
     frames_dir: str | Path,
     K: int = 8,
-    strategy: Literal["uniform", "pinned"] = "uniform",
+    strategy: Literal["uniform", "random"] = "uniform",
 ) -> tuple[list[Image.Image], list[int]]:
     """Sample K keyframes from a rollout's frames directory.
 
     Strategies:
       - "uniform": evenly spaced indices from 0..T-1
-      - "pinned": first and last frame always included, rest evenly spaced
+      - "random": K random indices (breaks positional priors)
 
     Returns (list of PIL Images, list of timestep indices).
     """
@@ -110,19 +110,60 @@ def sample_keyframes(
 
     if strategy == "uniform":
         indices = np.linspace(0, T - 1, K, dtype=int).tolist()
-    elif strategy == "pinned":
-        if K <= 2:
-            indices = [0, T - 1][:K]
-        else:
-            inner = np.linspace(0, T - 1, K, dtype=int).tolist()
-            # Ensure first and last are pinned
-            inner[0] = 0
-            inner[-1] = T - 1
-            indices = inner
+    elif strategy == "random":
+        indices = sorted(np.random.choice(T, size=K, replace=False).tolist())
     else:
         raise ValueError(f"Unknown strategy: {strategy}")
 
     # Deduplicate while preserving order
+    seen = set()
+    unique_indices = []
+    for i in indices:
+        if i not in seen:
+            seen.add(i)
+            unique_indices.append(i)
+    indices = unique_indices
+
+    images = [Image.open(all_frames[i]) for i in indices]
+    return images, indices
+
+
+def sample_keyframes_around(
+    frames_dir: str | Path,
+    center: int,
+    K: int = 8,
+    window_fraction: float = 0.3,
+) -> tuple[list[Image.Image], list[int]]:
+    """Sample K keyframes densely around a center timestep.
+
+    Used for the refinement pass in two-pass adaptive probing.
+    Samples K frames from [center - window/2, center + window/2],
+    clamped to episode bounds.
+
+    Args:
+        center: timestep to center the dense window on
+        K: number of frames to sample
+        window_fraction: fraction of episode length for the window
+    """
+    frames_dir = Path(frames_dir)
+    all_frames = sorted(frames_dir.glob("*.png"))
+    T = len(all_frames)
+    if T == 0:
+        raise ValueError(f"No frames found in {frames_dir}")
+    K = min(K, T)
+
+    half_window = int(T * window_fraction / 2)
+    lo = max(0, center - half_window)
+    hi = min(T - 1, center + half_window)
+    # Ensure we have at least K frames in the window
+    if hi - lo + 1 < K:
+        lo = max(0, hi - K + 1)
+        if hi - lo + 1 < K:
+            hi = min(T - 1, lo + K - 1)
+
+    indices = np.linspace(lo, hi, K, dtype=int).tolist()
+
+    # Deduplicate
     seen = set()
     unique_indices = []
     for i in indices:
@@ -605,7 +646,7 @@ if __name__ == "__main__":
     parser.add_argument("--rollout-dir", required=True, help="Path to a rollout directory")
     parser.add_argument("--task", required=True, help="Task name (e.g. reach-v3)")
     parser.add_argument("--K", type=int, default=8)
-    parser.add_argument("--strategy", default="uniform", choices=["uniform", "pinned"])
+    parser.add_argument("--strategy", default="uniform", choices=["uniform", "random"])
     parser.add_argument("--model", default="claude-sonnet-4-6")
     args = parser.parse_args()
 
