@@ -150,6 +150,32 @@ it's valid.
 | `LIT_REVIEW.md` | Literature review (§1: 11 alternative PER methods) |
 | `NOTES.md` | Detailed notes on task selection, literature, and methodology |
 
+### reach-v3 — 5-seed mode comparison (100k steps, iter_012)
+
+**TD-PER actively hurts learning.** Uniform replay is the best strategy.
+
+| Mode | Learns | ep_rew@90k (best seed) | Q_mean@100k | |TD| @100k | Spearman@100k |
+|------|--------|----------------------|-------------|-----------|---------------|
+| **Uniform** | **3/5 (60%)** | 469 | 20.8 ± 18.3 | 0.20 ± 0.16 | +0.18 ± 0.12 |
+| TD-PER | **0/5 (0%)** | 31 | 228.3 ± 377.0 | 7.62 ± 12.6 | −0.00 ± 0.01 |
+| Adaptive | 2/5 (40%) | 471 | 87.2 ± 72.3 | 2.18 ± 1.92 | +0.00 ± 0.02 |
+
+**Why TD-PER hurts:**
+1. **Q-value explosion:** TD-PER Q_mean=228 vs uniform Q_mean=21 (11× higher).
+   PER's biased sampling creates a positive feedback loop: high-|TD| transitions
+   get resampled → critic overfits to them → Q diverges → even higher |TD| errors.
+2. **No seed learned with TD-PER.** Even seeds that learn with uniform (123, 7, 256)
+   fail completely under TD-PER.
+3. **IS weights insufficient:** Despite β annealing from 0.4→1.0, importance sampling
+   corrections don't prevent the Q-divergence.
+
+**Adaptive is better than TD-PER but worse than uniform:** 2/5 seeds learn (vs 0/5
+for TD-PER), likely because regime detection occasionally falls back to uniform
+sampling during unstable episodes. But the PER overhead still causes Q instability
+for the seeds that don't learn.
+
+![Multi-seed mode comparison](figures/multiseed_mode_comparison.png)
+
 ## Status
 
 - [x] Single-seed (42) runs on reach-v3 + pick-place-v3, 100k steps
@@ -169,6 +195,10 @@ it's valid.
 - [x] **5-seed uniform baseline (iter_011)**: 3/5 learn, 2/5 don't — confirms stochasticity
   - Pinned MetaWorld to 3.0.0 for reproducibility
   - Figure: `figures/5seed_baseline_reach_v3.png`
-- [ ] Multi-seed mode comparison: uniform vs td-per vs adaptive (5 seeds each)
+- [x] **5-seed mode comparison (iter_012)**: TD-PER 0/5, uniform 3/5, adaptive 2/5
+  - **TD-PER actively hurts** — Q-value explosion (11×), zero seeds learn
+  - Adaptive middling — regime detection helps but PER overhead still hurts
+  - Figure: `figures/multiseed_mode_comparison.png`
 - [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix
+- [ ] Consider RPE-PER or other non-TD priority signals as baselines

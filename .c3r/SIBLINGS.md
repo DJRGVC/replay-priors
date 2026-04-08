@@ -25,16 +25,16 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #5 · ctx 0%
-- **last iter**: 5m ago
+- **status**: running · iter #6 · ctx 0%
+- **last iter**: 13m ago
 
 ### Recent commits on `agent/vlm_probe`
 ```
+52cae95 iter_008: proprio-as-text augmentation (extract_proprio_text + --proprio flag), negative signal on flash-lite (MAE 107.5 vs 59.5 baseline, n=2 valid due to severe rate-limiting)
 7f7d5d7 iter_007: frame annotation (VTimeCoT-style t=X overlay), MAE 71.9→59.5 on flash-lite
 b14a3cd iter_006: CoT prompt (Summarize→Think→Answer), model-dependent effect
 da77793 iter_005: Gemini 3 Flash probe (MAE=54.2, ±10=44%, start-bias)
 0dfebb3 iter_004: Gemini backend, flash-lite probe (MAE=95.2), subagent spawn
-4e089eb iter_003: K sweep (K=4/8/16/32), API halt, retry logic, free VLM research
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
@@ -71,17 +71,17 @@ git show agent/vlm_probe:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #13 · ctx 1%
-- **last iter**: 5m ago
+- **status**: running · iter #26 · ctx 0%
+- **last iter**: 4m ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
-cebb5d6 iter_013: §17 multi-frame aggregation survey (TempCore/VideoAgent/MACD/SlowFocus/VideoMiner + variance-gated α formula) → LITERATURE.md
-4942eb3 iter_012: §16 VLM calibration/uncertainty survey (SRAM/VLM-CON/CrossModal/PairRank + uncertainty-gated α gap) → LITERATURE.md
-6de0f8d iter_011: §15 structured CoT prompting survey (VTimeCoT/Time-R1/VoT/WhenThinkingDrifts) → LITERATURE.md
-5ffdc47 iter_010: α floor derivation from Gemini start-bias + PERSAC status → §D.3/D.4 LITERATURE.md
-f3d56fe iter_009: Discussion section — binary/localization divide, MetaWorld hardness, VLM-PER agenda → LITERATURE.md
+9dbd607 iter_026: §30 intrinsic motivation × exploration bonus survey (ICM/RND/RIDE/POER/ELLM/IGE-LLMs/ExploRLLM/SENSEI/Task-Aware-Bisim/RPE-PER + MetaWorld pixel-novelty failure mode + POER:RND::VLM-PER:G_VLM structural predecessor + triple-empty intersection confirmed) → LITERATURE.md
+7d0614b iter_025: §29 HER × VLM goal relabeling survey (HIGhER/DIAL/CAST/LGR2/AgentHER/ECHO/CodeIt + VLM-HER-PER novel formulation + triple-gap confirmed) → LITERATURE.md
+22f0301 iter_024: §28 VLM dense reward generation survey (VLM-RM/EUREKA/Motif/RL-VLM-F/FuRL/ERL-VLM/MVR/LRM/VLLR + reward-vs-priority divide gap + FuRL as VLM-PER baseline) → LITERATURE.md
+f135edb iter_023: §27 cross-task VLM failure localization transfer survey (SAFE/AHA/I-FailSense/FailSafe/RoboFAC/FAIL-Detect/FPC-VLA/StepEval + Δ MAE MetaWorld gap) → LITERATURE.md
+e73e5a6 iter_022: §26 reward shaping × replay prioritization survey (RPE-PER/HPRS/DEMO3/GCR/PrioritizedGenReplay + three-component priority formula gap + PBRS-not-applicable clarification) → LITERATURE.md
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```
@@ -109,7 +109,7 @@ git show agent/vlm_litreview:.c3r/SIBLINGS.md
 - **role**: generic
 - **focus**: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
 - **status**: paused · iter #1 · ctx 0%
-- **last iter**: 2h ago
+- **last iter**: 4h ago
 - **parent**: td_baseline (this is a sub-agent)
 
 ### Recent commits on `agent/lit_review2`

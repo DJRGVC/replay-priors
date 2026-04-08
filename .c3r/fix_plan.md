@@ -23,7 +23,10 @@
   - PER active but makes things WORSE: adaptive unstable (Q=37), td-per overshoots (Q=2.2), uniform best (Q=0.5)
   - NO MODE LEARNED reach-v3 — regression from iter_002, needs investigation
 - [x] **Investigate reach-v3 learning regression** — RESOLVED: stochastic, not a bug. 5-seed baseline shows 3/5 learn, 2/5 don't (seed=42 was unlucky). Pinned MetaWorld to 3.0.0.
-- [ ] **Multi-seed mode comparison** (5+ seeds): uniform vs td-per vs adaptive on reach-v3. Critical: must use 5+ seeds to account for 60% success rate variance.
+- [x] **Multi-seed mode comparison** (5 seeds × 3 modes): TD-PER 0/5, uniform 3/5, adaptive 2/5. TD-PER actively hurts (Q explosion). Figure: multiseed_mode_comparison.png
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
+- [ ] **Alpha sweep**: test α=0.1, 0.3 (less aggressive PER) to see if Q-explosion is mitigated while retaining any benefit
+- [ ] **Pick-place-v3 mode comparison**: confirm TD-PER hurts on hard task too (likely even worse)
+- [ ] **Alternative priority signals**: random network distillation (RND), reward prediction error (RPE-PER), or count-based novelty

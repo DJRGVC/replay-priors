@@ -249,3 +249,32 @@ Decision:   Next iteration: run multi-seed mode comparison (5 seeds × 3 modes:
             uniform, td-per, adaptive) to get statistically meaningful comparison
             of whether PER helps or hurts. Need n=5 per mode to distinguish real
             effects from stochastic noise given the 60% base success rate.
+
+## iter_012 — 5-seed mode comparison: TD-PER hurts, uniform wins  (2026-04-08T13:00:00Z)
+Hypothesis: TD-PER will not improve sample efficiency over uniform replay across
+            5 seeds, because TD-error is uninformative for most of training.
+Change:     Ran 5 seeds × 2 remaining modes (td-per, adaptive) on reach-v3 via
+            Modal (100k steps each, T4 GPU). Uniform baseline from iter_011.
+            Created plot_multiseed_comparison.py (6-panel figure). Updated FINDINGS.md.
+Command:    modal run modal_app.py --tasks reach-v3 --seeds "42,123,7,99,256" --modes "td-per,adaptive"
+            python plot_multiseed_comparison.py
+Result:     **HYPOTHESIS CONFIRMED — TD-PER ACTIVELY HURTS LEARNING:**
+            - Uniform:  3/5 seeds learn (60%) — best performer
+            - TD-PER:   0/5 seeds learn (0%) — worst performer
+            - Adaptive: 2/5 seeds learn (40%) — middling
+            Q-value explosion under PER: td-per Q=228±377 vs uniform Q=21±18 (11×).
+            PER creates positive feedback: high-|TD| transitions get resampled →
+            critic overfits → Q diverges → higher |TD| → more resampling.
+            IS weights (β=0.4→1.0) do not prevent this divergence.
+            Adaptive's regime detection helps (2 seeds escape via uniform fallback)
+            but PER overhead still causes Q instability for non-learning seeds.
+            Spearman ≈ 0 across all modes for non-learning seeds.
+            Wall time: ~1700-2800s per run (10 parallel on Modal T4).
+            Figure: figures/multiseed_mode_comparison.png
+Decision:   Next iteration: this study's core question is now answered with
+            statistical power. TD-PER is harmful on sparse-reward tasks. Options:
+            (a) Run same comparison on pick-place-v3 to confirm on a harder task,
+            (b) test alternative priority signals (random network distillation,
+            reward prediction error, or VLM-based priorities),
+            (c) investigate whether lower alpha (less aggressive PER) mitigates
+            Q-explosion while retaining any benefit.
