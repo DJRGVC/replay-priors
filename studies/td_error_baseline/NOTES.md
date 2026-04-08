@@ -67,3 +67,46 @@ Both tasks: obs ∈ ℝ³⁹, action ∈ ℝ⁴, max episode length = 500 steps.
 - **Lahire et al. (2022)** — *Large Batch Experience Replay*. Argues that
   large batch sizes reduce the impact of prioritization noise; relevant
   to our question of whether TD-error noise matters in practice.
+
+## Results — 100k-step runs (2026-04-08)
+
+### Setup
+- SAC with MlpPolicy, 100k buffer, batch=256, learning_starts=1000
+- Sparse binary reward (1.0 on success, 0.0 otherwise)
+- Dense reward logged as oracle signal (never used for training)
+- TD-error snapshots every 10k steps; 5000 transitions sampled per snapshot
+- Correlation metric: Spearman rank correlation between |TD-error| and
+  oracle advantage (dense_reward − mean(dense_reward))
+- Trained on Modal (T4 GPU), seed=42
+
+### Key findings
+
+**reach-v3 (easy task):**
+- Policy starts learning around 60k steps (ep_rew_mean rises from 0 to 116)
+- Spearman(|TD|, oracle) hovers near 0 (range −0.11 to +0.10) for first 60k steps
+- Correlation jumps to 0.28 at 80k, 0.65 at 90k as the policy improves
+- By 100k it settles at 0.45
+- **Interpretation:** TD-error is uninformative for 60% of training even on the
+  easiest MetaWorld task. Only after the critic has already learned a reasonable
+  value function does |TD| align with oracle advantage.
+
+**pick-place-v3 (hard task):**
+- Policy never learns in 100k steps (ep_rew_mean = 0 throughout, 0% success rate)
+- Spearman(|TD|, oracle) stays near 0 throughout (range −0.04 to +0.24)
+- Slight upward trend at the end (0.22) but noise-level, not meaningful signal
+- Q-values explode (Q_mean = 909 at 100k, critic_loss = 2100) — the critic
+  is wildly miscalibrated, so its TD-errors are pure noise
+- **Interpretation:** On hard sparse-reward tasks, TD-error PER is completely
+  uninformative. The critic never converges within the training budget, so
+  |TD| priorities are essentially random with respect to the oracle signal.
+
+### Central claim supported
+The figure (`figures/td_correlation_over_training.png`) shows exactly the
+pattern the proposal predicts: TD-error PER is uninformative in early training.
+On easy tasks, correlation eventually emerges but only after the policy is
+already performing well (defeating the purpose of prioritization). On hard
+tasks, correlation never emerges within a reasonable training budget.
+
+This motivates the proposal's core idea: replacing TD-error with a VLM-based
+priority signal that can identify "interesting" transitions before the critic
+has learned.

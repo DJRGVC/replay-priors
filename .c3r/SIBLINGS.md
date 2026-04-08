@@ -29,8 +29,29 @@ Siblings will see it in their next SIBLINGS.md refresh.
 
 ### Recent commits on `agent/vlm_probe`
 ```
+007302f iter_001: collect 60 failure rollouts across 3 MetaWorld tasks
 3b59ea0 scaffold replay-priors umbrella
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
-_(none)_
+```
+.c3r/INBOX.md
+.c3r/INBOX_ARCHIVE.md
+.c3r/PROMPT.md
+.c3r/RESEARCH_LOG.md
+.c3r/SIBLINGS.md
+.c3r/agent.conf
+.c3r/env.sh
+.c3r/fix_plan.md
+.claude/settings.json
+studies/vlm_localization_probe/collect_rollouts.py
+studies/vlm_localization_probe/regenerate_meta.py
+```
+### Read one with:
+```
+git show agent/vlm_probe:.c3r/INBOX.md
+git show agent/vlm_probe:.c3r/INBOX_ARCHIVE.md
+git show agent/vlm_probe:.c3r/PROMPT.md
+git show agent/vlm_probe:.c3r/RESEARCH_LOG.md
+git show agent/vlm_probe:.c3r/SIBLINGS.md
+```
 

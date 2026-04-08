@@ -19,3 +19,21 @@ Result:     Pipeline runs end-to-end. 3 snapshots produced. Spearman(|TD|, oracl
             stored correctly (mean 1.2→2.4 as policy improves). All snapshot keys present.
 Decision:   Next iteration: set up Modal app for full 100k-step runs on both reach-v3 and
             pick-place-v3. The local stack is validated.
+
+## iter_002 — Modal app + full 100k runs + correlation figure  (2026-04-08T05:45:00Z)
+Hypothesis: TD-error will be uninformative (near-zero Spearman with oracle advantage)
+            for the first ~50% of training on reach-v3, and throughout training on
+            pick-place-v3 where the sparse-reward policy never converges.
+Change:     Created modal_app.py (image with MetaWorld+SB3+mujoco, T4 GPU, Modal Volume
+            for results), plot_td_correlation.py for figure generation. Ran 100k-step
+            training on both tasks via Modal, downloaded snapshots, produced figure.
+Command:    modal run studies/td_error_baseline/modal_app.py  (parallel reach-v3 + pick-place-v3)
+            python plot_td_correlation.py --run-dirs snapshots/reach-v3_s42/reach-v3_s42 snapshots/pick-place-v3_s42/pick-place-v3_s42
+Result:     reach-v3: Spearman ≈ 0 for first 60k steps, jumps to 0.65 at 90k as policy
+            learns (ep_rew 0→116). pick-place-v3: Spearman stays 0–0.24 throughout,
+            policy never learns (ep_rew=0). Figure at figures/td_correlation_over_training.png.
+            Wall time: reach-v3 ~19min, pick-place-v3 ~22min on T4.
+Decision:   Next iteration: add seed=123 runs for robustness (error bars in figure).
+            Also run oracle_correlation.py for Gini + top-K overlap metrics. Consider
+            extending to 200k or 500k steps on pick-place-v3 to see if correlation
+            ever emerges given enough training.

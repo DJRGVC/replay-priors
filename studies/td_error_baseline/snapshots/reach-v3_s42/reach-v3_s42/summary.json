@@ -1,0 +1,7 @@
+{
+  "task": "reach-v3",
+  "total_steps": 100000,
+  "seed": 42,
+  "snapshots": 11,
+  "wall_time_seconds": 1109.6099364757538
+}
