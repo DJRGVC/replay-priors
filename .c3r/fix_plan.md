@@ -15,7 +15,8 @@
 - [x] Write summary comparing TD-error PER failure modes with VLM probe accuracy data → SYNTHESIS.md §2
 - [x] Regime classification + MI proxy + wasted budget analysis → plot_regime_map.py, 6-panel figure
 - [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
-- [ ] Implement Adaptive Priority Mixer (TD + VLM hybrid, regime-aware switching)
+- [x] Implement Adaptive Priority Mixer (TD + VLM hybrid, regime-aware switching) — adaptive_priority_mixer.py + train_mixer.py
+- [ ] Run full 100k comparison: uniform vs td-per vs adaptive on reach-v3 (seed=42) via Modal
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost

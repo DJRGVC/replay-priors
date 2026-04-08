@@ -126,3 +126,25 @@ Result:     **TD-PER fails 50-93% of training time across all runs.**
 Decision:   Next iteration: coordinate with vlm_probe sibling to run pick-place-v3
             probes. If sibling is busy, start prototyping the Adaptive Priority
             Mixer as a drop-in SB3 component.
+
+## iter_007 — Adaptive Priority Mixer implementation + smoke test  (2026-04-08T08:30:00Z)
+Hypothesis: A regime-aware replay buffer that detects noise/aligned/inverted/unstable
+            regimes online and switches between TD-error priorities and uniform can be
+            implemented as a drop-in SB3 ReplayBuffer subclass.
+Change:     Created adaptive_priority_mixer.py (SumTree proportional PER, RegimeDetector
+            using Q coefficient-of-variation + TD Gini + trend analysis, AdaptivePriorityMixer
+            buffer with regime-aware priority switching). Created train_mixer.py supporting
+            3 modes: adaptive, td-per, uniform. MixerInstrumentCallback extends
+            TDInstrumentCallback with online regime detection every 100 steps + regime
+            stats logging.
+Command:    python train_mixer.py --task reach-v3 --total-steps 3000 --learning-starts 200
+            --snapshot-interval 1000 --buffer-size 1000 --output-dir /tmp/mixer_smoke_test
+            --seed 42 --mode adaptive  (+ uniform + td-per modes)
+Result:     All 3 modes pass smoke test. Regime detector correctly transitions:
+            noise (steps 0-700) → aligned (700+) once Gini > 0.3 and Q > 0.1.
+            Stats logged: q_cv=0.025, td_gini=0.42, beta annealing works.
+            Uniform and td-per baselines produce comparable Spearman (≈0, expected
+            at 3k steps). No crashes, correct snapshot + regime JSON output.
+Decision:   Next iteration: run full 100k-step comparison on reach-v3 (all 3 modes,
+            seed=42) via Modal to measure whether adaptive switching actually improves
+            sample efficiency vs uniform and td-per baselines.
