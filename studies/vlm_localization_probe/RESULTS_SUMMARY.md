@@ -63,6 +63,50 @@ All Gemini models share a Google Cloud project. Practical limits:
 
 Rate limiting is the primary bottleneck. Exploring Groq (Llama 4 Scout, 30 RPM free) as alternative.
 
+## Priority Quality Analysis (VLM → Replay Priority Conversion)
+
+Converts VLM predictions into per-transition priorities using a Gaussian kernel
+`p_i = c * exp(-(i - t_f)² / 2σ²) + (1-c) * uniform`, then compares to oracle
+(Gaussian centered on true failure) and uniform baseline.
+
+**Metrics:** KL(oracle || priority) — lower is better; Top-20% overlap — higher is better.
+
+### Cross-config priority quality (σ=10, reach-v3)
+
+| Model | K | Annot | N | MAE | KL_vlm | KL_uni | KL_imp | Overlap | Ovlp_uni | Ovlp_imp |
+|-------|---|-------|---|-----|--------|--------|--------|---------|----------|----------|
+| claude-sonnet-4-6 | 4 | N | 10 | 47.4 | 1.865 | 1.501 | -24% | 13.3% | 11.7% | +1.7% |
+| claude-sonnet-4-6 | 8 | N | 14 | 43.4 | 1.641 | 1.525 | -8% | **27.1%** | 15.5% | **+11.7%** |
+| claude-sonnet-4-6 | 16 | N | 20 | 44.4 | 1.594 | 1.498 | -6% | 26.7% | 15.8% | +10.8% |
+| claude-sonnet-4-6 | 32 | N | 32 | 55.4 | 1.716 | 1.493 | -15% | 17.7% | 13.5% | +4.2% |
+| gemini-2.5-flash-lite | 8 | Y+P | 4 | 107.5 | 3.232 | 1.623 | -99% | 0.0% | 0.0% | +0.0% |
+
+### Key findings — priority quality
+
+1. **KL divergence is always worse than uniform** — catastrophic misses (center/start-bias)
+   create priority peaks far from the true failure, which is worse than spreading priority
+   evenly. The bimodal prediction distribution (some good, some catastrophic) makes the
+   *average* VLM priority distribution less informative than uniform.
+
+2. **Top-20% overlap beats uniform by +8-12%** at K=8/K=16 — despite bad KL, the VLM
+   correctly identifies some failure-adjacent transitions in its top priorities. This is
+   the metric that matters for replay sampling: does the VLM help sample transitions
+   *near* the failure more often than chance?
+
+3. **Downstream RL implication:** If the SAC agent benefits from sampling failure-adjacent
+   transitions (even with some noise), VLM priority is useful. If it needs well-calibrated
+   distributions (no catastrophic peaks in wrong locations), VLM priority hurts. The
+   overlap vs KL gap suggests a **confidence-gated hybrid**: use VLM priority when
+   confident, fall back to uniform otherwise. Current confidence scores (0.3-0.55) are
+   not calibrated enough for this — need better confidence estimation.
+
+4. **σ sensitivity:** Wider σ (≥30) shrinks the KL gap to near-zero but also shrinks the
+   overlap advantage. σ=10-15 is the sweet spot: enough specificity to be useful, but not
+   so narrow that misses are catastrophic.
+
+5. **Figures:** `figures/priority_good_vs_bad_sonnet_k8.png` (best/worst predictions),
+   `figures/sigma_sweep_sonnet_k8.png` (σ sensitivity analysis).
+
 ## Open Experiments (quota-gated)
 
 1. Annotation on gemini-3-flash-preview and gemini-2.5-flash

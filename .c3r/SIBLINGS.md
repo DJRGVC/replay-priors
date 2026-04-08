@@ -26,7 +26,7 @@ Siblings will see it in their next SIBLINGS.md refresh.
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
 - **status**: running · iter #10 · ctx 0%
-- **last iter**: 1h ago
+- **last iter**: 2h ago
 
 ### Recent commits on `agent/td_baseline`
 ```
@@ -82,17 +82,17 @@ git show agent/td_baseline:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #24 · ctx 0%
-- **last iter**: 6m ago
+- **status**: running · iter #36 · ctx 0%
+- **last iter**: 28s ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
-22f0301 iter_024: §28 VLM dense reward generation survey (VLM-RM/EUREKA/Motif/RL-VLM-F/FuRL/ERL-VLM/MVR/LRM/VLLR + reward-vs-priority divide gap + FuRL as VLM-PER baseline) → LITERATURE.md
-f135edb iter_023: §27 cross-task VLM failure localization transfer survey (SAFE/AHA/I-FailSense/FailSafe/RoboFAC/FAIL-Detect/FPC-VLA/StepEval + Δ MAE MetaWorld gap) → LITERATURE.md
-e73e5a6 iter_022: §26 reward shaping × replay prioritization survey (RPE-PER/HPRS/DEMO3/GCR/PrioritizedGenReplay + three-component priority formula gap + PBRS-not-applicable clarification) → LITERATURE.md
-5a022cf iter_021: §25 VLM-free failure-proximity survey (FIPER/RC-NF/TW-CRL/normalizing flows + Level 1 gate hybrid design + no prior replay-priority use gap) → LITERATURE.md
-a7db28f iter_020: cross-reference vlm_probe iter_006/007 into §19 and §24j (CoT model-dependence + annotation −17% MAE confirmed)
+2e5ed86 iter_036: compaction (summarized iters 001-016 into archive; log shrunk 306→175 lines; fix_plan pruned)
+f3fd93f iter_035: cross-ref vlm_probe iter_008 proprio-as-text negative signal into §19h/§19i/§20 (MAE 59.5→107.5, n=2, rate-limit confound, LaRe symbolic-grounding mechanism) → LITERATURE.md (4101→4110 lines)
+b60e582 iter_034: §36 temporal credit assignment survey — GP-LRR Gaussian kernel formally justifies G_i formula (RUDDER/HCA/IRCR/DIASTER/COCOA/GRD/LaRe/GP-LRR — no return decomp paper uses replay priority p_i, σ estimation via leave-one-out GP-LRR, IRCR added as uniform-priority ablation baseline) → LITERATURE.md (3979→4101 lines)
+3f3bfa5 iter_033: §35 VLM-as-verifier + process reward model survey (Robo-Dopamine/Robometer/AgentPRM/VRPRM/OmegaPRM/RLVR — per-step signals never used as replay priority p_i, Robo-Dopamine closest rival, NC1 MAE unreported in PRM literature) → LITERATURE.md (3876→3979 lines)
+1e61fd1 iter_032: §34 world-model failure-proximity survey (DreamerV3/TD-MPC2/GWM/Curious-Replay — no per-transition MetaWorld+priority triple, WM error not failure-aligned, new Curious-Replay ablation baseline) → LITERATURE.md (3769→3876 lines)
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```
@@ -100,6 +100,7 @@ a7db28f iter_020: cross-reference vlm_probe iter_006/007 into §19 and §24j (Co
 .c3r/INBOX_ARCHIVE.md
 .c3r/PROMPT.md
 .c3r/RESEARCH_LOG.md
+.c3r/RESEARCH_LOG_ARCHIVE.md
 .c3r/SIBLINGS.md
 .c3r/agent.conf
 .c3r/env.sh
@@ -113,14 +114,14 @@ git show agent/vlm_litreview:.c3r/INBOX.md
 git show agent/vlm_litreview:.c3r/INBOX_ARCHIVE.md
 git show agent/vlm_litreview:.c3r/PROMPT.md
 git show agent/vlm_litreview:.c3r/RESEARCH_LOG.md
-git show agent/vlm_litreview:.c3r/SIBLINGS.md
+git show agent/vlm_litreview:.c3r/RESEARCH_LOG_ARCHIVE.md
 ```
 
 ## lit_review2
 - **role**: generic
 - **focus**: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
 - **status**: paused · iter #1 · ctx 0%
-- **last iter**: 3h ago
+- **last iter**: 5h ago
 - **parent**: td_baseline (this is a sub-agent)
 
 ### Recent commits on `agent/lit_review2`
