@@ -70,10 +70,7 @@ class MixerInstrumentCallback(TDInstrumentCallback):
                 abs_td = (np.abs(td1) + np.abs(td2)) / 2.0
 
             buffer.update_regime(q_vals, abs_td)
-
-            # Also update priorities if in adaptive or td-per mode
-            if self.mode in ("adaptive", "td-per") and hasattr(buffer, '_last_tree_inds'):
-                pass  # priorities updated during sample()
+            # Note: priorities are now updated in PERSAC.train() after each gradient step
 
             # Log regime transitions
             current = buffer.current_regime
@@ -129,8 +126,8 @@ def parse_args():
 def main():
     args = parse_args()
 
-    from stable_baselines3 import SAC
     from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
+    from per_sac import PERSAC
 
     if args.output_dir is None:
         args.output_dir = str(
@@ -159,7 +156,12 @@ def main():
             "beta0": args.per_beta0,
         }
 
-    model = SAC(
+    # Use PERSAC (SAC subclass with PER priority updates) for td-per/adaptive modes;
+    # vanilla SAC for uniform mode (no PER needed).
+    from stable_baselines3 import SAC as VanillaSAC
+    sac_cls = VanillaSAC if args.mode == "uniform" else PERSAC
+
+    model = sac_cls(
         "MlpPolicy",
         env,
         buffer_size=args.buffer_size,

@@ -170,3 +170,23 @@ Result:     **CRITICAL BUG: SB3's SAC never calls update_priorities()** on the b
 Decision:   Next iteration: fix PER integration by subclassing SAC to override
             train() and call buffer.update_priorities() with actual TD errors.
             This is the minimum viable change to make PER actually work with SB3.
+
+## iter_009 — Fix SB3 PER integration: PERSAC subclass  (2026-04-08T10:00:00Z)
+Hypothesis: Subclassing SAC.train() to extract per-sample TD errors and call
+            update_priorities() will make PER actually differentiate priorities,
+            and IS-weighted critic loss will keep gradients unbiased.
+Change:     Created per_sac.py with PERSAC class that overrides train() to:
+            (1) compute per-sample |TD| averaged across both critics,
+            (2) call buffer.update_priorities(tree_inds, td_errors) each gradient step,
+            (3) apply IS weights to critic loss when buffer provides them.
+            Updated train_mixer.py and modal_app.py to use PERSAC for td-per/adaptive
+            modes and vanilla SAC for uniform mode.
+Command:    python train_mixer.py --task reach-v3 --total-steps 3000 --learning-starts 200
+            --snapshot-interval 1000 --buffer-size 1000 --seed 42 --mode {td-per,adaptive,uniform}
+Result:     All 3 modes pass smoke test. PER now active: max_priority=2.42 (was stuck
+            at 1.0), tree_total varies across snapshots (141→166→186). Regime detector
+            transitions noise→aligned at step 700. IS weights applied correctly.
+            Uniform mode uses vanilla SAC (no PER overhead).
+Decision:   Next iteration: re-run full 100k comparison on reach-v3 (all 3 modes,
+            seed=42) via Modal with working PER. This will be the first valid
+            head-to-head test of adaptive vs td-per vs uniform.

@@ -192,6 +192,7 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
     from adaptive_priority_mixer import AdaptivePriorityMixer
     from dense_reward_buffer import DenseRewardReplayBuffer
     from metaworld_env import make_env
+    from per_sac import PERSAC
     from train_mixer import MixerInstrumentCallback
 
     from stable_baselines3 import SAC
@@ -222,7 +223,11 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
         buffer_cls = AdaptivePriorityMixer
         buffer_kwargs = {"alpha": 0.6, "beta0": 0.4}
 
-    model = SAC(
+    # Use PERSAC for PER modes (calls update_priorities with TD errors);
+    # vanilla SAC for uniform mode
+    sac_cls = SAC if mode == "uniform" else PERSAC
+
+    model = sac_cls(
         "MlpPolicy",
         env,
         buffer_size=100_000,

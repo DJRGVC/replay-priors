@@ -18,7 +18,7 @@
 - [x] Implement Adaptive Priority Mixer (TD + VLM hybrid, regime-aware switching) — adaptive_priority_mixer.py + train_mixer.py
 - [x] Run full 100k comparison: uniform vs td-per vs adaptive on reach-v3 (seed=42) via Modal
   - BUG: SB3 SAC never calls update_priorities() → PER was inactive
-- [ ] **Fix SB3 PER integration: subclass SAC.train() to call update_priorities() with TD errors**
+- [x] **Fix SB3 PER integration: subclass SAC.train() to call update_priorities() with TD errors** — per_sac.py PERSAC class
 - [ ] Re-run 100k comparison with working PER (reach-v3, seed=42, all 3 modes)
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
