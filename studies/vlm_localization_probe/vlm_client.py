@@ -33,6 +33,26 @@ from typing import Literal
 import numpy as np
 from PIL import Image
 
+
+# ── Rate-limit retry config ──────────────────────────────────────
+MAX_RETRIES = 5
+RETRY_BASE_DELAY = 15  # seconds — conservative for 5 RPM limit
+
+
+def _retry_on_rate_limit(fn, *args, **kwargs):
+    """Call fn with exponential backoff on 429 rate-limit errors."""
+    for attempt in range(MAX_RETRIES):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            if "429" in str(e) or "rate_limit" in str(e):
+                delay = RETRY_BASE_DELAY * (2 ** attempt)
+                print(f"    Rate limited (attempt {attempt+1}/{MAX_RETRIES}), waiting {delay}s...")
+                time.sleep(delay)
+            else:
+                raise
+    raise RuntimeError(f"Rate limited after {MAX_RETRIES} retries")
+
 # ── Keyframe sampling ──────────────────────────────────────────────
 
 def sample_keyframes(
@@ -153,13 +173,16 @@ def _call_claude(
 
     content.append({"type": "text", "text": "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."})
 
+    def _do_call():
+        return client.messages.create(
+            model=model,
+            max_tokens=512,
+            system=SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": content}],
+        )
+
     t0 = time.time()
-    response = client.messages.create(
-        model=model,
-        max_tokens=512,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": content}],
-    )
+    response = _retry_on_rate_limit(_do_call)
     latency = time.time() - t0
 
     # Parse response
@@ -207,15 +230,18 @@ def _call_openai(
 
     content.append({"type": "text", "text": "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."})
 
+    def _do_call():
+        return client.chat.completions.create(
+            model=model,
+            max_tokens=512,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": content},
+            ],
+        )
+
     t0 = time.time()
-    response = client.chat.completions.create(
-        model=model,
-        max_tokens=512,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": content},
-        ],
-    )
+    response = _retry_on_rate_limit(_do_call)
     latency = time.time() - t0
 
     text = response.choices[0].message.content.strip()

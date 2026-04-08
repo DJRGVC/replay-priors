@@ -11,22 +11,15 @@
 # Save and exit your editor when done. Empty file = agent picks its own direction.
 
 - [ ] just like the td agent, occasionally add relevant literature to discord so i can review it.
-- [x] Collect ~20 failure rollouts on each of 2-3 MetaWorld tasks — DONE iter_001: 60 rollouts across reach/push/pick-place
-- [ ] Build a single-file VLM client: takes (task_description, list_of_keyframe_PIL_images, K) → {failure_timestep_index,      
-confidence, one_sentence_rationale}. Start with `claude-sonnet-4-6` via the Anthropic messages API (vision input).             
-`ANTHROPIC_API_KEY` is in env.
-- [ ] Implement uniform K-frame keyframe sampling plus one alternative (e.g. evenly spaced with first/last pinned). Make K a   
-parameter; K=8 default.                                                                                                        
-- [ ] Single-task accuracy probe: run the client over all rollouts on ONE task with K=8, default prompt, single model. Report 
-absolute timestep error vs GT, window IoU at ±5 / ±10 tolerance, latency/call, $/call. Drop a 1-page NOTES.md. This is the     
-"does the idea work at all" checkpoint that de-risks the proposal's central pipeline before Parshawn wires it into SAC — 
-surface loudly in INBOX.md if accuracy is at chance.                                                                           
-- [ ] If step 4 is non-trivial, sweep K ∈ {2, 4, 8, 16} on the same task and plot accuracy vs K and $ vs K. One figure in 
-`studies/vlm_localization_probe/figures/`. Tells us which K Parshawn should even bother plugging into the replay-prioritization
-pipeline.
-- [ ] Open questions to surface (not block on): definition of "failure" for time-out tasks with no clear failure event;        
-vision-only vs vision+proprio-as-text; free-form rationale vs forced JSON output.                                              
-- [ ] Budget: soft cap $20 in Anthropic API spend overnight. If approaching it, pause and ask in the Discord thread. Out of 
-scope tonight: wiring into SAC/replay buffers (Parshawn's territory), multi-model sweeps before single-model accuracy is       
-established.
+- [x] Collect ~20 failure rollouts on each of 2-3 MetaWorld tasks — DONE iter_001
+- [x] Build VLM client + keyframe sampling — DONE iter_002
+- [x] Single-task accuracy probe on reach-v3 with K=8 — DONE iter_002 (MAE=41.9, ±10=20%)
+- [x] K sweep on reach-v3 — DONE iter_003 (K=4/8/16/32: no improvement with more frames, MAE flat ~42-52)
+- [ ] **PRIORITY: Add Gemini 2.5 Flash backend to vlm_client.py** — free tier, 0 cost, 250 RPD. See FREE_VLM_OPTIONS.md.
+- [ ] Re-run K sweep on reach-v3 with Gemini Flash to validate cross-model consistency
+- [ ] Run probe on push-v3 and pick-place-v3 (may have more visually distinct failure modes)
+- [ ] Try "pinned" sampling strategy (first+last frames pinned) vs uniform
+- [ ] Try improved prompt: provide proprio state as text, or use chain-of-thought prompting
+- [ ] Open questions: definition of "failure" for time-out tasks; vision-only vs vision+proprio-as-text
+- [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 

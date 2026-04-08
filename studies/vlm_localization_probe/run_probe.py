@@ -164,7 +164,9 @@ def run_sweep(
                         config_results.append(entry)
                         all_results.append(entry)
 
-                        status = f"gt={gt:3d} pred={pred.get('failure_timestep', '?'):>4} err={metrics['abs_error']:3d} lat={pred.get('_latency_s',0):.1f}s ${cost:.4f}"
+                        pred_t = pred.get('failure_timestep')
+                        pred_str = f"{pred_t:>4d}" if pred_t is not None else "   ?"
+                        status = f"gt={gt:3d} pred={pred_str} err={metrics['abs_error']:3d} lat={pred.get('_latency_s',0):.1f}s ${cost:.4f}"
                         print(f"  {rd.name}: {status}")
 
                     # Config summary

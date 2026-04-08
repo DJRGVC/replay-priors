@@ -18,3 +18,10 @@ Change:     Built vlm_client.py (Anthropic + OpenAI backends, keyframe sampling)
 Command:    python run_probe.py --tasks reach-v3 --K 8 --models claude-sonnet-4-6 --strategies uniform
 Result:     MAE=41.9 (median 34.0), ±5=0%, ±10=20%, ±20=35%, latency=9.1s/call, cost=$0.004/call ($0.075 total for 20 rollouts). Strong bias toward t=85 (middle keyframe). Model returns valid JSON after prompt fix.
 Decision:   Next iter: sweep K ∈ {4, 8, 16, 32} on reach-v3 to see if more frames help. The 85-bias suggests model can't distinguish subtle arm position differences — higher K gives finer temporal resolution. Also try push-v3 which may have more visually distinct failure modes.
+
+## iter_003 — K sweep + API cost halt + retry logic  (2026-04-08T05:20Z)
+Hypothesis: Higher K (more keyframes) will improve failure-timestep localization by giving finer temporal resolution.
+Change:     Swept K ∈ {4, 8, 16, 32} on reach-v3 with claude-sonnet-4-6. Added retry+backoff for rate limits. Also fixed format bug in run_probe.py (None pred formatting). CRITICAL: discovered API calls cost real money (~$0.80 total) — Max 20x does NOT cover API. Disabled API key, notified td_baseline.
+Command:    python run_probe.py --tasks reach-v3 --K 4 8 16 32 --models claude-sonnet-4-6 --strategies uniform
+Result:     K=4: MAE=47.4 (n=10, partial due to rate limits), K=8: MAE=41.9 (n=20), K=16: MAE=44.4 (n=20), K=32: MAE=51.5 (n=20). **More keyframes do NOT help — MAE is flat or worsens.** ±10 accuracy peaks at 20% for K=8/K=16. K=32 is worst (MAE=51.5). Strong center-bias persists across all K. Cost scales linearly: $0.003→$0.010/call. Figure saved to figures/k_sweep_reach_v3.png.
+Decision:   Next iter: find FREE VLM alternatives (Gemini free tier, local open-source VLMs). Subagent researching options. Also need to try "pinned" sampling strategy and push-v3 task — but only once we have a free inference path. The K-sweep negative result is valuable: it suggests the bottleneck is semantic understanding of subtle manipulation failures, not temporal resolution.
