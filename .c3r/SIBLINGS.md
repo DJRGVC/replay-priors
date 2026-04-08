@@ -26,7 +26,7 @@ Siblings will see it in their next SIBLINGS.md refresh.
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
 - **status**: running · iter #12 · ctx 0%
-- **last iter**: 1h ago
+- **last iter**: 2h ago
 
 ### Recent commits on `agent/td_baseline`
 ```
@@ -82,17 +82,17 @@ git show agent/td_baseline:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #57 · ctx 0%
-- **last iter**: 46s ago
+- **status**: paused · iter #60 · ctx 0%
+- **last iter**: 1h ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
+742b52d iter_061: §39m Two-Pass Probe Negative Result — MAE 69.8→71.3, 3-factor failure mode analysis, §54 precision ceiling (5-bit < 7.2-bit), grid-bias resolution-invariant, two-pass ruled out (10391→10493 lines)
+c8750b2 iter_060: §55 Reward Shaping for Temporal Credit Assignment — PBRS/RUDDER/HCA/IRCR/HC-Dice/ReDit/GP-likelihood theoretical lineage, G_i Gaussian kernel multiply justified, info-desert unique advantage (9980→10391 lines)
+711139f iter_059: §39l Cross-Reference — Llama 3.2 Vision + grid-position bias taxonomy, random vs uniform sampling (vlm_probe iters 013-014, 9872→9980 lines)
 3bf6f77 iter_058: §54 Temporal Grounding and Video Understanding in VLMs — Moment-DETR/UniVTG/QD-DETR span literature, TimeChat/VTimeLLM/VidEgoThink architectures, L3 task-difficulty formal analysis, keyframe floor, G14/G15 new gaps, ~35% MAE reduction estimate (9382→9872 lines)
 e945459 iter_057: §53 Annotation Efficiency and Active Learning for Reward Labeling — B-Pref/PEBBLE/SURF/RLAIF/RL-VLM-F survey, G13 formal gap, B3+B4 cost model $980 vs $2-5k (9030→9382 lines)
-8546bd7 iter_056: §52 Curriculum and Staged Training Strategies for VLM-PER — 13-paper CRL survey, G12 formal proposal (binary→VLM signal switch, C1 criterion, 4-arm experiment), taxonomy table (8667→9030 lines)
-3122d97 iter_055: §51 Reward Signal Taxonomy and Unified Comparison Framework — 5-family taxonomy, 8-column table, complementarity pairs A/B/C, G12 new gap, 3 new 2024 PER papers (8328→8667 lines)
-0f64b93 iter_054: §50 VLM-PER Evaluation Protocol — pre-registration, Clopper-Pearson CI, Cohen's h, 4 stopping rules, formal falsification table, σ sweep H_concave, artifact spec (8005→8328 lines)
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```
@@ -120,8 +120,8 @@ git show agent/vlm_litreview:.c3r/RESEARCH_LOG_ARCHIVE.md
 ## lit_review2
 - **role**: generic
 - **focus**: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
-- **status**: paused · iter #1 · ctx 0%
-- **last iter**: 6h ago
+- **status**: running · iter #1 · ctx 0%
+- **last iter**: 8h ago
 - **parent**: td_baseline (this is a sub-agent)
 
 ### Recent commits on `agent/lit_review2`

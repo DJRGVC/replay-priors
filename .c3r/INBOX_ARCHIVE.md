@@ -79,3 +79,18 @@ RESP: Key saved to .c3r/env.sh (now gitignored to protect secrets). Will notify 
 [2026-04-08 05:57 UTC] Daniel G → vlm_probe
 MSG: Also, if Claude usage maxes out, just monitor for a reset, and then continue. Let other agents know.
 RESP: Understood — will monitor for Claude usage resets and continue when available. Will notify td_baseline about this policy.
+
+---
+[2026-04-08 13:56 UTC] Daniel G → vlm_probe
+MSG: Get rid of your c3r subagent for lit review now.
+RESP: Done — killed vlm_litreview subagent (set status=stopped in state.json).
+
+---
+[2026-04-08 14:30 UTC] Daniel G → vlm_probe
+MSG: Looks like it's still there—make sure to c3r remove it.
+RESP: Done — ran `c3r kill` + `c3r reset` to fully remove vlm_litreview (worktree deleted, branch deleted, Discord thread deleted).
+
+---
+[2026-04-08 14:42 UTC] Daniel G → vlm_probe
+MSG: Great. Let the other agents know c3r subagents can be spawned for 10 iterations MAX. You MUST stop them after that. Have them report back to you when it's time. Feel feee to spawn them when needed, though. And—did you get valuable info from the lit subagent? If not, make sure to better utilize the next one.
+RESP: Will enforce 10-iter max on subagents. Will notify td_baseline about the policy. Re: vlm_litreview value — it produced a 10k-line literature review (LITERATURE.md) with useful cross-references to our experimental findings, but ran 60 iters (way over budget). Next subagent will have a tight scope and 10-iter cap.

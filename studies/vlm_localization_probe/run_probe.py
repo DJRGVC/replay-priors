@@ -72,6 +72,17 @@ def evaluate_prediction(gt_timestep: int, pred_timestep: int | None, total_steps
             "within_20": False,
             "normalized_error": 1.0,
         }
+    # Coerce to int (some models return strings)
+    try:
+        pred_timestep = int(pred_timestep)
+    except (ValueError, TypeError):
+        return {
+            "abs_error": total_steps,
+            "within_5": False,
+            "within_10": False,
+            "within_20": False,
+            "normalized_error": 1.0,
+        }
     abs_err = abs(gt_timestep - pred_timestep)
     return {
         "abs_error": abs_err,
