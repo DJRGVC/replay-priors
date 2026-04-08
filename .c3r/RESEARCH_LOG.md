@@ -100,3 +100,29 @@ Result:     HYPOTHESIS PARTIALLY REFUTED — seed42 showed marginal learning (ep
 Decision:   Next iteration: synthesize cross-study implications. Compare TD baseline
             failure modes with VLM probe's localization data from sibling. Write a joint
             summary that motivates VLM-based replay prioritization.
+
+## iter_006 — Cross-study synthesis + regime map + information-theoretic analysis  (2026-04-08T07:00:00Z)
+Hypothesis: Formalizing TD-PER's failure as a "regime classification" problem will
+            reveal that failures are structural (not parametric) and will make the
+            case for VLM-augmented PER quantitatively precise.
+Change:     Created plot_regime_map.py (6-panel figure: Q-dynamics, regime heatmap,
+            Spearman trajectory with regime coloring, MI proxy, wasted sampling budget,
+            and regime breakdown bar chart). Created SYNTHESIS.md combining TD baseline
+            results, VLM probe accuracy data, and lit review into an actionable proposal
+            for an Adaptive Priority Mixer. Updated FINDINGS.md and fix_plan.md.
+Command:    python studies/td_error_baseline/plot_regime_map.py
+Result:     **TD-PER fails 50-93% of training time across all runs.**
+            Regime breakdown:
+              reach-v3 s42:  aligned=20%, noise=70%, inverted=0%, unstable=10%
+              reach-v3 s123: aligned=50%, noise=50%, inverted=0%, unstable=0%
+              pp-v3 s42:     aligned=7%,  noise=40%, inverted=17%, unstable=37%
+              pp-v3 s123:    aligned=13%, noise=60%, inverted=3%, unstable=23%
+            MI proxy shows "information desert" for first 40-70k steps (0 bits).
+            Effective waste reaches 50%+ on pick-place. VLM probe (K=8, MAE=41.9,
+            within-20=35%) provides complementary signal from step 0.
+            Proposed Adaptive Priority Mixer: regime-aware switching between TD and
+            VLM scores, with explicit inversion handling.
+            6-panel regime map figure: figures/td_per_regime_map.png (+ PDF).
+Decision:   Next iteration: coordinate with vlm_probe sibling to run pick-place-v3
+            probes. If sibling is busy, start prototyping the Adaptive Priority
+            Mixer as a drop-in SB3 component.

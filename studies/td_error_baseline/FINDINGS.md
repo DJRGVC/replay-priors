@@ -95,17 +95,36 @@ would sample the least informative transitions most frequently.
    convergence — and critically, without the inversion problem where high TD-error
    transitions become anti-informative.
 
+## Cross-Study Synthesis
+
+See **[SYNTHESIS.md](SYNTHESIS.md)** for the full cross-study analysis combining:
+- TD-error baseline (this study)
+- VLM localization probe (sibling: `agent/vlm_probe`)
+- Literature review (subagent: `agent/lit_review2`)
+
+**Headline result:** TD-PER fails 50-93% of training time. We identify four failure
+regimes (noise, aligned, inverted, unstable) and propose an Adaptive Priority Mixer
+that uses VLM scores when TD-error is uninformative and switches to TD-error when
+it's valid.
+
 ## Files
 
 | File | Description |
 |------|-------------|
-| `figures/td_correlation_over_training.png` | Main figure (Spearman + Pearson over training) |
-| `figures/td_correlation_over_training.json` | Raw correlation data behind the figure |
+| `SYNTHESIS.md` | **Cross-study synthesis** — headline deliverable |
+| `figures/td_per_regime_map.png` | **6-panel regime map** — main figure |
+| `figures/td_per_regime_map.pdf` | Same figure in PDF for presentations |
+| `figures/td_correlation_over_training.png` | Spearman + Pearson over training |
+| `figures/td_correlation_over_training.json` | Raw correlation data |
+| `figures/priority_quality_metrics.png` | Top-K overlap + Gini + Spearman (3-panel) |
+| `plot_regime_map.py` | Regime map figure generation script |
+| `plot_td_correlation.py` | Correlation figure generation script |
+| `plot_priority_quality.py` | Priority quality figure generation script |
 | `snapshots/` | Per-run snapshot data (TD errors, dense rewards, correlations) |
 | `modal_app.py` | Modal app for running training on cloud GPU |
 | `train.py` | Local training script |
-| `plot_td_correlation.py` | Figure generation script |
 | `td_instrumenter.py` | Callback that snapshots |TD|, dense reward, and computes correlations |
+| `LIT_REVIEW.md` | Literature review (§1: 11 alternative PER methods) |
 | `NOTES.md` | Detailed notes on task selection, literature, and methodology |
 
 ## Status
@@ -115,3 +134,5 @@ would sample the least informative transitions most frequently.
 - [x] Gini coefficient + top-K overlap metrics — top-K at chance, Gini moderate, correlation inverts late
 - [x] Extended 300k runs on pick-place-v3 — correlation never stabilizes, inverts under Q-instability
 - [x] Literature review (§1: 11 alternative PER methods) via lit_review2 subagent
+- [x] Cross-study synthesis with VLM probe + lit review → SYNTHESIS.md + regime map figure
+- [x] Regime classification (4 regimes) + MI proxy + wasted budget analysis

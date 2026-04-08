@@ -11,6 +11,11 @@
 - [x] Run oracle_correlation.py analysis on downloaded snapshots for priority_gini + top-K overlap metrics
 - [x] Keep a record of relevant literature — lit_review2 produced §1 (11 methods); pulled into branch
 - [x] 300k pick-place-v3 runs — correlation never stabilizes, inverts under Q-instability
-- [ ] Synthesize cross-study implications with VLM probe results (sibling)
-- [ ] Write summary comparing TD-error PER failure modes with VLM probe accuracy data
-- [ ] Open questions to surface: is "early training" measured in env vs gradient steps? full buffer vs stratified snapshots?
+- [x] Synthesize cross-study implications with VLM probe results (sibling) → SYNTHESIS.md
+- [x] Write summary comparing TD-error PER failure modes with VLM probe accuracy data → SYNTHESIS.md §2
+- [x] Regime classification + MI proxy + wasted budget analysis → plot_regime_map.py, 6-panel figure
+- [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
+- [ ] Implement Adaptive Priority Mixer (TD + VLM hybrid, regime-aware switching)
+- [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
+- [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
+- [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
