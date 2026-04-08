@@ -358,7 +358,7 @@ footer {{
     <h1>VLM Failure-Localization Probe</h1>
     <div class="subtitle">Can vision-language models localize failure timesteps in robotic manipulation rollouts from keyframe images alone?</div>
     <p>MetaWorld reach-v3 &bull; 150-step episodes &bull; Random policy (all failures) &bull; 224&times;224 RGB</p>
-    <div class="meta">Report generated: {now} &bull; 19 iterations &bull; 8 models &bull; 7 interventions tested</div>
+    <div class="meta">Report generated: {now} &bull; 23 iterations &bull; 9 models &bull; 8 interventions tested</div>
 </div>
 
 {frames_html}
@@ -367,21 +367,22 @@ footer {{
 <h2>Overview</h2>
 
 <div class="stat-grid">
-    <div class="stat-card"><div class="number">8</div><div class="label">Models Tested</div></div>
-    <div class="stat-card"><div class="number">7</div><div class="label">Interventions</div></div>
+    <div class="stat-card"><div class="number">9</div><div class="label">Models Tested</div></div>
+    <div class="stat-card"><div class="number">8</div><div class="label">Interventions</div></div>
     <div class="stat-card"><div class="number">44%</div><div class="label">Best &pm;10 Accuracy</div></div>
     <div class="stat-card"><div class="number">41.9</div><div class="label">Best MAE</div></div>
     <div class="stat-card"><div class="number">$0.80</div><div class="label">Total API Cost</div></div>
-    <div class="stat-card"><div class="number">19</div><div class="label">Experiments Run</div></div>
+    <div class="stat-card"><div class="number">23</div><div class="label">Experiments Run</div></div>
 </div>
 
 <div class="tldr">
     <strong>TL;DR:</strong> VLMs achieve coarse failure localization (best &pm;10 = 44%) but are dominated by
     <strong>positional biases</strong> rather than visual understanding. Every model has a distinct bias pattern
-    (center/start/end/grid-cell). All tested interventions (more frames, CoT, two-pass, random sampling) either
-    fail or provide marginal gains. Frame annotation is model-dependent (&minus;17% MAE on weak Flash-Lite,
-    +11% on GPT-4o-mini). The fundamental bottleneck is <strong>visual acuity</strong>: distinguishing subtle arm
-    position changes at 224&times;224 with ~30-pixel arm regions.
+    (center/start/end/grid-cell). Frame annotation has a <strong>U-shaped</strong> effect: helps weak (&minus;17%) and
+    strong (&minus;30% GPT-4o) models, hurts mid-tier (+11% GPT-4o-mini). CoT and annotation are
+    <strong>partially substitutable</strong> &mdash; both anchor temporal attention, and adding both yields no gain
+    over either alone (GPT-4o 2&times;2 factorial). The fundamental bottleneck is <strong>visual acuity</strong>:
+    distinguishing subtle arm position changes at 224&times;224 with ~30-pixel arm regions.
 </div>
 </section>
 
@@ -423,6 +424,17 @@ footer {{
             <td class="num best">44%</td>
             <td class="num best">56%</td>
             <td>start (t=0)</td>
+            <td class="num">$0</td>
+        </tr>
+        <tr>
+            <td>GPT-4o (ann.)</td>
+            <td>GitHub</td>
+            <td>Multi-image</td>
+            <td class="num">52.7</td>
+            <td class="num">43.5</td>
+            <td class="num">10%</td>
+            <td class="num">10%</td>
+            <td>early-mid (t=42)</td>
             <td class="num">$0</td>
         </tr>
         <tr>
@@ -481,6 +493,17 @@ footer {{
             <td class="num">$0</td>
         </tr>
         <tr>
+            <td>GPT-4o (no ann.)</td>
+            <td>GitHub</td>
+            <td>Multi-image</td>
+            <td class="num">75.8</td>
+            <td class="num">65.0</td>
+            <td class="num worst">0%</td>
+            <td class="num">20%</td>
+            <td>start (t=0)</td>
+            <td class="num">$0</td>
+        </tr>
+        <tr>
             <td>Llama-3.2-11B</td>
             <td>GitHub</td>
             <td>Grid tiled</td>
@@ -528,6 +551,8 @@ footer {{
         <tr><td>Claude Sonnet</td><td>center</td><td>Predicts t&asymp;85 (middle keyframe)</td></tr>
         <tr><td>Gemini 3 Flash Preview</td><td>start</td><td>Predicts t=0 ("arm remains stationary")</td></tr>
         <tr><td>Gemini 2.5 Flash</td><td>end</td><td>Predicts t&asymp;149</td></tr>
+        <tr><td>GPT-4o (ann.)</td><td>early-mid</td><td>6/10 at t=42 (native multi-image)</td></tr>
+        <tr><td>GPT-4o (no ann.)</td><td>start</td><td>5/10 at t=0 (annotation completely shifts bias)</td></tr>
         <tr><td>GPT-4o-mini</td><td>late</td><td>t&asymp;106, 127 (despite native multi-image)</td></tr>
         <tr><td>Llama/Phi-4</td><td>grid-cell</td><td>Locks onto specific tile positions</td></tr>
     </table>
@@ -541,15 +566,30 @@ footer {{
 </div>
 
 <div class="finding">
-    <h3><span class="finding-num">4</span> CoT prompting hurts mid/weak models (3/3 negative)
-    <span class="tag tag-negative">NEGATIVE</span></h3>
-    <p>Structured CoT (Summarize&rarr;Think&rarr;Answer) allows models to confabulate reasoning chains that drift toward positional priors. Flash-Lite: +7.3 MAE. Flash: +7.3 MAE. Phi-4: <strong>+25.9 MAE</strong>. Only Gemini 3 Flash Preview showed improvement (n=3, insufficient for significance).</p>
+    <h3><span class="finding-num">4</span> CoT &amp; annotation are substitutable temporal scaffolds
+    <span class="tag tag-mixed">MIXED</span></h3>
+    <p>CoT hurts mid/weak models (3/3 negative: Flash-Lite +7.3, Flash +7.3, Phi-4 <strong>+25.9 MAE</strong>).
+    But GPT-4o 2&times;2 factorial reveals the mechanism: <strong>CoT and annotation are partially substitutable.</strong>
+    Both anchor temporal attention. When annotation is already present, CoT adds nothing (52.7&rarr;52.2).
+    When annotation is absent, CoT helps (75.8&rarr;65.0, &minus;14%). Once one scaffold is provided, the other is redundant.</p>
+    <table>
+        <tr><th>GPT-4o</th><th>Direct</th><th>CoT</th></tr>
+        <tr><td><strong>Annotated</strong></td><td class="num">52.7</td><td class="num">52.2</td></tr>
+        <tr><td><strong>Unannotated</strong></td><td class="num worst">75.8</td><td class="num neutral">65.0</td></tr>
+    </table>
 </div>
 
 <div class="finding">
-    <h3><span class="finding-num">5</span> Frame annotation is model-dependent
-    <span class="tag tag-mixed">MIXED</span></h3>
-    <p>VTimeCoT-style "t=X (N%)" overlays: <span class="best">&minus;17% MAE</span> on weak Flash-Lite (59.5 vs 71.9), but <span class="worst">+11% MAE</span> on GPT-4o-mini (68.0 vs 61.2). Annotation shifts GPT-4o-mini&rsquo;s distribution toward late timesteps, worsening late-bias. Helps weak models that need temporal anchors; hurts models that attend too much to the text.</p>
+    <h3><span class="finding-num">5</span> Frame annotation has a U-shaped effect across model strength
+    <span class="tag tag-mixed">U-SHAPED</span></h3>
+    <p>VTimeCoT-style "t=X (N%)" overlays show a <strong>non-monotonic</strong> effect:</p>
+    <table>
+        <tr><th>Model</th><th>Tier</th><th>Unannotated</th><th>Annotated</th><th>&Delta;MAE</th></tr>
+        <tr><td>Flash-Lite</td><td>Weak</td><td class="num">71.9</td><td class="num best">59.5</td><td class="num best">&minus;17%</td></tr>
+        <tr><td>GPT-4o-mini</td><td>Mid</td><td class="num best">61.2</td><td class="num">68.0</td><td class="num worst">+11%</td></tr>
+        <tr><td>GPT-4o</td><td>Strong</td><td class="num">75.8</td><td class="num best">52.7</td><td class="num best">&minus;30%</td></tr>
+    </table>
+    <p>Weak &amp; strong models benefit from temporal grounding; mid-tier models are distracted by the overlay text, worsening their positional bias.</p>
 </div>
 
 <div class="finding">
@@ -603,15 +643,21 @@ footer {{
         </tr>
         <tr>
             <td>CoT prompting</td>
-            <td>+7 to +26 MAE</td>
-            <td><span class="tag tag-negative">NEGATIVE</span></td>
-            <td>3/3 negative on mid/weak models. Thinking drift.</td>
+            <td>+7 to +26 MAE (mid/weak); neutral on strong</td>
+            <td><span class="tag tag-mixed">MODEL-DEP</span></td>
+            <td>3/3 negative on mid/weak. Neutral on GPT-4o when annotated. Substitutable with annotation.</td>
         </tr>
         <tr>
             <td>Frame annotation</td>
-            <td>&minus;12 to +7 MAE</td>
-            <td><span class="tag tag-mixed">MODEL-DEP</span></td>
-            <td>Helps weak (Flash-Lite), hurts mid (GPT-4o-mini)</td>
+            <td>&minus;30% to +11% MAE</td>
+            <td><span class="tag tag-mixed">U-SHAPED</span></td>
+            <td>Helps weak (Flash-Lite &minus;17%) &amp; strong (GPT-4o &minus;30%), hurts mid (GPT-4o-mini +11%)</td>
+        </tr>
+        <tr>
+            <td>CoT &times; Annotation (2&times;2)</td>
+            <td>Substitutable, not additive</td>
+            <td><span class="tag tag-info">MECHANISTIC</span></td>
+            <td>GPT-4o: ann+direct&asymp;ann+CoT&asymp;52. Both anchor temporal attention; redundant together.</td>
         </tr>
         <tr>
             <td>Proprio-as-text</td>
@@ -789,6 +835,18 @@ footer {{
     <div class="entry neutral">
         <strong>iter_019</strong> &mdash; Annotation &pm; comparison: annotation hurts GPT-4o-mini (+11% MAE)
     </div>
+    <div class="entry positive">
+        <strong>iter_020</strong> &mdash; Self-contained HTML report interface (build_report.py &rarr; report.html)
+    </div>
+    <div class="entry positive">
+        <strong>iter_021</strong> &mdash; Literature review: 6 related papers, CVPR 2025 confirms positional bias
+    </div>
+    <div class="entry positive">
+        <strong>iter_022</strong> &mdash; GPT-4o annotation &pm;: annotation helps strong model (&minus;30% MAE), U-shaped effect
+    </div>
+    <div class="entry positive">
+        <strong>iter_023</strong> &mdash; GPT-4o CoT&times;annotation 2&times;2: CoT &amp; annotation substitutable temporal scaffolds
+    </div>
 </div>
 </section>
 
@@ -817,9 +875,10 @@ footer {{
 
 <h3>Next Steps</h3>
 <ul>
-    <li>Test annotation on Gemini 3 Flash Preview (best model + untested annotation)</li>
-    <li>Complete CoT comparison on Gemini 3 Flash Preview (n&ge;9)</li>
+    <li>Test annotation on Gemini 3 Flash Preview (best model + untested annotation) &mdash; quota-gated</li>
+    <li>Complete CoT comparison on Gemini 3 Flash Preview (n&ge;9) &mdash; quota-gated</li>
     <li>Explore Cohere aya-vision-32b (1000 req/month, native multi-image, no grid)</li>
+    <li>Test SoFA (training-free positional bias mitigation from CVPR 2025)</li>
     <li>Confidence-gated hybrid priority scheme</li>
     <li>Trained-policy rollouts for multi-task evaluation</li>
 </ul>
@@ -827,7 +886,7 @@ footer {{
 
 <footer>
     <p>VLM Failure-Localization Probe &bull; replay-priors project &bull; Generated {now}</p>
-    <p>Agent: vlm_probe &bull; Branch: agent/vlm_probe &bull; 19 iterations</p>
+    <p>Agent: vlm_probe &bull; Branch: agent/vlm_probe &bull; 23 iterations</p>
 </footer>
 
 </body>
