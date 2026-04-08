@@ -20,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-from vlm_client import predict_failure, sample_keyframes, TASK_DESCRIPTIONS
+from vlm_client import predict_failure, sample_keyframes, TASK_DESCRIPTIONS, annotate_frame
 
 
 # ── Cost estimation (approximate, per 1M tokens) ──────────────────
@@ -88,6 +88,7 @@ def run_sweep(
     output_dir: Path,
     max_rollouts: int | None = None,
     prompt_styles: list[str] | None = None,
+    annotate: bool = False,
 ):
     """Run the full sweep and save results."""
     if prompt_styles is None:
@@ -134,6 +135,7 @@ def run_sweep(
                                     total_timesteps=rollout["num_steps"],
                                     model=model,
                                     prompt_style=prompt_style,
+                                    annotate_frames=annotate,
                                 )
                             except Exception as e:
                                 print(f"  ERROR {rd.name}: {e}")
@@ -158,6 +160,7 @@ def run_sweep(
                                 "K": K,
                                 "strategy": strategy,
                                 "prompt_style": prompt_style,
+                                "annotate": annotate,
                                 "rollout": rd.name,
                                 "gt_failure_t": gt,
                                 "gt_failure_type": rollout.get("failure_type"),
@@ -242,6 +245,8 @@ def main():
     parser.add_argument("--strategies", nargs="+", default=["uniform"])
     parser.add_argument("--prompt-styles", nargs="+", default=["direct"], choices=["direct", "cot"])
     parser.add_argument("--max-rollouts", type=int, default=None)
+    parser.add_argument("--annotate", action="store_true",
+                        help="Overlay timestep index + progress on keyframe images (VTimeCoT-style)")
     args = parser.parse_args()
 
     data_dir = Path(__file__).parent / args.data_dir
@@ -256,6 +261,7 @@ def main():
         output_dir=output_dir,
         max_rollouts=args.max_rollouts,
         prompt_styles=args.prompt_styles,
+        annotate=args.annotate,
     )
 
 

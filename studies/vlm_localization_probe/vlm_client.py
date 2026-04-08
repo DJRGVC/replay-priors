@@ -55,6 +55,39 @@ def _retry_on_rate_limit(fn, *args, **kwargs):
 
 # ── Keyframe sampling ──────────────────────────────────────────────
 
+def annotate_frame(img: Image.Image, timestep: int, total_timesteps: int) -> Image.Image:
+    """Overlay timestep index and progress fraction on a keyframe image.
+
+    Inspired by VTimeCoT (ICCV 2025): visual progress anchors reduce positional
+    bias by embedding temporal context directly in the image.
+    """
+    from PIL import ImageDraw, ImageFont
+
+    img = img.copy()
+    draw = ImageDraw.Draw(img)
+    w, h = img.size
+
+    # Use a legible font size (~5% of image height)
+    font_size = max(12, h // 18)
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
+    except (OSError, IOError):
+        font = ImageFont.load_default()
+
+    frac = timestep / max(total_timesteps - 1, 1)
+    label = f"t={timestep} ({frac:.0%})"
+
+    # Draw with black outline for readability
+    x, y = 4, 4
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            if dx or dy:
+                draw.text((x + dx, y + dy), label, fill="black", font=font)
+    draw.text((x, y), label, fill="white", font=font)
+
+    return img
+
+
 def sample_keyframes(
     frames_dir: str | Path,
     K: int = 8,
@@ -416,16 +449,22 @@ def predict_failure(
     total_timesteps: int,
     model: str = "claude-sonnet-4-6",
     prompt_style: str = "direct",
+    annotate_frames: bool = False,
 ) -> dict:
     """Predict the failure timestep using a VLM.
 
     Args:
         prompt_style: "direct" (predict timestep immediately) or
                       "cot" (Summarize→Think→Answer structured reasoning)
+        annotate_frames: If True, overlay timestep index + progress fraction
+                         on each keyframe image (VTimeCoT-style visual anchor).
 
     Returns dict with: failure_timestep, confidence, rationale,
     plus _latency_s, _input_tokens, _output_tokens, _model.
     """
+    if annotate_frames:
+        keyframes = [annotate_frame(img, idx, total_timesteps) for img, idx in zip(keyframes, keyframe_indices)]
+
     if "claude" in model or "sonnet" in model or "opus" in model or "haiku" in model:
         return _call_claude(task_description, keyframes, keyframe_indices, total_timesteps, model, prompt_style)
     elif "gpt" in model or "o1" in model or "o3" in model or "o4" in model:

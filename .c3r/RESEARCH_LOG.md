@@ -51,3 +51,18 @@ Result:     **CoT is model-strength-dependent — hurts weak models, may help st
   - Rate limits: gemini-2.5-flash exhausted 20 RPD; gemini-3-flash-preview severely rate-limited with CoT (image+free-text output hits tighter quota). Could only get 3 valid CoT predictions.
   - gemini-2.5-flash also tested as new direct baseline: much weaker than gemini-3-flash-preview (MAE 67.8 vs 54.2), strong end-bias vs start-bias.
 Decision:   Next iter: complete gemini-3-flash-preview CoT comparison (need n=7 more to match direct n=9). Rate limits reset daily — schedule runs accordingly. If CoT confirms improvement on gemini-3-flash-preview (n≥9), the finding is: structured reasoning only helps models strong enough to ground their CoT in visual evidence. Also try push-v3 task for visual diversity.
+
+## iter_007 — frame index annotation (VTimeCoT-style)  (2026-04-08T16:00Z)
+Hypothesis: Overlaying timestep index + progress fraction ("t=X (N%)") on keyframe images will reduce positional bias and improve failure-timestep localization (lit review §15g estimates +4-8% ±10 gain).
+Change:     Added `annotate_frame()` to vlm_client.py (PIL text overlay with DejaVuSans-Bold, black outline for readability). Added `--annotate` flag to run_probe.py. Ran paired comparison on gemini-2.5-flash-lite, K=8, uniform, reach-v3 (n=10 each, same rollouts).
+Command:    python run_probe.py --tasks reach-v3 --K 8 --models gemini-2.5-flash-lite --strategies uniform --max-rollouts 10 --annotate  (then same without --annotate as control)
+Result:     **Frame annotation improves weak-model localization:**
+  - Unannotated control: MAE=71.9 (median 82.0), ±5=0%, ±10=10%, ±20=10%
+  - Annotated:           MAE=59.5 (median 56.5), ±5=10%, ±10=20%, ±20=20%
+  - **MAE improved by 12.4 points (-17%), ±10 accuracy doubled (10%→20%)**
+  - Per-rollout: annotated better in 4/10, unannotated better in 2/10, tie in 4/10
+  - Annotation helps most when GT is near episode boundaries (rollouts 004,007,009: gt=109,149,141)
+  - Note: unannotated baseline (MAE=71.9) is better than iter_004 (MAE=95.2) because thinking_budget=0 fix now prevents parse errors
+  - All quotas for gemini-2.5-flash and gemini-3-flash-preview exhausted (20 RPD each). Only flash-lite available.
+  - Also shared lit review highlights to Discord (standing fix_plan task).
+Decision:   Next iter: test annotation on stronger models (gemini-2.5-flash or gemini-3-flash-preview) once quota resets. The annotation-helps-weak-models finding aligns with §15d "Thinking Drifts" — visual anchors provide the strongest lift where the model has weakest internal temporal reasoning. Also: run push-v3 probe (task diversity) and complete CoT comparison. Gemini quotas are the binding constraint — all 3 models share the same project, 20 RPD each.

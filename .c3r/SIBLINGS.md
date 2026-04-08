@@ -25,16 +25,16 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: running · iter #7 · ctx 0%
-- **last iter**: 12m ago
+- **status**: running · iter #9 · ctx 0%
+- **last iter**: 24m ago
 
 ### Recent commits on `agent/td_baseline`
 ```
+180bc8a iter_009: fix SB3 PER integration — PERSAC subclass calls update_priorities() with TD errors + IS-weighted critic loss
+9dfa19f iter_008: 100k mode comparison reveals PER integration bug — SB3 never calls update_priorities()
 b44306e iter_007: Adaptive Priority Mixer — regime-aware PER buffer + train_mixer.py + smoke test
 48b820b iter_006: cross-study synthesis + regime map + MI analysis — TD-PER fails 50-93% of training
 b95ec14 iter_005: 300k pick-place-v3 — TD-error inverts under Q-instability
-77b429c iter_004: Gini + top-K overlap analysis + priority quality figure
-451a4fc iter_003: seed=123 runs + FINDINGS.md + multi-seed figure + lit_review2 subagent
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
@@ -54,20 +54,21 @@ studies/td_error_baseline/NOTES.md
 studies/td_error_baseline/SYNTHESIS.md
 studies/td_error_baseline/adaptive_priority_mixer.py
 studies/td_error_baseline/dense_reward_buffer.py
+studies/td_error_baseline/figures/mode_comparison_reach_v3.pdf
 studies/td_error_baseline/figures/td_correlation_over_training.json
 studies/td_error_baseline/figures/td_correlation_over_training.png
 studies/td_error_baseline/figures/td_per_regime_map.pdf
 studies/td_error_baseline/metaworld_env.py
 studies/td_error_baseline/modal_app.py
 studies/td_error_baseline/oracle_correlation.py
+studies/td_error_baseline/per_sac.py
+studies/td_error_baseline/plot_mode_comparison.py
 studies/td_error_baseline/plot_priority_quality.py
 studies/td_error_baseline/plot_regime_map.py
 studies/td_error_baseline/plot_td_correlation.py
 studies/td_error_baseline/snapshots/.gitignore
 studies/td_error_baseline/sparse_wrapper.py
-studies/td_error_baseline/td_instrumenter.py
-studies/td_error_baseline/train.py
-studies/td_error_baseline/train_mixer.py
+... and 3 more
 ```
 ### Read one with:
 ```
@@ -81,17 +82,17 @@ git show agent/td_baseline:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #5 · ctx 0%
-- **last iter**: 1h ago
+- **status**: running · iter #12 · ctx 0%
+- **last iter**: 59s ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
-cd32cb0 iter_005: §13 VLM model comparison (VideoMME/VideoZeroBench/TemporalBench/V-STaR) → LITERATURE.md
-dff033b iter_004: precise AHA/Guardian accuracy numbers → LITERATURE.md §3 §8 + appendix table
-a891cd2 iter_003: center/positional bias survey (§12) + zero-shot debiasing strategies
-dd39fd5 iter_002: temporal video grounding section (§11) + IoU vs MAE metric alignment
-9a5cb2b iter_001: initial VLM failure detection literature survey → LITERATURE.md (10 papers, 2023-2026)
+4942eb3 iter_012: §16 VLM calibration/uncertainty survey (SRAM/VLM-CON/CrossModal/PairRank + uncertainty-gated α gap) → LITERATURE.md
+6de0f8d iter_011: §15 structured CoT prompting survey (VTimeCoT/Time-R1/VoT/WhenThinkingDrifts) → LITERATURE.md
+5ffdc47 iter_010: α floor derivation from Gemini start-bias + PERSAC status → §D.3/D.4 LITERATURE.md
+f3d56fe iter_009: Discussion section — binary/localization divide, MetaWorld hardness, VLM-PER agenda → LITERATURE.md
+9448009 iter_008: hybrid VLM+TD replay priority gap survey — §14h expanded (VLAC/TOPReward/Robometer/D-SPEAR/DPER/FARL + critical gap confirmed) → LITERATURE.md
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```
@@ -119,7 +120,7 @@ git show agent/vlm_litreview:.c3r/SIBLINGS.md
 - **role**: generic
 - **focus**: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
 - **status**: paused · iter #1 · ctx 0%
-- **last iter**: 1h ago
+- **last iter**: 2h ago
 - **parent**: td_baseline (this is a sub-agent)
 
 ### Recent commits on `agent/lit_review2`
