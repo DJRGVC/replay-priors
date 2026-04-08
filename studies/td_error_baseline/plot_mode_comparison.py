@@ -1,7 +1,7 @@
 """Plot comparison of adaptive vs td-per vs uniform modes on reach-v3.
 
-Produces a multi-panel figure comparing TD-error dynamics, Q-value evolution,
-and regime detection across the three prioritization modes.
+Produces a 6-panel figure comparing TD-error dynamics, Q-value evolution,
+Spearman correlation, and regime detection across three prioritization modes.
 """
 
 import json
@@ -33,9 +33,9 @@ def load_snapshots(mode: str):
             "abs_td_mean": float(np.mean(data["abs_td_errors"])),
             "abs_td_median": float(np.median(data["abs_td_errors"])),
             "abs_td_p90": float(np.percentile(data["abs_td_errors"], 90)),
-            "spearman": float(data.get("spearman_corr", 0)),
+            "spearman": float(data.get("td_dense_spearman", 0)),
+            "pearson": float(data.get("td_dense_pearson", 0)),
             "q_mean": float(data.get("q_mean", 0)),
-            "ep_rew_mean": float(data.get("ep_rew_mean", 0)),
             "buffer_size": int(data.get("buffer_size", 0)),
         })
     return results
@@ -57,7 +57,7 @@ def load_regimes(mode: str):
 
 
 def main():
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
 
     # Load data
     all_data = {}
@@ -66,57 +66,70 @@ def main():
         all_data[mode] = load_snapshots(mode)
         all_regimes[mode] = load_regimes(mode)
 
-    # Common steps (up to min across modes)
-    max_step = min(
-        max(d["step"] for d in all_data[m]) if all_data[m] else 0
-        for m in MODES
-    )
-
     # Panel 1: |TD| mean over training
     ax = axes[0, 0]
     for mode in MODES:
-        data = [d for d in all_data[mode] if d["step"] <= max_step]
+        data = all_data[mode]
         steps = [d["step"] for d in data]
         vals = [d["abs_td_mean"] for d in data]
         ax.plot(steps, vals, "o-", label=MODE_LABELS[mode],
-                color=MODE_COLORS[mode], linewidth=2, markersize=6)
+                color=MODE_COLORS[mode], linewidth=2, markersize=5)
     ax.set_xlabel("Environment Steps")
     ax.set_ylabel("Mean |TD-error|")
-    ax.set_title("TD-Error Magnitude")
-    ax.legend()
+    ax.set_title("(a) TD-Error Magnitude")
+    ax.legend(fontsize=9)
     ax.set_yscale("log")
     ax.grid(True, alpha=0.3)
 
     # Panel 2: Q-values
     ax = axes[0, 1]
     for mode in MODES:
-        data = [d for d in all_data[mode] if d["step"] <= max_step]
+        data = all_data[mode]
         steps = [d["step"] for d in data]
         vals = [d["q_mean"] for d in data]
         ax.plot(steps, vals, "o-", label=MODE_LABELS[mode],
-                color=MODE_COLORS[mode], linewidth=2, markersize=6)
+                color=MODE_COLORS[mode], linewidth=2, markersize=5)
     ax.set_xlabel("Environment Steps")
     ax.set_ylabel("Mean Q-value")
-    ax.set_title("Q-Value Evolution")
-    ax.legend()
+    ax.set_title("(b) Q-Value Evolution")
+    ax.legend(fontsize=9)
     ax.grid(True, alpha=0.3)
 
-    # Panel 3: Extended data — all snapshots per mode (no max_step cap)
-    ax = axes[1, 0]
+    # Panel 3: Spearman correlation (|TD| vs oracle advantage)
+    ax = axes[0, 2]
     for mode in MODES:
         data = all_data[mode]
         steps = [d["step"] for d in data]
-        vals = [d["abs_td_mean"] for d in data]
-        ax.plot(steps, vals, "o-", label=f"{MODE_LABELS[mode]} ({len(data)} snaps)",
-                color=MODE_COLORS[mode], linewidth=2, markersize=6)
+        vals = [d["spearman"] for d in data]
+        ax.plot(steps, vals, "o-", label=MODE_LABELS[mode],
+                color=MODE_COLORS[mode], linewidth=2, markersize=5)
+    ax.axhline(y=0, color="gray", linestyle="--", linewidth=1, alpha=0.5)
     ax.set_xlabel("Environment Steps")
-    ax.set_ylabel("Mean |TD-error|")
-    ax.set_title("TD-Error (All Available Data)")
-    ax.legend()
-    ax.set_yscale("log")
+    ax.set_ylabel("Spearman(|TD|, Oracle Advantage)")
+    ax.set_title("(c) TD-Oracle Correlation")
+    ax.legend(fontsize=9)
+    ax.set_ylim(-0.15, 0.2)
     ax.grid(True, alpha=0.3)
 
-    # Panel 4: Regime detection for adaptive mode
+    # Panel 4: |TD| percentiles for td-per mode
+    ax = axes[1, 0]
+    data = all_data["td-per"]
+    steps = [d["step"] for d in data]
+    ax.fill_between(steps,
+                     [d["abs_td_median"] for d in data],
+                     [d["abs_td_p90"] for d in data],
+                     alpha=0.3, color=MODE_COLORS["td-per"], label="p50–p90")
+    ax.plot(steps, [d["abs_td_mean"] for d in data], "o-",
+            color=MODE_COLORS["td-per"], linewidth=2, markersize=5, label="Mean")
+    ax.plot(steps, [d["abs_td_median"] for d in data], "s--",
+            color=MODE_COLORS["td-per"], linewidth=1, markersize=4, label="Median")
+    ax.set_xlabel("Environment Steps")
+    ax.set_ylabel("|TD-error|")
+    ax.set_title("(d) TD-PER: |TD| Distribution")
+    ax.legend(fontsize=9)
+    ax.grid(True, alpha=0.3)
+
+    # Panel 5: Regime detection for adaptive mode
     ax = axes[1, 1]
     regime_colors = {
         "aligned": "#2ecc71", "noise": "#f39c12",
@@ -129,13 +142,12 @@ def main():
         td_ginis = [r.get("td_gini", 0) for r in regimes]
         colors = [regime_colors.get(r.get("current", "noise"), "gray") for r in regimes]
 
-        ax.bar(steps, q_cvs, width=8000, color=colors, alpha=0.7, label="Q CV")
+        ax.bar(steps, q_cvs, width=8000, color=colors, alpha=0.7)
         ax2 = ax.twinx()
-        ax2.plot(steps, td_ginis, "k^-", label="TD Gini", markersize=8)
+        ax2.plot(steps, td_ginis, "k^-", markersize=6, label="TD Gini")
         ax2.set_ylabel("TD Gini", color="black")
         ax2.set_ylim(0, 1)
 
-        # Legend for regimes
         from matplotlib.patches import Patch
         legend_patches = [Patch(facecolor=c, label=r) for r, c in regime_colors.items()
                           if any(reg.get("current") == r for reg in regimes)]
@@ -144,18 +156,43 @@ def main():
 
     ax.set_xlabel("Environment Steps")
     ax.set_ylabel("Q Coefficient of Variation")
-    ax.set_title("Adaptive Mode: Regime Detection")
+    ax.set_title("(e) Adaptive: Regime Detection")
     ax.grid(True, alpha=0.3)
 
-    # Suptitle
+    # Panel 6: Regime detection for td-per mode
+    ax = axes[1, 2]
+    if all_regimes.get("td-per"):
+        regimes = all_regimes["td-per"]
+        steps = [r["step"] for r in regimes]
+        q_cvs = [r.get("q_cv", 0) for r in regimes]
+        td_ginis = [r.get("td_gini", 0) for r in regimes]
+        colors = [regime_colors.get(r.get("current", "noise"), "gray") for r in regimes]
+
+        ax.bar(steps, q_cvs, width=8000, color=colors, alpha=0.7)
+        ax2 = ax.twinx()
+        ax2.plot(steps, td_ginis, "k^-", markersize=6, label="TD Gini")
+        ax2.set_ylabel("TD Gini", color="black")
+        ax2.set_ylim(0, 1)
+
+        from matplotlib.patches import Patch
+        legend_patches = [Patch(facecolor=c, label=r) for r, c in regime_colors.items()
+                          if any(reg.get("current") == r for reg in regimes)]
+        ax.legend(handles=legend_patches, loc="upper left", fontsize=8)
+        ax2.legend(loc="upper right", fontsize=8)
+
+    ax.set_xlabel("Environment Steps")
+    ax.set_ylabel("Q Coefficient of Variation")
+    ax.set_title("(f) TD-PER: Regime Detection")
+    ax.grid(True, alpha=0.3)
+
     fig.suptitle(
-        f"Mode Comparison: {TASK} (seed={SEED}, 100k steps)\n"
-        f"⚠ PER priorities never updated — td-per ≈ uniform\n"
-        f"Adaptive went unstable at 40k (Q CV > 3.0)",
-        fontsize=13, fontweight="bold"
+        f"Mode Comparison: {TASK} (seed={SEED}, 100k steps) — PER Active\n"
+        f"Working PER destabilizes Q: adaptive Q=37 (unstable), td-per Q=2.2, uniform Q=0.5\n"
+        f"Spearman(|TD|, oracle) ≈ 0 across all modes — no policy learned",
+        fontsize=12, fontweight="bold"
     )
 
-    plt.tight_layout(rect=[0, 0, 1, 0.92])
+    plt.tight_layout(rect=[0, 0, 1, 0.91])
     out_dir = Path(__file__).parent / "figures"
     out_dir.mkdir(exist_ok=True)
     for ext in ["png", "pdf"]:

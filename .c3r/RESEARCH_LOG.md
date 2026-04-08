@@ -190,3 +190,31 @@ Result:     All 3 modes pass smoke test. PER now active: max_priority=2.42 (was 
 Decision:   Next iteration: re-run full 100k comparison on reach-v3 (all 3 modes,
             seed=42) via Modal with working PER. This will be the first valid
             head-to-head test of adaptive vs td-per vs uniform.
+
+## iter_010 — 100k mode comparison with working PER  (2026-04-08T11:30:00Z)
+Hypothesis: With PER priorities actually updating, TD-PER will show different
+            training dynamics than uniform, and adaptive will outperform both
+            by switching to uniform during noise/unstable regimes.
+Change:     Re-ran 100k reach-v3 (seed=42) with all 3 modes via Modal using PERSAC
+            for td-per/adaptive modes. Downloaded snapshots, updated plot_mode_comparison.py
+            to 6-panel figure with Spearman + regime panels, updated FINDINGS.md.
+Command:    modal run modal_app.py --tasks reach-v3 --seeds 42 --total-steps 100000 --compare
+            python plot_mode_comparison.py
+Result:     **PER now clearly active** — td-per max_priority=6.35, adaptive=17.92 (vs 1.0 before).
+            **But working PER makes things WORSE:**
+            - adaptive: Q oscillates wildly (14→37), |TD| explodes 30× (0.04→1.38),
+              ends in "unstable" regime (q_cv=3.1). Catastrophically unstable.
+            - td-per: Q overshoots (2.2 vs uniform's 0.5), |TD| 10× higher (0.048 vs 0.0045).
+              Mostly "aligned" regime but with inverted episodes at 34k, 59k, 76k.
+            - uniform: stable Q decline (28→0.5), lowest |TD| (0.005), cleanest dynamics.
+            **Spearman ≈ 0 across ALL modes** (range: −0.03 to +0.13). No mode learned
+            reach-v3 (ep_rew≈0), contrasting with iters 002-003 where same task/seed learned
+            by 90k. Possible cause: train_mixer_task code path or Modal env difference.
+            Wall time: adaptive=1737s, td-per=1796s, uniform=1210s.
+            Figure: figures/mode_comparison_reach_v3.png (6-panel).
+Decision:   Next iteration: investigate WHY no mode learned reach-v3 when the same
+            task/seed learned in iter_002. Compare train_task vs train_mixer_task code
+            paths (different callback? different buffer internals?). If the uniform
+            mode with DenseRewardReplayBuffer + vanilla SAC doesn't reproduce earlier
+            learning, there may be a Modal image version difference. This regression
+            must be understood before the mode comparison results are meaningful.

@@ -19,7 +19,10 @@
 - [x] Run full 100k comparison: uniform vs td-per vs adaptive on reach-v3 (seed=42) via Modal
   - BUG: SB3 SAC never calls update_priorities() → PER was inactive
 - [x] **Fix SB3 PER integration: subclass SAC.train() to call update_priorities() with TD errors** — per_sac.py PERSAC class
-- [ ] Re-run 100k comparison with working PER (reach-v3, seed=42, all 3 modes)
+- [x] Re-run 100k comparison with working PER (reach-v3, seed=42, all 3 modes)
+  - PER active but makes things WORSE: adaptive unstable (Q=37), td-per overshoots (Q=2.2), uniform best (Q=0.5)
+  - NO MODE LEARNED reach-v3 — regression from iter_002, needs investigation
+- [ ] **URGENT: investigate reach-v3 learning regression** — train_mixer_task uniform vs train_task produce different results for same task/seed. Compare code paths, check Modal image versions, verify callback isn't interfering
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost

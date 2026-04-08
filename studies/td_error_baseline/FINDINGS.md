@@ -144,6 +144,11 @@ it's valid.
 - [x] 100k reach-v3 comparison: adaptive vs td-per vs uniform (iter_008)
   - **Critical bug found:** SB3 SAC never calls `update_priorities()` → td-per ≈ uniform
   - Adaptive mode went Q-unstable at 40k despite same effective sampling
-  - Need to hook into SAC's `train()` to actually update PER priorities
-- [ ] Fix SB3 PER integration — monkey-patch or subclass SAC.train() for priority updates
-- [ ] Re-run comparison with working PER
+- [x] Fix SB3 PER integration — PERSAC subclass (per_sac.py) calls update_priorities()
+- [x] Re-run comparison with working PER (iter_010)
+  - **PER now active:** td-per max_priority=6.35, adaptive max_priority=17.92
+  - **Working PER destabilizes Q:** adaptive Q=37 (unstable), td-per Q=2.2, uniform Q=0.5
+  - Adaptive goes catastrophically unstable (q_cv=3.1, |TD| explodes 30×)
+  - TD-PER causes Q overshooting vs uniform (2.2 vs 0.5)
+  - Spearman ≈ 0 across all modes — no policy learned in any mode
+  - Figure: `figures/mode_comparison_reach_v3.png`
