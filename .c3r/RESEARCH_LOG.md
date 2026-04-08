@@ -152,6 +152,29 @@ Decision:   The two-task story is now complete with statistical power:
             pick-place-v3 data, (b) start RPE-PER / alternative signal baseline, or
             (c) begin prototyping VLM-PER integration with vlm_probe sibling data.
 
+## iter_017 — 6-panel hero figure with pick-place-v3 data  (2026-04-08T21:00:00Z)
+Hypothesis: Adding pick-place-v3 5-seed data to the hero summary figure will
+            strengthen the narrative — showing a permanent information desert
+            on harder tasks complements the lagging-indicator story on reach-v3.
+Change:     Rewrote plot_summary_figure.py from 4-panel (reach-v3 only) to 6-panel
+            (3x2 grid) covering both tasks. New panels: (b) pick-place-v3 Spearman
+            traces (permanent desert, all grey), (d) pick-place-v3 Q-dynamics
+            (Q-instability not PER-specific), (e) side-by-side bar chart with
+            hatched pick-place bars, (f) regime breakdown expanded to all 10 runs.
+            Refactored shared plotting logic into helper functions. Updated
+            FINDINGS.md figure caption + file table.
+Command:    python studies/td_error_baseline/plot_summary_figure.py
+Result:     Figure saved: figures/td_per_summary.{png,pdf}. All 6 panels render
+            correctly. Key numbers confirmed: reach-v3 uniform 3/5, td-per 0/5;
+            pick-place-v3 all 0/5 across all modes. Pick-place Spearman stays
+            flat near 0 (no learning → no signal). Q-explosion panel (d) clearly
+            shows non-PER-specific instability on hard tasks. The two-task contrast
+            is visually compelling.
+Decision:   The primary deliverable (hero figure) is now complete with both tasks.
+            Next: consider RPE-PER (arXiv:2501.18093) as an alternative priority
+            signal baseline, or begin prototyping VLM-PER integration. The core
+            TD-error baseline study is finished — remaining work is extensions.
+
 ## iter_016 — Compaction (summarized iters 001-010)  (2026-04-08T18:00:00Z)
 Hypothesis: N/A — compaction iteration (RESEARCH_LOG.md was 355 lines, threshold 300).
 Change:     Archived verbatim iters 001-010 to RESEARCH_LOG_ARCHIVE.md. Rewrote

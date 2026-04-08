@@ -46,7 +46,7 @@ but that's a safety net — proactive management is your job.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: paused · iter #16 · ctx 0%
+- **status**: running · iter #16 · ctx 0%
 - **last iter**: 3h ago
 
 ### Recent commits on `agent/vlm_probe`

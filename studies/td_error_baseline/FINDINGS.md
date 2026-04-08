@@ -11,15 +11,15 @@ training). On hard tasks, it never emerges.
 
 ![TD-PER Summary](figures/td_per_summary.png)
 
-**Figure 1 (hero figure):** Four-panel summary of the complete TD-error PER baseline study.
-(a) Spearman correlation between |TD-error| and oracle advantage over training — TD-error
-is uninformative (ρ ≈ 0) for 60-80% of training, only becoming a lagging indicator after
-learning has already started. (b) Mode comparison across 5 seeds: TD-PER at default α=0.6
-prevents all seeds from learning (0/5), while even optimally-tuned α=0.3 only matches
-uniform replay, never exceeds it. (c) Q-value dynamics showing the PER positive feedback
-loop: biased resampling of high-|TD| transitions causes critic overfitting and Q-divergence
-(11× higher Q than uniform). (d) Regime classification showing TD-error is in a useful
-"aligned" regime for only 7-50% of training across tasks.
+**Figure 1 (hero figure):** Six-panel summary across two tasks (reach-v3, pick-place-v3),
+5 seeds x 3 modes each. (a) reach-v3 Spearman ρ(|TD|, oracle advantage) — TD-error is
+uninformative (ρ ≈ 0) for 60-80% of training, rising only after learning starts (lagging
+indicator). (b) pick-place-v3 Spearman — permanent information desert (0/5 seeds learn,
+ρ never exceeds 0.04). (c) reach-v3 Q-value dynamics — PER creates positive feedback loop
+(Q 11x higher than uniform). (d) pick-place-v3 Q-values — Q-instability is not PER-specific
+on hard tasks (seed 99 explodes across all modes). (e) Mode comparison bar chart — TD-PER
+0/5 vs uniform 3/5 on reach-v3; all 0/5 on pick-place-v3 regardless of mode. (f) Regime
+breakdown — TD-error aligned only 20-50% on reach-v3, 7-13% on pick-place-v3.
 
 ## Setup
 
@@ -144,7 +144,7 @@ it's valid.
 
 | File | Description |
 |------|-------------|
-| `figures/td_per_summary.png` | **4-panel hero figure** — primary deliverable |
+| `figures/td_per_summary.png` | **6-panel hero figure** — primary deliverable |
 | `figures/td_per_summary.pdf` | Same in PDF for presentations |
 | `SYNTHESIS.md` | **Cross-study synthesis** — headline deliverable |
 | `figures/td_per_regime_map.png` | **6-panel regime map** — detailed regime analysis |

@@ -9,4 +9,4 @@ All core deliverables done through iter_015: pipeline built, 2 tasks × 5 seeds 
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline — lit review's #1 recommendation
 - [ ] **Alternative priority signals**: RPE-PER, RND, or count-based novelty as baselines
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
-- [ ] Update hero summary figure to include pick-place-v3 mode comparison data
+- [x] Update hero summary figure to include pick-place-v3 mode comparison data (iter_017)

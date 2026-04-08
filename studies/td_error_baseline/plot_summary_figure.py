@@ -1,14 +1,22 @@
 """Hero summary figure: How (un)informative is TD-error PER in early training?
 
-Produces a single publication-quality 4-panel figure that tells the complete story:
-  (a) Spearman correlation over training (5 seeds, reach-v3) — shows TD-error is
-      uninformative early, becomes a lagging indicator only after learning starts
-  (b) Mode comparison bar chart — TD-PER 0/5, Uniform 3/5, α-tuned still ≤ uniform
-  (c) Q-value explosion under PER — positive feedback loop destabilizes learning
-  (d) Information regime breakdown — TD-PER wastes 50-93% of training on bad priorities
+Produces a single publication-quality 6-panel figure (3×2) that tells the complete
+story across two tasks of different difficulty:
 
-Data sources: 5-seed reach-v3 (100k steps) across uniform/td-per/adaptive modes,
-2-seed pick-place-v3 (300k steps), α sweep (0.1, 0.3, 0.6).
+Row 1: Spearman correlation over training
+  (a) reach-v3 — TD-error becomes informative only AFTER learning starts
+  (b) pick-place-v3 — permanent information desert (no learning at 100k)
+
+Row 2: Q-value dynamics
+  (c) reach-v3 — PER creates Q-value positive feedback loop
+  (d) pick-place-v3 — Q-instability not PER-specific on hard tasks
+
+Row 3: Aggregate analysis
+  (e) Mode comparison bar chart — both tasks, incl. alpha sweep
+  (f) Information regime breakdown — aligned fraction across runs
+
+Data sources: 5-seed reach-v3 + pick-place-v3 (100k steps each) across
+uniform/td-per/adaptive modes, α sweep (0.1, 0.3, 0.6) on reach-v3.
 """
 
 import json
@@ -28,7 +36,7 @@ FIG_DIR = Path(__file__).parent / "figures"
 FIG_DIR.mkdir(exist_ok=True)
 
 SEEDS = [42, 123, 7, 99, 256]
-TASK = "reach-v3"
+TASKS = ["reach-v3", "pick-place-v3"]
 
 # Color palette
 C_UNIFORM = "#2ecc71"
@@ -104,128 +112,65 @@ def classify_regime(spearman, q_cv, q_mean):
     return "noise"
 
 
-def main():
-    # Set up figure with custom grid
-    fig = plt.figure(figsize=(14, 10))
-    gs = gridspec.GridSpec(2, 2, hspace=0.35, wspace=0.3,
-                           left=0.08, right=0.96, top=0.90, bottom=0.08)
+def plot_spearman_panel(ax, task, seeds, mode_suffix, title_label, title_text):
+    """Plot Spearman correlation traces for a task."""
+    agg, runs = aggregate_mode(task, seeds, mode_suffix)
+    if not agg:
+        ax.text(0.5, 0.5, f"No data for {task}", transform=ax.transAxes,
+                ha="center", va="center")
+        return
 
-    # =========================================================================
-    # Panel (a): Spearman correlation over training — 5 seeds, uniform baseline
-    # Shows individual seed traces + mean, with learning onset marked
-    # =========================================================================
-    ax_a = fig.add_subplot(gs[0, 0])
+    steps = sorted(agg.keys())
 
-    uniform_agg, uniform_runs = aggregate_mode(TASK, SEEDS, "uniform")
-    steps = sorted(uniform_agg.keys())
-
-    # Plot individual seed traces (thin, transparent)
-    for seed, snaps in uniform_runs.items():
-        ss = [d["step"] for d in snaps if d["step"] in uniform_agg]
-        sp = [d["spearman"] for d in snaps if d["step"] in uniform_agg]
-        er = [d["ep_rew"] for d in snaps if d["step"] in uniform_agg]
-        # Color trace by whether seed learned
+    # Plot individual seed traces
+    for seed, snaps in runs.items():
+        ss = [d["step"] for d in snaps if d["step"] in agg]
+        sp = [d["spearman"] for d in snaps if d["step"] in agg]
+        er = [d["ep_rew"] for d in snaps if d["step"] in agg]
         max_rew = max(er) if er else 0
         color = "#27ae60" if max_rew > 50 else "#bdc3c7"
         lw = 1.2 if max_rew > 50 else 0.8
-        ax_a.plot([s/1000 for s in ss], sp, "-", color=color, alpha=0.5,
-                  linewidth=lw, zorder=2)
+        ax.plot([s/1000 for s in ss], sp, "-", color=color, alpha=0.5,
+                linewidth=lw, zorder=2)
 
-    # Plot mean ± std
-    mean_sp = [uniform_agg[s]["spearman"][0] for s in steps]
-    std_sp = [uniform_agg[s]["spearman"][1] for s in steps]
+    # Plot mean +/- std
+    mean_sp = [agg[s]["spearman"][0] for s in steps]
+    std_sp = [agg[s]["spearman"][1] for s in steps]
     steps_k = [s/1000 for s in steps]
-    ax_a.plot(steps_k, mean_sp, "k-", linewidth=2.5, zorder=3, label="Mean (n=5)")
-    ax_a.fill_between(steps_k,
-                      [m - s for m, s in zip(mean_sp, std_sp)],
-                      [m + s for m, s in zip(mean_sp, std_sp)],
-                      alpha=0.15, color="black", zorder=1)
+    ax.plot(steps_k, mean_sp, "k-", linewidth=2.5, zorder=3, label="Mean (n=5)")
+    ax.fill_between(steps_k,
+                    [m - s for m, s in zip(mean_sp, std_sp)],
+                    [m + s for m, s in zip(mean_sp, std_sp)],
+                    alpha=0.15, color="black", zorder=1)
 
-    # Annotate the "information desert" and "lagging signal" zones
-    ax_a.axhspan(-0.15, 0.15, alpha=0.08, color="red", zorder=0)
-    ax_a.axhline(0, color="gray", linestyle="--", linewidth=0.8, alpha=0.5)
+    # Information desert shading
+    ax.axhspan(-0.15, 0.15, alpha=0.08, color="red", zorder=0)
+    ax.axhline(0, color="gray", linestyle="--", linewidth=0.8, alpha=0.5)
 
-    # Add text annotations
-    ax_a.annotate("Information desert\n(TD-error ≈ random noise)",
-                  xy=(30, -0.08), fontsize=8, color="#c0392b", fontstyle="italic",
-                  ha="center", fontweight="bold")
-    ax_a.annotate("Signal emerges\nonly after learning\nalready started",
-                  xy=(80, 0.50), fontsize=8, color="#27ae60", fontstyle="italic",
-                  ha="center", fontweight="bold")
+    # Count learning seeds
+    n_learn = sum(1 for seed, snaps in runs.items()
+                  if max(d["ep_rew"] for d in snaps) > 50)
+    n_total = len(runs)
 
-    # Legend for seed traces
-    learned_patch = mpatches.Patch(color="#27ae60", alpha=0.5, label="Seeds that learn (3/5)")
-    nolearn_patch = mpatches.Patch(color="#bdc3c7", alpha=0.5, label="Seeds that don't (2/5)")
-    ax_a.legend(handles=[learned_patch, nolearn_patch,
-                         plt.Line2D([0], [0], color="k", lw=2.5, label="Mean ± σ")],
-                fontsize=7.5, loc="upper left")
+    learned_patch = mpatches.Patch(color="#27ae60", alpha=0.5,
+                                   label=f"Seeds that learn ({n_learn}/{n_total})")
+    nolearn_patch = mpatches.Patch(color="#bdc3c7", alpha=0.5,
+                                   label=f"Seeds that don't ({n_total-n_learn}/{n_total})")
+    ax.legend(handles=[learned_patch, nolearn_patch,
+                       plt.Line2D([0], [0], color="k", lw=2.5, label="Mean +/- σ")],
+              fontsize=7, loc="upper left")
 
-    ax_a.set_xlabel("Environment Steps (×10³)", fontsize=9)
-    ax_a.set_ylabel("Spearman ρ(|TD|, Oracle Advantage)", fontsize=9)
-    ax_a.set_title("(a) TD-error is uninformative for 60-80%\nof early training",
-                   fontsize=10, fontweight="bold")
-    ax_a.set_ylim(-0.35, 0.75)
-    ax_a.set_xlim(0, 105)
-    ax_a.grid(True, alpha=0.2)
+    ax.set_xlabel("Environment Steps (x10³)", fontsize=9)
+    ax.set_ylabel("Spearman ρ(|TD|, Oracle Adv.)", fontsize=9)
+    ax.set_title(f"({title_label}) {title_text}", fontsize=10, fontweight="bold")
+    ax.set_ylim(-0.4, 0.8)
+    max_step = max(steps_k) if steps_k else 100
+    ax.set_xlim(0, max_step + 5)
+    ax.grid(True, alpha=0.2)
 
-    # =========================================================================
-    # Panel (b): Mode comparison — bar chart with success rates + alpha sweep
-    # =========================================================================
-    ax_b = fig.add_subplot(gs[0, 1])
 
-    # Collect success rates for each mode/alpha
-    modes = [
-        ("Uniform", "uniform", None, C_UNIFORM),
-        ("TD-PER\nα=0.3", "td-per_a0.3", None, "#5dade2"),
-        ("TD-PER\nα=0.6", "td-per", None, C_TDPER),
-        ("TD-PER\nα=0.1", "td-per_a0.1", None, "#85c1e9"),
-        ("Adaptive\nMixer", "adaptive", None, C_ADAPTIVE),
-    ]
-
-    success_counts = []
-    for label, suffix, _, color in modes:
-        learned = 0
-        total = 0
-        for seed in SEEDS:
-            snaps = load_snapshots(TASK, seed, suffix)
-            if not snaps:
-                continue
-            total += 1
-            max_rew = max(d["ep_rew"] for d in snaps if d["step"] >= 50000)
-            if max_rew > 50:
-                learned += 1
-        success_counts.append((label, learned, total, color))
-
-    x_pos = range(len(success_counts))
-    bars = ax_b.bar(x_pos, [sc[1] for sc in success_counts],
-                    color=[sc[3] for sc in success_counts],
-                    alpha=0.85, edgecolor="black", linewidth=0.8)
-
-    ax_b.set_xticks(list(x_pos))
-    ax_b.set_xticklabels([sc[0] for sc in success_counts], fontsize=8)
-    ax_b.set_ylabel("Seeds that Learn (out of 5)", fontsize=9)
-    ax_b.set_title("(b) TD-PER hurts; best α only\nmatches uniform, never beats it",
-                   fontsize=10, fontweight="bold")
-    ax_b.set_ylim(0, 5.8)
-
-    for bar, sc in zip(bars, success_counts):
-        count = sc[1]
-        pct = f"{count}/{sc[2]}" if sc[2] > 0 else "N/A"
-        ax_b.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.15,
-                  pct, ha="center", va="bottom", fontweight="bold", fontsize=11)
-
-    # Add horizontal reference line at uniform baseline
-    ax_b.axhline(3, color=C_UNIFORM, linestyle=":", alpha=0.5, linewidth=1.5)
-    ax_b.text(4.6, 3.15, "Uniform\nbaseline", fontsize=7, color=C_UNIFORM,
-              ha="right", va="bottom")
-    ax_b.grid(True, alpha=0.2, axis="y")
-
-    # =========================================================================
-    # Panel (c): Q-value explosion — shows the positive feedback loop
-    # TD-PER inflates Q-values 11× vs uniform
-    # =========================================================================
-    ax_c = fig.add_subplot(gs[1, 0])
-
+def plot_q_panel(ax, task, seeds, title_label, title_text):
+    """Plot Q-value dynamics for all 3 modes."""
     mode_data = {
         "Uniform": ("uniform", C_UNIFORM),
         "TD-PER (α=0.6)": ("td-per", C_TDPER),
@@ -233,58 +178,192 @@ def main():
     }
 
     for label, (suffix, color) in mode_data.items():
-        agg, _ = aggregate_mode(TASK, SEEDS, suffix)
+        agg, _ = aggregate_mode(task, seeds, suffix)
         if not agg:
             continue
         steps = sorted(agg.keys())
         q_means = [agg[s]["q_mean"][0] for s in steps]
         q_stds = [agg[s]["q_mean"][1] for s in steps]
         steps_k = [s/1000 for s in steps]
-        ax_c.plot(steps_k, q_means, "o-", color=color, linewidth=2,
-                  markersize=4, label=label, zorder=3)
-        ax_c.fill_between(steps_k,
-                          [max(0.01, m - s) for m, s in zip(q_means, q_stds)],
-                          [m + s for m, s in zip(q_means, q_stds)],
-                          alpha=0.15, color=color, zorder=1)
+        ax.plot(steps_k, q_means, "o-", color=color, linewidth=2,
+                markersize=3, label=label, zorder=3)
+        ax.fill_between(steps_k,
+                        [max(0.01, m - s) for m, s in zip(q_means, q_stds)],
+                        [m + s for m, s in zip(q_means, q_stds)],
+                        alpha=0.15, color=color, zorder=1)
 
-    # Annotate the Q-explosion with arrow pointing to TD-PER line
+    ax.set_xlabel("Environment Steps (x10³)", fontsize=9)
+    ax.set_ylabel("Mean Q-value", fontsize=9)
+    ax.set_title(f"({title_label}) {title_text}", fontsize=10, fontweight="bold")
+    ax.set_yscale("symlog", linthresh=1)
+    ax.legend(fontsize=7.5, loc="upper left")
+    ax.grid(True, alpha=0.2)
+
+
+def main():
+    fig = plt.figure(figsize=(14, 15))
+    gs = gridspec.GridSpec(3, 2, hspace=0.40, wspace=0.30,
+                           left=0.08, right=0.96, top=0.93, bottom=0.05)
+
+    # =========================================================================
+    # Row 1: Spearman correlation over training
+    # =========================================================================
+    ax_a = fig.add_subplot(gs[0, 0])
+    plot_spearman_panel(ax_a, "reach-v3", SEEDS, "uniform", "a",
+                        "reach-v3: TD-error lags learning")
+    # Add annotations for reach-v3
+    ax_a.annotate("Information desert\n(TD-error ≈ random)",
+                  xy=(30, -0.08), fontsize=7.5, color="#c0392b",
+                  fontstyle="italic", ha="center", fontweight="bold")
+    ax_a.annotate("Signal emerges\nonly after learning",
+                  xy=(80, 0.50), fontsize=7.5, color="#27ae60",
+                  fontstyle="italic", ha="center", fontweight="bold")
+
+    ax_b = fig.add_subplot(gs[0, 1])
+    plot_spearman_panel(ax_b, "pick-place-v3", SEEDS, "uniform", "b",
+                        "pick-place-v3: permanent desert")
+    # Add annotation for pick-place
+    ax_b.annotate("No learning ever occurs\n→ TD-error never informative",
+                  xy=(50, -0.15), fontsize=7.5, color="#c0392b",
+                  fontstyle="italic", ha="center", fontweight="bold")
+
+    # =========================================================================
+    # Row 2: Q-value dynamics
+    # =========================================================================
+    ax_c = fig.add_subplot(gs[1, 0])
+    plot_q_panel(ax_c, "reach-v3", SEEDS, "c",
+                 "reach-v3: PER inflates Q 11x")
     ax_c.annotate("Q explodes under PER:\nhigh |TD| → resample →\noverfit → ↑Q → ↑|TD|",
                   xy=(40, 100), xytext=(70, 350),
-                  fontsize=7.5, color=C_TDPER,
+                  fontsize=7, color=C_TDPER,
                   fontstyle="italic", ha="center",
                   arrowprops=dict(arrowstyle="->", color=C_TDPER, lw=1.5),
                   bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
                             edgecolor=C_TDPER, alpha=0.9))
 
-    ax_c.set_xlabel("Environment Steps (×10³)", fontsize=9)
-    ax_c.set_ylabel("Mean Q-value", fontsize=9)
-    ax_c.set_title("(c) PER creates a Q-value positive\nfeedback loop that prevents learning",
-                   fontsize=10, fontweight="bold")
-    ax_c.set_yscale("symlog", linthresh=1)
-    ax_c.legend(fontsize=8, loc="upper left")
-    ax_c.set_xlim(0, 105)
-    ax_c.grid(True, alpha=0.2)
-
-    # =========================================================================
-    # Panel (d): Information regime breakdown — stacked bar per run
-    # Shows what fraction of training each regime occupies
-    # =========================================================================
     ax_d = fig.add_subplot(gs[1, 1])
+    plot_q_panel(ax_d, "pick-place-v3", SEEDS, "d",
+                 "pick-place-v3: Q-instability not PER-specific")
+    ax_d.annotate("All modes unstable\n(seed 99 explodes\nacross all modes)",
+                  xy=(50, 200), xytext=(70, 400),
+                  fontsize=7, color=C_NOISE,
+                  fontstyle="italic", ha="center",
+                  arrowprops=dict(arrowstyle="->", color=C_NOISE, lw=1.5),
+                  bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                            edgecolor=C_NOISE, alpha=0.9))
 
-    # Compute regime classification for each run
+    # =========================================================================
+    # Row 3, Left: Mode comparison bar chart — both tasks
+    # =========================================================================
+    ax_e = fig.add_subplot(gs[2, 0])
+
+    modes_reach = [
+        ("Uniform", "uniform", C_UNIFORM),
+        ("TD-PER\nα=0.3", "td-per_a0.3", "#5dade2"),
+        ("TD-PER\nα=0.6", "td-per", C_TDPER),
+        ("TD-PER\nα=0.1", "td-per_a0.1", "#85c1e9"),
+        ("Adaptive", "adaptive", C_ADAPTIVE),
+    ]
+
+    # Count successes for reach-v3
+    reach_counts = []
+    for label, suffix, color in modes_reach:
+        learned = 0
+        total = 0
+        for seed in SEEDS:
+            snaps = load_snapshots("reach-v3", seed, suffix)
+            if not snaps:
+                continue
+            total += 1
+            max_rew = max(d["ep_rew"] for d in snaps if d["step"] >= 50000)
+            if max_rew > 50:
+                learned += 1
+        reach_counts.append((label, learned, total, color))
+
+    x_pos = np.arange(len(reach_counts))
+    bar_width = 0.35
+
+    # reach-v3 bars
+    bars_r = ax_e.bar(x_pos - bar_width/2, [sc[1] for sc in reach_counts],
+                      bar_width, color=[sc[3] for sc in reach_counts],
+                      alpha=0.85, edgecolor="black", linewidth=0.8,
+                      label="reach-v3")
+
+    # pick-place-v3 bars (all 0/5 for every mode)
+    pp_counts = []
+    for label, suffix, color in modes_reach:
+        # pick-place doesn't have alpha variants
+        pp_suffix = suffix
+        if "a0." in suffix:
+            pp_counts.append((label, 0, 0, color))  # no data
+            continue
+        learned = 0
+        total = 0
+        for seed in SEEDS:
+            snaps = load_snapshots("pick-place-v3", seed, pp_suffix)
+            if not snaps:
+                continue
+            total += 1
+            max_rew = max(d["ep_rew"] for d in snaps if d["step"] >= 50000)
+            if max_rew > 50:
+                learned += 1
+        pp_counts.append((label, learned, total, color))
+
+    # Only plot pp bars where data exists
+    pp_vals = [sc[1] for sc in pp_counts]
+    pp_colors = [sc[3] if sc[2] > 0 else "none" for sc in pp_counts]
+    pp_edges = ["black" if sc[2] > 0 else "none" for sc in pp_counts]
+    bars_p = ax_e.bar(x_pos + bar_width/2, pp_vals,
+                      bar_width, color=pp_colors,
+                      alpha=0.4, edgecolor=pp_edges, linewidth=0.8,
+                      hatch="//", label="pick-place-v3")
+
+    # Labels
+    for bar, sc in zip(bars_r, reach_counts):
+        if sc[2] > 0:
+            ax_e.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.12,
+                      f"{sc[1]}/{sc[2]}", ha="center", va="bottom",
+                      fontweight="bold", fontsize=9)
+    for bar, sc in zip(bars_p, pp_counts):
+        if sc[2] > 0:
+            ax_e.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.12,
+                      f"{sc[1]}/{sc[2]}", ha="center", va="bottom",
+                      fontweight="bold", fontsize=8, color="#555")
+
+    ax_e.set_xticks(list(x_pos))
+    ax_e.set_xticklabels([sc[0] for sc in reach_counts], fontsize=8)
+    ax_e.set_ylabel("Seeds that Learn (out of 5)", fontsize=9)
+    ax_e.set_title("(e) TD-PER never beats uniform;\npick-place 0/5 across all modes",
+                   fontsize=10, fontweight="bold")
+    ax_e.set_ylim(0, 5.8)
+    ax_e.axhline(3, color=C_UNIFORM, linestyle=":", alpha=0.5, linewidth=1.5)
+    ax_e.legend(fontsize=8, loc="upper right")
+    ax_e.grid(True, alpha=0.2, axis="y")
+
+    # =========================================================================
+    # Row 3, Right: Regime breakdown — both tasks
+    # =========================================================================
+    ax_f = fig.add_subplot(gs[2, 1])
+
     run_configs = [
-        ("reach-v3\ns42 (unif)", TASK, 42, "uniform"),
-        ("reach-v3\ns123 (unif)", TASK, 123, "uniform"),
-        ("reach-v3\ns7 (unif)", TASK, 7, "uniform"),
-        ("pp-v3\ns42 (300k)", "pick-place-v3", 42, ""),
-        ("pp-v3\ns123 (300k)", "pick-place-v3", 123, ""),
+        # reach-v3 uniform (3 learning, 2 non-learning)
+        ("reach s42 (unif)", "reach-v3", 42, "uniform"),
+        ("reach s123 (unif)", "reach-v3", 123, "uniform"),
+        ("reach s7 (unif)", "reach-v3", 7, "uniform"),
+        ("reach s99 (unif)", "reach-v3", 99, "uniform"),
+        ("reach s256 (unif)", "reach-v3", 256, "uniform"),
+        # pick-place-v3 uniform (all non-learning)
+        ("pp s42 (unif)", "pick-place-v3", 42, "uniform"),
+        ("pp s123 (unif)", "pick-place-v3", 123, "uniform"),
+        ("pp s7 (unif)", "pick-place-v3", 7, "uniform"),
+        ("pp s99 (unif)", "pick-place-v3", 99, "uniform"),
+        ("pp s256 (unif)", "pick-place-v3", 256, "uniform"),
     ]
 
     regime_data = []
     for label, task, seed, suffix in run_configs:
         snaps = load_snapshots(task, seed, suffix)
         if not snaps:
-            regime_data.append((label, {"aligned": 0, "noise": 0, "inverted": 0, "unstable": 0}))
             continue
         counts = {"aligned": 0, "noise": 0, "inverted": 0, "unstable": 0}
         for d in snaps:
@@ -295,7 +374,6 @@ def main():
         fracs = {k: v / total if total > 0 else 0 for k, v in counts.items()}
         regime_data.append((label, fracs))
 
-    # Stacked horizontal bar chart
     labels = [rd[0] for rd in regime_data]
     y_pos = range(len(labels))
 
@@ -308,33 +386,39 @@ def main():
     lefts = [0] * len(regime_data)
     for regime in regime_order:
         widths = [rd[1].get(regime, 0) for rd in regime_data]
-        ax_d.barh(y_pos, widths, left=lefts, height=0.6,
+        ax_f.barh(y_pos, widths, left=lefts, height=0.6,
                   color=regime_colors[regime], edgecolor="white", linewidth=0.5,
                   label=regime_labels[regime])
         lefts = [l + w for l, w in zip(lefts, widths)]
 
-    ax_d.set_yticks(list(y_pos))
-    ax_d.set_yticklabels(labels, fontsize=8)
-    ax_d.set_xlabel("Fraction of Training", fontsize=9)
-    ax_d.set_title("(d) TD-error is in a useful regime\nonly 7-50% of training",
+    ax_f.set_yticks(list(y_pos))
+    ax_f.set_yticklabels(labels, fontsize=7.5)
+    ax_f.set_xlabel("Fraction of Training", fontsize=9)
+    ax_f.set_title("(f) TD-error aligned regime:\nreach 20-50%, pick-place 7-13%",
                    fontsize=10, fontweight="bold")
-    ax_d.set_xlim(0, 1.0)
-    ax_d.legend(fontsize=7.5, loc="lower right", ncol=2)
-    ax_d.grid(True, alpha=0.2, axis="x")
-    ax_d.invert_yaxis()
+    ax_f.set_xlim(0, 1.0)
+    ax_f.legend(fontsize=7, loc="lower right", ncol=2)
+    ax_f.grid(True, alpha=0.2, axis="x")
+    ax_f.invert_yaxis()
 
     # Add percentage annotations for aligned fraction
     for i, (label, fracs) in enumerate(regime_data):
         aligned_frac = fracs.get("aligned", 0)
-        ax_d.text(aligned_frac + 0.02, i, f"{aligned_frac:.0%}",
-                  va="center", fontsize=8, fontweight="bold", color=C_ALIGNED)
+        ax_f.text(aligned_frac + 0.02, i, f"{aligned_frac:.0%}",
+                  va="center", fontsize=7.5, fontweight="bold", color=C_ALIGNED)
+
+    # Add separator line between tasks
+    # Find boundary between reach and pick-place entries
+    n_reach = sum(1 for l, _ in regime_data if l.startswith("reach"))
+    if 0 < n_reach < len(regime_data):
+        ax_f.axhline(n_reach - 0.5, color="black", linestyle="-", linewidth=1, alpha=0.3)
 
     # =========================================================================
     # Main title
     # =========================================================================
     fig.suptitle(
         "TD-Error Prioritized Experience Replay Is Uninformative and Harmful\n"
-        "in Sparse-Reward Early Training",
+        "in Sparse-Reward Early Training (reach-v3 + pick-place-v3, 5 seeds x 3 modes)",
         fontsize=13, fontweight="bold", y=0.97
     )
 
@@ -345,14 +429,17 @@ def main():
     print(f"Saved: {FIG_DIR / 'td_per_summary.pdf'}")
     plt.close()
 
-    # Print key numbers for the log
+    # Print key numbers
     print("\n=== Key Statistics ===")
-    print(f"Uniform baseline: 3/5 seeds learn reach-v3 (60%)")
-    print(f"TD-PER (α=0.6):  0/5 seeds learn (0%)")
-    print(f"TD-PER (α=0.3):  3/5 seeds learn (ties uniform)")
-    print(f"TD-PER (α=0.1):  2/5 seeds learn (40%)")
-    print(f"Adaptive mixer:   2/5 seeds learn (40%)")
-    print(f"Spearman ≈ 0 for first 60-80% of training across all modes")
+    print("reach-v3 (100k steps):")
+    for label, learned, total, _ in reach_counts:
+        pct = f"{learned}/{total}" if total > 0 else "N/A"
+        print(f"  {label.replace(chr(10), ' ')}: {pct}")
+    print("pick-place-v3 (100k steps):")
+    for label, learned, total, _ in pp_counts:
+        pct = f"{learned}/{total}" if total > 0 else "no data"
+        print(f"  {label.replace(chr(10), ' ')}: {pct}")
+    print("Spearman: ~0 for 60-80% of reach-v3 training, ~0 always on pick-place-v3")
 
 
 if __name__ == "__main__":
