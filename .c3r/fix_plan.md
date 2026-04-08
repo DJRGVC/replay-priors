@@ -15,8 +15,9 @@
 - [x] Build VLM client + keyframe sampling — DONE iter_002
 - [x] Single-task accuracy probe on reach-v3 with K=8 — DONE iter_002 (MAE=41.9, ±10=20%)
 - [x] K sweep on reach-v3 — DONE iter_003 (K=4/8/16/32: no improvement with more frames, MAE flat ~42-52)
-- [ ] **PRIORITY: Add Gemini 2.5 Flash backend to vlm_client.py** — free tier, 0 cost, 250 RPD. See FREE_VLM_OPTIONS.md.
-- [ ] Re-run K sweep on reach-v3 with Gemini Flash to validate cross-model consistency
+- [x] **Add Gemini backend to vlm_client.py** — DONE iter_004. Flash-lite MAE=95.2 (much worse than Sonnet 41.9). Flash quota exhausted (20 RPD!).
+- [ ] **Re-run reach-v3 probe with gemini-2.5-flash** (thinking_budget=0 fix applied) — wait for quota reset
+- [ ] Try gemini-2.0-flash or gemini-3-flash-preview which may have different/higher RPD limits
 - [ ] Run probe on push-v3 and pick-place-v3 (may have more visually distinct failure modes)
 - [ ] Try "pinned" sampling strategy (first+last frames pinned) vs uniform
 - [ ] Try improved prompt: provide proprio state as text, or use chain-of-thought prompting

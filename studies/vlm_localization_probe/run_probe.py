@@ -30,6 +30,8 @@ COST_PER_1M = {
     "claude-haiku-4-5-20251001": {"input": 0.80, "output": 4.0},
     "gpt-4o": {"input": 2.50, "output": 10.0},
     "gpt-4o-mini": {"input": 0.15, "output": 0.60},
+    "gemini-2.5-flash": {"input": 0.0, "output": 0.0},  # free tier
+    "gemini-2.5-flash-lite": {"input": 0.0, "output": 0.0},  # free tier
 }
 
 

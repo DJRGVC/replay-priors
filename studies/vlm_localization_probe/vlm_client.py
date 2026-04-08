@@ -260,6 +260,66 @@ def _call_openai(
     return result
 
 
+# ── Gemini (Google) backend ────────────────────────────────────────
+
+def _call_gemini(
+    task_description: str,
+    keyframes: list[Image.Image],
+    keyframe_indices: list[int],
+    total_timesteps: int,
+    model: str = "gemini-2.5-flash",
+) -> dict:
+    from google import genai
+    from google.genai import types
+
+    client = genai.Client()
+
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps)
+
+    # Build content parts: text + interleaved images with labels
+    contents = [user_text]
+    for img, idx in zip(keyframes, keyframe_indices):
+        contents.append(img)
+        contents.append(f"↑ Timestep {idx}")
+    contents.append("Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line.")
+
+    def _do_call():
+        return client.models.generate_content(
+            model=model,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                max_output_tokens=2048,
+                response_mime_type="application/json",
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+
+    t0 = time.time()
+    response = _retry_on_rate_limit(_do_call)
+    latency = time.time() - t0
+
+    text = response.text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError:
+        result = {"failure_timestep": None, "confidence": 0.0, "rationale": f"parse_error: {text[:200]}"}
+
+    # Gemini usage metadata
+    usage = response.usage_metadata
+    input_tokens = getattr(usage, "prompt_token_count", 0) or 0
+    output_tokens = getattr(usage, "candidates_token_count", 0) or 0
+
+    result["_latency_s"] = round(latency, 2)
+    result["_input_tokens"] = input_tokens
+    result["_output_tokens"] = output_tokens
+    result["_model"] = model
+    return result
+
+
 # ── Unified entry point ────────────────────────────────────────────
 
 TASK_DESCRIPTIONS = {
@@ -285,8 +345,10 @@ def predict_failure(
         return _call_claude(task_description, keyframes, keyframe_indices, total_timesteps, model)
     elif "gpt" in model or "o1" in model or "o3" in model or "o4" in model:
         return _call_openai(task_description, keyframes, keyframe_indices, total_timesteps, model)
+    elif "gemini" in model:
+        return _call_gemini(task_description, keyframes, keyframe_indices, total_timesteps, model)
     else:
-        raise ValueError(f"Unknown model family: {model}. Use a Claude or OpenAI model name.")
+        raise ValueError(f"Unknown model family: {model}. Use a Claude, OpenAI, or Gemini model name.")
 
 
 # ── Quick CLI test ─────────────────────────────────────────────────

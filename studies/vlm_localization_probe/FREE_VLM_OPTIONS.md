@@ -4,18 +4,17 @@ Researched 2026-04-08 after discovering Anthropic API costs real money.
 
 ## Recommended: Gemini 2.5 Flash (Free Tier)
 
-- **Rate limits**: 10 RPM, 250 requests/day, 250K TPM
+- **Rate limits**: 10 RPM, **20 requests/day** (confirmed empirically 2026-04-08)
 - **Vision**: Full multi-image support, images count as tokens
 - **Context**: 1M token window (same as paid)
 - **Cost**: $0 (free tier, no billing needed)
-- **Integration**: `google-generativeai` Python SDK, very similar API pattern
-- **Caveat**: As of April 2026, Pro models paywalled for free users. Flash still free.
-
-For our use case (20 rollouts × a few K values = 80-200 calls), 250 RPD is plenty.
+- **Integration**: `google-genai` Python SDK (new SDK, `google-generativeai` deprecated)
+- **Caveat**: Thinking model — `thinking_budget=0` needed to avoid token waste on simple JSON tasks.
+- **IMPORTANT**: 20 RPD is very low — only enough for 1 probe run per day. Use flash-lite for sweeps.
 
 ## Alternative: Gemini 2.5 Flash-Lite (Free Tier)
 
-- 15 RPM, 1000 RPD — even more generous
+- 15 RPM, **1000 RPD** — much more generous, good for sweeps
 - May be less capable on nuanced visual reasoning
 
 ## Alternative: NVIDIA build.nvidia.com (Qwen3.5-VL)
