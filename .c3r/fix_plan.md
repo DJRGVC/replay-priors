@@ -17,7 +17,8 @@
 - [x] K sweep on reach-v3 — DONE iter_003 (K=4/8/16/32: no improvement with more frames, MAE flat ~42-52)
 - [x] **Add Gemini backend to vlm_client.py** — DONE iter_004. Flash-lite MAE=95.2 (much worse than Sonnet 41.9). Flash quota exhausted (20 RPD!).
 - [ ] **Re-run reach-v3 probe with gemini-2.5-flash** (thinking_budget=0 fix applied) — wait for quota reset
-- [ ] Try gemini-2.0-flash or gemini-3-flash-preview which may have different/higher RPD limits
+- [x] **Try gemini-3-flash-preview** — DONE iter_005. MAE=54.2 (median 14), ±10=44%, ±20=56%. 2× better ±10 than Sonnet. Start-bias, bimodal. gemini-2.0-flash has 0 free RPD (dead).
+- [ ] Run remaining 10 rollouts on gemini-3-flash-preview for n=20 fair comparison
 - [ ] Run probe on push-v3 and pick-place-v3 (may have more visually distinct failure modes)
 - [ ] Try "pinned" sampling strategy (first+last frames pinned) vs uniform
 - [ ] Try improved prompt: provide proprio state as text, or use chain-of-thought prompting

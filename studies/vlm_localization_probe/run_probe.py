@@ -32,6 +32,8 @@ COST_PER_1M = {
     "gpt-4o-mini": {"input": 0.15, "output": 0.60},
     "gemini-2.5-flash": {"input": 0.0, "output": 0.0},  # free tier
     "gemini-2.5-flash-lite": {"input": 0.0, "output": 0.0},  # free tier
+    "gemini-2.0-flash": {"input": 0.0, "output": 0.0},  # free tier
+    "gemini-3-flash-preview": {"input": 0.0, "output": 0.0},  # free tier
 }
 
 
