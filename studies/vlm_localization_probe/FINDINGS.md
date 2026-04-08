@@ -143,6 +143,40 @@ objects). GT "failure timestep" = argmin(hand-object distance), which is arbitra
 with no visually salient event. Only reach-v3 has non-ambiguous GT with this
 experimental setup. Trained-policy rollouts would be needed for multi-task evaluation.
 
+## Related Work
+
+Recent literature directly connects to our findings:
+
+**Positional bias in multi-image VLMs.** Tian et al. (CVPR 2025 Oral,
+[arXiv:2503.13792](https://arxiv.org/abs/2503.13792)) independently confirm our
+Finding #2: open-source models exhibit "recency bias" (preferring later images),
+while proprietary models show a "lost-in-the-middle" effect. They trace this to
+position embeddings and causal attention masks, and propose SoFt Attention (SoFA)
+— a training-free interpolation between causal and bidirectional attention that
+reduces bias. This is a potential mitigation we have not tested.
+
+**VLM failure detection in manipulation.** AHA (Duan et al., NeurIPS 2024,
+[arXiv:2410.00371](https://arxiv.org/abs/2410.00371)) is closest prior work: a
+fine-tuned VLM that detects and reasons about failures in robotic manipulation,
+outperforming GPT-4o in-context by 10.3%. Unlike our zero-shot probing, AHA uses
+a custom dataset (FailGen) with procedurally perturbed demonstrations. Our results
+contextualize their gains — zero-shot VLMs are dominated by positional bias,
+making fine-tuning essential for reliable failure detection.
+
+**VLM as reward/critic for RL.** VLAC (InternRobotics, 2025,
+[arXiv:2509.15937](https://arxiv.org/abs/2509.15937)) trains a VLM critic on
+3000h+ data to output dense progress deltas. This is the "VLM as priority signal"
+idea from §9 taken to production scale, validating the direction but requiring
+substantial training data.
+
+**Visual temporal grounding.** VTimeCoT (2025,
+[arXiv:2510.14672](https://arxiv.org/abs/2510.14672)) overlays progress-bar
+annotations on video frames — closely mirroring our frame annotation intervention
+(§5). Code-as-Monitor (Zhou et al., CVPR 2025,
+[arXiv:2412.04455](https://arxiv.org/abs/2412.04455)) uses VLM-generated code for
+spatio-temporal constraint monitoring, representing an alternative paradigm
+(programmatic vs direct prediction) for failure detection.
+
 ## Cross-Study Connection: TD-Error Baseline
 
 The sibling study (`td_error_baseline`) finds TD-error PER is **uninformative in
@@ -194,6 +228,8 @@ a reliable priority signal when it would be most needed (early training).
 | 017 | FINDINGS.md synthesis | 10 findings, Gemini still blocked | ✓ |
 | 018 | GPT-4o-mini (annotated) | MAE=68.0, late-bias, native multi-image | ✓ |
 | 019 | GPT-4o-mini annotation ± | Annotation HURTS (+11% MAE), model-dependent | ✓ |
+| 020 | HTML report interface | Self-contained report.html with embedded figures | ✓ |
+| 021 | Literature review + Gemini retry | 6 related papers found, Gemini still 20 RPD exhausted | ✓ |
 
 ## Bottom Line
 
