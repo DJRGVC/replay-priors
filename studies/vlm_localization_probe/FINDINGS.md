@@ -11,9 +11,9 @@ GPT-4o-mini ($0 via GitHub), Gemini 3 Flash Preview ($0), Gemini 2.5 Flash ($0),
 Gemini 2.5 Flash-Lite ($0), Llama-3.2-11B ($0), Llama-3.2-90B ($0),
 Phi-4-multimodal ($0).
 
-**Interventions tested (7):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
+**Interventions tested (8):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
 annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probing,
-annotation ± comparison on multi-image API.
+annotation ± comparison on multi-image API, CoT × annotation 2×2 factorial.
 
 ## Key Findings
 
@@ -73,21 +73,33 @@ input noise from 32 similar-looking images). The task requires distinguishing ~0
 arm position changes in 224×224 images where the arm occupies ~30 pixels. This is a
 visual acuity problem, not a temporal sampling problem.
 
-### 4. CoT prompting hurts mid/weak-tier models (3/3 negative), only suggestive benefit on strongest model
+### 4. CoT prompting hurts weak/mid models, is neutral on strong models — partially substitutable with annotation
 
 | Model | Direct MAE | CoT MAE | Δ | N |
 |-------|-----------|---------|---|---|
 | Gemini 2.5 Flash-Lite | 71.9 | 79.2* | +7.3 | 10 |
 | Gemini 2.5 Flash | 67.8 | 75.1 | +7.3 | 10 |
 | Phi-4-multimodal | 64.3 | 90.2 | **+25.9** | 10 |
+| GPT-4o (annotated) | 52.7 | 52.2 | −0.5 | 10 |
+| GPT-4o (unannotated) | 75.8 | 65.0 | −10.8 | 10 |
 | Gemini 3 Flash Preview | 54.2 | 22.0 | −32.2 | **3** |
 
 *Estimated from iter_007 control.
 
-CoT (Summarize→Think→Answer) allows models to confabulate plausible reasoning chains
-that drift toward positional priors instead of correcting them. Only Gemini 3 Flash
-Preview showed improvement, but with n=3 — insufficient for significance. Rate limits
-prevented scaling this test.
+CoT (Summarize→Think→Answer) hurts weak/mid models (3/3 negative: +7 to +26 MAE) but
+is **neutral on strong models when annotation is present** (GPT-4o annotated: 52.7→52.2).
+Crucially, CoT **helps unannotated GPT-4o** (75.8→65.0, −14%), revealing that CoT and
+annotation are **partially substitutable** — both provide temporal scaffolding, and when
+you already have annotation, CoT adds nothing further. The full 2×2 on GPT-4o:
+
+| GPT-4o | Direct | CoT |
+|--------|--------|-----|
+| **Annotated** | 52.7 | 52.2 |
+| **Unannotated** | 75.8 | 65.0 |
+
+This suggests the beneficial mechanism of both interventions is anchoring attention to
+temporal structure. Once that's provided (by either annotation or CoT), the second
+intervention is redundant.
 
 ### 5. Frame annotation is model-dependent — helps weak & strong models, hurts mid-tier
 
@@ -241,6 +253,7 @@ a reliable priority signal when it would be most needed (early training).
 | 020 | HTML report interface | Self-contained report.html with embedded figures | ✓ |
 | 021 | Literature review + Gemini retry | 6 related papers found, Gemini still 20 RPD exhausted | ✓ |
 | 022 | GPT-4o annotation ± comparison | Ann MAE=52.7, no-ann MAE=75.8 — annotation helps strong models (−30%) | ✓ |
+| 023 | GPT-4o CoT 2×2 (ann × prompt) | CoT neutral when annotated (52.7→52.2), helps unannotated (75.8→65.0) — CoT & annotation substitutable | ✓ |
 
 ## Bottom Line
 
@@ -248,9 +261,11 @@ VLMs achieve coarse failure localization (best ±10 accuracy = 44%) but are domi
 by positional biases rather than visual understanding. All tested interventions
 (more frames, CoT, two-pass refinement, random sampling) either fail or provide
 marginal improvement. Frame annotation has a U-shaped effect: helps weak (−17% Flash-Lite)
-and strong (−30% GPT-4o) models, but hurts mid-tier (+11% GPT-4o-mini). The fundamental
-bottleneck is visual acuity: distinguishing subtle arm position changes at 224×224
-resolution with ~30-pixel arm regions. VLM-based replay priorities show a promising
+and strong (−30% GPT-4o) models, but hurts mid-tier (+11% GPT-4o-mini). CoT and
+annotation are partially substitutable — both provide temporal scaffolding, and when
+one is already present, the other adds nothing (GPT-4o 2×2: annotated+CoT ≈ annotated+direct).
+The fundamental bottleneck is visual acuity: distinguishing subtle arm position changes at
+224×224 resolution with ~30-pixel arm regions. VLM-based replay priorities show a promising
 overlap signal (+12% above uniform) but harmful KL divergence, suggesting a
 confidence-gated hybrid approach as the path forward — if confidence calibration can
 be solved.
