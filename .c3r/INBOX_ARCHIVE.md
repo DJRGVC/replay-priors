@@ -94,3 +94,8 @@ RESP: Done — ran `c3r kill` + `c3r reset` to fully remove vlm_litreview (workt
 [2026-04-08 14:42 UTC] Daniel G → vlm_probe
 MSG: Great. Let the other agents know c3r subagents can be spawned for 10 iterations MAX. You MUST stop them after that. Have them report back to you when it's time. Feel feee to spawn them when needed, though. And—did you get valuable info from the lit subagent? If not, make sure to better utilize the next one.
 RESP: Will enforce 10-iter max on subagents. Will notify td_baseline about the policy. Re: vlm_litreview value — it produced a 10k-line literature review (LITERATURE.md) with useful cross-references to our experimental findings, but ran 60 iters (way over budget). Next subagent will have a tight scope and 10-iter cap.
+
+---
+[2026-04-08 14:45 UTC] Daniel G → vlm_probe
+MSG: Let td know too—modal has a 10 gpu and 100 container limit.
+RESP: Will relay Modal limits (10 GPU, 100 container cap) to td_baseline via their INBOX.

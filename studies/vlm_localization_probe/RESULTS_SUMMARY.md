@@ -28,6 +28,19 @@ Task: reach-v3 (MetaWorld), 150-step episodes, random policy, K=8 uniform keyfra
 - Both worse than Claude Sonnet (MAE=41.9) and gemini-3-flash-preview (±10=44%)
 - Grid format fundamentally limits multi-image reasoning — models pick visually salient grid cells rather than reasoning about temporal progression
 
+## GitHub Models — GPT-4o-mini (K=8, direct, annotated, native multi-image)
+
+| Model | N | Valid | MAE | Median | ±5 | ±10 | ±20 | Bias | Cost/call |
+|-------|---|-------|-----|--------|-----|------|------|------|-----------|
+| GPT-4o-mini | 10 | 10 | 68.0 | 63.5 | 0% | 0% | 10% | late (t≈106,127) | $0 |
+
+**Notes:**
+- Uses GitHub Models API with native multi-image support (no grid tiling needed)
+- Despite native multi-image, still exhibits strong late-bias: 5/10 predictions at t=106 or t=127
+- **Key control:** confirms positional bias is intrinsic to models' temporal reasoning, not a grid-tiling artifact
+- Worse than Claude Sonnet (MAE=41.9) and gemini-3-flash-preview (±10=44%)
+- Predictions: [127, 106, 106, 127, 127, 63, 106, 106, 85, 63]
+
 ## K Sweep (claude-sonnet-4-6, direct, no annotation)
 
 | K | N | MAE | ±10 | ±20 | Note |

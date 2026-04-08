@@ -6,9 +6,9 @@ rollouts from keyframe images alone?
 **Setup:** MetaWorld reach-v3, 150-step episodes, random policy (all failures), 224×224
 RGB frames, 20 rollouts. GT failure timestep = argmin(hand-to-goal distance).
 
-**Models tested (7):** Claude Sonnet 4.6 ($0.004/call), Gemini 3 Flash Preview ($0),
-Gemini 2.5 Flash ($0), Gemini 2.5 Flash-Lite ($0), Llama-3.2-11B ($0), Llama-3.2-90B
-($0), Phi-4-multimodal ($0).
+**Models tested (8):** Claude Sonnet 4.6 ($0.004/call), GPT-4o-mini ($0 via GitHub),
+Gemini 3 Flash Preview ($0), Gemini 2.5 Flash ($0), Gemini 2.5 Flash-Lite ($0),
+Llama-3.2-11B ($0), Llama-3.2-90B ($0), Phi-4-multimodal ($0).
 
 **Interventions tested (6):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
 annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probing.
@@ -24,6 +24,7 @@ annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probi
 | Llama-3.2-90B | GitHub | 53.5 | 37.5 | 0% | 0% | grid-cell (t=42) |
 | Phi-4-multimodal | GitHub | 64.3 | — | 0% | 10% | grid-center (t=85) |
 | Gemini 2.5 Flash | Google | 67.8 | — | 20% | 30% | end (t≈149) |
+| GPT-4o-mini | GitHub | 68.0 | 63.5 | 0% | 10% | late (t≈106,127) |
 | Llama-3.2-11B | GitHub | 72.9 | 66.5 | 10% | 10% | grid-cell (t=106) |
 | Gemini 2.5 Flash-Lite | Google | 95.2 | 107.5 | 5% | 10% | late |
 
@@ -38,6 +39,7 @@ Each model defaults to a characteristic position regardless of visual content:
 - **Claude Sonnet:** center-bias (t≈85, the middle keyframe)
 - **Gemini 3 Flash Preview:** start-bias (predicts t=0, "arm remains stationary")
 - **Gemini 2.5 Flash:** end-bias (predicts t≈149)
+- **GPT-4o-mini (multi-image):** late-bias (t≈106, 127 — despite native multi-image, no grid)
 - **Llama/Phi-4 (grid-tiled):** grid-cell bias (locks onto specific tile positions)
 
 This is the strongest signal in the study. Models are selecting positions in the
@@ -45,6 +47,10 @@ This is the strongest signal in the study. Models are selecting positions in the
 *visual content*. The bias patterns are stable across rollouts within a model but
 completely different between models, confirming they reflect learned positional priors
 rather than visual understanding.
+
+**Important control (iter 018):** GPT-4o-mini uses native multi-image (no grid tiling)
+yet still exhibits strong late-bias — confirming positional bias is intrinsic to the
+models' temporal reasoning, not an artifact of the grid presentation format.
 
 ### 3. More keyframes do not help — the bottleneck is visual understanding, not temporal resolution
 

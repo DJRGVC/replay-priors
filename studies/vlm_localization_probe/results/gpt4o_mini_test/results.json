@@ -1,0 +1,27 @@
+[
+  {
+    "task": "reach-v3",
+    "model": "gh:gpt-4o-mini",
+    "K": 8,
+    "strategy": "uniform",
+    "prompt_style": "direct",
+    "annotate": true,
+    "proprio": false,
+    "rollout": "rollout_000",
+    "gt_failure_t": 10,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "gt_ambiguous": false,
+    "pred_failure_t": null,
+    "pred_confidence": 0.0,
+    "pred_rationale": "api_error: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "abs_error": 150,
+    "within_5": false,
+    "within_10": false,
+    "within_20": false,
+    "normalized_error": 1.0,
+    "latency_s": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0
+  }
+]

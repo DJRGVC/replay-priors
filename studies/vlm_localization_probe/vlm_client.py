@@ -654,19 +654,32 @@ def _call_github_models(
         total_timesteps, prompt_style, proprio_labels,
     )
 
-    # GitHub Models limits to 1 image per request — tile into grid
-    grid = _tile_keyframes(keyframes, keyframe_indices, total_timesteps)
-    b64 = _pil_to_base64(grid, fmt="JPEG")  # JPEG for smaller payload
-
     suffix = (
         "Now follow the 3-step process. After your reasoning, output the JSON on its own line."
         if prompt_style == "cot" else
         "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."
     )
-    content = [
-        {"type": "text", "text": user_text + f"\n\nThe image below is a {len(keyframes)}-frame grid (left-to-right, top-to-bottom). Each cell is labeled with its timestep.\n\n{suffix}"},
-        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}", "detail": "low"}},
-    ]
+
+    # GPT-4o models support native multi-image — no grid tiling needed
+    is_gpt = "gpt" in model.lower()
+    if is_gpt:
+        content = [{"type": "text", "text": user_text}]
+        for img, idx in zip(keyframes, keyframe_indices):
+            b64 = _pil_to_base64(img, fmt="JPEG")
+            content.append({
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{b64}", "detail": "low"},
+            })
+            content.append({"type": "text", "text": f"↑ Timestep {idx}"})
+        content.append({"type": "text", "text": suffix})
+    else:
+        # Non-GPT models (Llama, Phi, etc.) — tile into grid (1 image limit)
+        grid = _tile_keyframes(keyframes, keyframe_indices, total_timesteps)
+        b64 = _pil_to_base64(grid, fmt="JPEG")
+        content = [
+            {"type": "text", "text": user_text + f"\n\nThe image below is a {len(keyframes)}-frame grid (left-to-right, top-to-bottom). Each cell is labeled with its timestep.\n\n{suffix}"},
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}", "detail": "low"}},
+        ]
 
     max_tokens = 2048 if prompt_style == "cot" else 512
 
@@ -739,15 +752,16 @@ def predict_failure(
         proprio_labels=proprio_labels,
     )
 
-    if "claude" in model or "sonnet" in model or "opus" in model or "haiku" in model:
+    # gh: prefix must be checked FIRST — it can contain "gpt", "llama", etc.
+    if model.startswith("gh:"):
+        kwargs["model"] = model[3:]  # strip "gh:" prefix
+        return _call_github_models(**kwargs)
+    elif "claude" in model or "sonnet" in model or "opus" in model or "haiku" in model:
         return _call_claude(**kwargs)
     elif "gpt" in model or "o1" in model or "o3" in model or "o4" in model:
         return _call_openai(**kwargs)
     elif "gemini" in model:
         return _call_gemini(**kwargs)
-    elif model.startswith("gh:"):
-        kwargs["model"] = model[3:]  # strip "gh:" prefix
-        return _call_github_models(**kwargs)
     elif "llama" in model or "groq" in model:
         return _call_groq(**kwargs)
     else:

@@ -37,6 +37,8 @@ COST_PER_1M = {
     "meta-llama/llama-4-scout-17b-16e-instruct": {"input": 0.0, "output": 0.0},  # Groq free tier
     "gh:Llama-3.2-11B-Vision-Instruct": {"input": 0.0, "output": 0.0},  # GitHub Models free
     "gh:Llama-3.2-90B-Vision-Instruct": {"input": 0.0, "output": 0.0},  # GitHub Models free
+    "gh:gpt-4o-mini": {"input": 0.0, "output": 0.0},  # GitHub Models free
+    "gh:Phi-4-multimodal-instruct": {"input": 0.0, "output": 0.0},  # GitHub Models free
 }
 
 
