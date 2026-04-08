@@ -112,7 +112,7 @@ def _pil_to_base64(img: Image.Image, fmt: str = "PNG") -> str:
 
 # ── Prompt construction ────────────────────────────────────────────
 
-SYSTEM_PROMPT = """\
+SYSTEM_PROMPT_DIRECT = """\
 You are analyzing a robot manipulation rollout that FAILED its task.
 You will see K keyframes sampled from the episode at known timestep indices.
 Your job: identify the single timestep INDEX (from the provided list of indices) \
@@ -124,11 +124,38 @@ Respond with ONLY a valid JSON object on a single line, nothing else:
 {"failure_timestep": <int from the index list>, "confidence": <float 0-1>, "rationale": "<one sentence>"}
 """
 
+SYSTEM_PROMPT_COT = """\
+You are analyzing a robot manipulation rollout that FAILED its task.
+You will see K keyframes sampled from the episode at known timestep indices.
+Your job: identify when the critical failure occurred — the moment the robot's \
+behavior most clearly diverged from what would achieve the task goal.
+
+You MUST follow this exact 3-step reasoning process:
+
+**Step 1 — SUMMARIZE:** For EACH keyframe image, describe in 1-2 sentences what \
+you see: the robot arm's position, gripper state (open/closed), the object's \
+location relative to the target, and any notable changes from the previous frame. \
+Reference specific visual details — do NOT skip any frame.
+
+**Step 2 — THINK:** Based on your frame-by-frame descriptions, identify which \
+transition between consecutive keyframes shows the clearest sign that the task \
+will fail. What specific visual evidence supports this? Is the arm moving away \
+from the target? Has it missed the object? Is it stuck?
+
+**Step 3 — ANSWER:** First estimate what fraction of the episode (0.0 to 1.0) has \
+elapsed when the failure occurs. Then convert that fraction to the nearest \
+timestep index from the provided list.
+
+After your reasoning, output the final answer as a JSON object on its own line:
+{"failure_timestep": <int from the index list>, "confidence": <float 0-1>, "rationale": "<one sentence>"}
+"""
+
 def _build_user_message(
     task_description: str,
     keyframes: list[Image.Image],
     keyframe_indices: list[int],
     total_timesteps: int,
+    prompt_style: str = "direct",
 ) -> str:
     """Build the text portion of the user message."""
     lines = [
@@ -138,11 +165,63 @@ def _build_user_message(
         f"",
         f"You are shown {len(keyframes)} keyframes at these timestep indices:",
         f"  {keyframe_indices}",
-        f"",
-        f"For each image below, the timestep index is labeled.",
-        f"Identify which timestep index marks the critical failure point.",
     ]
+    if prompt_style == "cot":
+        lines += [
+            f"",
+            f"Follow the 3-step process (SUMMARIZE → THINK → ANSWER) described in your instructions.",
+            f"Describe each frame carefully before making your prediction.",
+        ]
+    else:
+        lines += [
+            f"",
+            f"For each image below, the timestep index is labeled.",
+            f"Identify which timestep index marks the critical failure point.",
+        ]
     return "\n".join(lines)
+
+
+def _get_system_prompt(prompt_style: str = "direct") -> str:
+    """Return the appropriate system prompt for the given style."""
+    if prompt_style == "cot":
+        return SYSTEM_PROMPT_COT
+    return SYSTEM_PROMPT_DIRECT
+
+
+def _parse_json_from_text(text: str) -> dict:
+    """Extract JSON object from text that may contain CoT reasoning before it."""
+    # Strip markdown fences
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+    # Try parsing the whole thing first (direct style)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # For CoT: find the last JSON object in the text
+    import re
+    # Find all JSON-like objects
+    json_matches = list(re.finditer(r'\{[^{}]*"failure_timestep"[^{}]*\}', text))
+    if json_matches:
+        try:
+            return json.loads(json_matches[-1].group())
+        except json.JSONDecodeError:
+            pass
+
+    # Last resort: find any {...} at end of text
+    last_brace = text.rfind('{')
+    if last_brace >= 0:
+        candidate = text[last_brace:]
+        end = candidate.find('}')
+        if end >= 0:
+            try:
+                return json.loads(candidate[:end+1])
+            except json.JSONDecodeError:
+                pass
+
+    return {"failure_timestep": None, "confidence": 0.0, "rationale": f"parse_error: {text[:200]}"}
 
 
 # ── Claude (Anthropic) backend ─────────────────────────────────────
@@ -153,6 +232,7 @@ def _call_claude(
     keyframe_indices: list[int],
     total_timesteps: int,
     model: str = "claude-sonnet-4-6",
+    prompt_style: str = "direct",
 ) -> dict:
     import anthropic
 
@@ -160,7 +240,7 @@ def _call_claude(
 
     # Build content blocks: interleave images with labels
     content = []
-    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps)
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style)
     content.append({"type": "text", "text": user_text})
 
     for img, idx in zip(keyframes, keyframe_indices):
@@ -171,13 +251,18 @@ def _call_claude(
         })
         content.append({"type": "text", "text": f"↑ Timestep {idx}"})
 
-    content.append({"type": "text", "text": "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."})
+    if prompt_style == "cot":
+        content.append({"type": "text", "text": "Now follow the 3-step process. After your reasoning, output the JSON on its own line."})
+    else:
+        content.append({"type": "text", "text": "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."})
+
+    max_tokens = 2048 if prompt_style == "cot" else 512
 
     def _do_call():
         return client.messages.create(
             model=model,
-            max_tokens=512,
-            system=SYSTEM_PROMPT,
+            max_tokens=max_tokens,
+            system=_get_system_prompt(prompt_style),
             messages=[{"role": "user", "content": content}],
         )
 
@@ -185,16 +270,8 @@ def _call_claude(
     response = _retry_on_rate_limit(_do_call)
     latency = time.time() - t0
 
-    # Parse response
     text = response.content[0].text.strip()
-    # Handle potential markdown fences
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-
-    try:
-        result = json.loads(text)
-    except json.JSONDecodeError:
-        result = {"failure_timestep": None, "confidence": 0.0, "rationale": f"parse_error: {text[:200]}"}
+    result = _parse_json_from_text(text)
 
     result["_latency_s"] = round(latency, 2)
     result["_input_tokens"] = response.usage.input_tokens
@@ -211,12 +288,13 @@ def _call_openai(
     keyframe_indices: list[int],
     total_timesteps: int,
     model: str = "gpt-4o",
+    prompt_style: str = "direct",
 ) -> dict:
     from openai import OpenAI
 
     client = OpenAI()
 
-    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps)
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style)
 
     # Build content parts
     content = [{"type": "text", "text": user_text}]
@@ -228,14 +306,19 @@ def _call_openai(
         })
         content.append({"type": "text", "text": f"↑ Timestep {idx}"})
 
-    content.append({"type": "text", "text": "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."})
+    if prompt_style == "cot":
+        content.append({"type": "text", "text": "Now follow the 3-step process. After your reasoning, output the JSON on its own line."})
+    else:
+        content.append({"type": "text", "text": "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."})
+
+    max_tokens = 2048 if prompt_style == "cot" else 512
 
     def _do_call():
         return client.chat.completions.create(
             model=model,
-            max_tokens=512,
+            max_tokens=max_tokens,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": _get_system_prompt(prompt_style)},
                 {"role": "user", "content": content},
             ],
         )
@@ -245,13 +328,7 @@ def _call_openai(
     latency = time.time() - t0
 
     text = response.choices[0].message.content.strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-
-    try:
-        result = json.loads(text)
-    except json.JSONDecodeError:
-        result = {"failure_timestep": None, "confidence": 0.0, "rationale": f"parse_error: {text[:200]}"}
+    result = _parse_json_from_text(text)
 
     result["_latency_s"] = round(latency, 2)
     result["_input_tokens"] = response.usage.prompt_tokens
@@ -268,29 +345,38 @@ def _call_gemini(
     keyframe_indices: list[int],
     total_timesteps: int,
     model: str = "gemini-2.5-flash",
+    prompt_style: str = "direct",
 ) -> dict:
     from google import genai
     from google.genai import types
 
     client = genai.Client()
 
-    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps)
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style)
 
     # Build content parts: text + interleaved images with labels
     contents = [user_text]
     for img, idx in zip(keyframes, keyframe_indices):
         contents.append(img)
         contents.append(f"↑ Timestep {idx}")
-    contents.append("Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line.")
+
+    if prompt_style == "cot":
+        contents.append("Now follow the 3-step process. After your reasoning, output the JSON on its own line.")
+    else:
+        contents.append("Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line.")
+
+    # For CoT, disable JSON response mode so the model can reason freely
+    response_mime = None if prompt_style == "cot" else "application/json"
+    max_tokens = 4096 if prompt_style == "cot" else 2048
 
     def _do_call():
         return client.models.generate_content(
             model=model,
             contents=contents,
             config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                max_output_tokens=2048,
-                response_mime_type="application/json",
+                system_instruction=_get_system_prompt(prompt_style),
+                max_output_tokens=max_tokens,
+                response_mime_type=response_mime,
                 thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
@@ -300,13 +386,7 @@ def _call_gemini(
     latency = time.time() - t0
 
     text = response.text.strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-
-    try:
-        result = json.loads(text)
-    except json.JSONDecodeError:
-        result = {"failure_timestep": None, "confidence": 0.0, "rationale": f"parse_error: {text[:200]}"}
+    result = _parse_json_from_text(text)
 
     # Gemini usage metadata
     usage = response.usage_metadata
@@ -335,18 +415,23 @@ def predict_failure(
     keyframe_indices: list[int],
     total_timesteps: int,
     model: str = "claude-sonnet-4-6",
+    prompt_style: str = "direct",
 ) -> dict:
     """Predict the failure timestep using a VLM.
+
+    Args:
+        prompt_style: "direct" (predict timestep immediately) or
+                      "cot" (Summarize→Think→Answer structured reasoning)
 
     Returns dict with: failure_timestep, confidence, rationale,
     plus _latency_s, _input_tokens, _output_tokens, _model.
     """
     if "claude" in model or "sonnet" in model or "opus" in model or "haiku" in model:
-        return _call_claude(task_description, keyframes, keyframe_indices, total_timesteps, model)
+        return _call_claude(task_description, keyframes, keyframe_indices, total_timesteps, model, prompt_style)
     elif "gpt" in model or "o1" in model or "o3" in model or "o4" in model:
-        return _call_openai(task_description, keyframes, keyframe_indices, total_timesteps, model)
+        return _call_openai(task_description, keyframes, keyframe_indices, total_timesteps, model, prompt_style)
     elif "gemini" in model:
-        return _call_gemini(task_description, keyframes, keyframe_indices, total_timesteps, model)
+        return _call_gemini(task_description, keyframes, keyframe_indices, total_timesteps, model, prompt_style)
     else:
         raise ValueError(f"Unknown model family: {model}. Use a Claude, OpenAI, or Gemini model name.")
 

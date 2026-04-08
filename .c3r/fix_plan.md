@@ -18,10 +18,11 @@
 - [x] **Add Gemini backend to vlm_client.py** — DONE iter_004. Flash-lite MAE=95.2 (much worse than Sonnet 41.9). Flash quota exhausted (20 RPD!).
 - [ ] **Re-run reach-v3 probe with gemini-2.5-flash** (thinking_budget=0 fix applied) — wait for quota reset
 - [x] **Try gemini-3-flash-preview** — DONE iter_005. MAE=54.2 (median 14), ±10=44%, ±20=56%. 2× better ±10 than Sonnet. Start-bias, bimodal. gemini-2.0-flash has 0 free RPD (dead).
-- [ ] Run remaining 10 rollouts on gemini-3-flash-preview for n=20 fair comparison
+- [ ] **Complete gemini-3-flash-preview CoT comparison** — need n≥9 to match direct baseline. Rate limits: run when quota resets.
+- [ ] Run remaining 10 rollouts on gemini-3-flash-preview direct for n=20
 - [ ] Run probe on push-v3 and pick-place-v3 (may have more visually distinct failure modes)
 - [ ] Try "pinned" sampling strategy (first+last frames pinned) vs uniform
-- [ ] Try improved prompt: provide proprio state as text, or use chain-of-thought prompting
+- [ ] Try proprio-as-text augmentation (complement visual with numeric end-effector state)
 - [ ] Open questions: definition of "failure" for time-out tasks; vision-only vs vision+proprio-as-text
 - [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 

@@ -87,8 +87,11 @@ def run_sweep(
     models: list[str],
     output_dir: Path,
     max_rollouts: int | None = None,
+    prompt_styles: list[str] | None = None,
 ):
     """Run the full sweep and save results."""
+    if prompt_styles is None:
+        prompt_styles = ["direct"]
     output_dir.mkdir(parents=True, exist_ok=True)
     all_results = []
     total_cost = 0.0
@@ -103,88 +106,91 @@ def run_sweep(
         for model in models:
             for K in K_values:
                 for strategy in strategies:
-                    config_key = f"{task_name}/{model}/K={K}/{strategy}"
-                    print(f"\n{'='*60}")
-                    print(f"Config: {config_key}")
-                    print(f"{'='*60}")
+                    for prompt_style in prompt_styles:
+                        config_key = f"{task_name}/{model}/K={K}/{strategy}/{prompt_style}"
+                        print(f"\n{'='*60}")
+                        print(f"Config: {config_key}")
+                        print(f"{'='*60}")
 
-                    config_results = []
-                    for rollout in rollouts:
-                        if rollout["success"]:
-                            continue  # skip successes
+                        config_results = []
+                        for rollout in rollouts:
+                            if rollout["success"]:
+                                continue  # skip successes
 
-                        rd = Path(rollout["_dir"])
-                        frames_dir = rd / "frames"
+                            rd = Path(rollout["_dir"])
+                            frames_dir = rd / "frames"
 
-                        try:
-                            frames, indices = sample_keyframes(frames_dir, K=K, strategy=strategy)
-                        except ValueError as e:
-                            print(f"  SKIP {rd.name}: {e}")
-                            continue
+                            try:
+                                frames, indices = sample_keyframes(frames_dir, K=K, strategy=strategy)
+                            except ValueError as e:
+                                print(f"  SKIP {rd.name}: {e}")
+                                continue
 
-                        try:
-                            pred = predict_failure(
-                                task_description=task_desc,
-                                keyframes=frames,
-                                keyframe_indices=indices,
-                                total_timesteps=rollout["num_steps"],
-                                model=model,
-                            )
-                        except Exception as e:
-                            print(f"  ERROR {rd.name}: {e}")
-                            pred = {
-                                "failure_timestep": None,
-                                "confidence": 0.0,
-                                "rationale": f"api_error: {e}",
-                                "_latency_s": 0,
-                                "_input_tokens": 0,
-                                "_output_tokens": 0,
-                                "_model": model,
+                            try:
+                                pred = predict_failure(
+                                    task_description=task_desc,
+                                    keyframes=frames,
+                                    keyframe_indices=indices,
+                                    total_timesteps=rollout["num_steps"],
+                                    model=model,
+                                    prompt_style=prompt_style,
+                                )
+                            except Exception as e:
+                                print(f"  ERROR {rd.name}: {e}")
+                                pred = {
+                                    "failure_timestep": None,
+                                    "confidence": 0.0,
+                                    "rationale": f"api_error: {e}",
+                                    "_latency_s": 0,
+                                    "_input_tokens": 0,
+                                    "_output_tokens": 0,
+                                    "_model": model,
+                                }
+
+                            gt = rollout["failure_timestep"]
+                            metrics = evaluate_prediction(gt, pred.get("failure_timestep"), rollout["num_steps"])
+                            cost = estimate_cost(model, pred.get("_input_tokens", 0), pred.get("_output_tokens", 0))
+                            total_cost += cost
+
+                            entry = {
+                                "task": task_name,
+                                "model": model,
+                                "K": K,
+                                "strategy": strategy,
+                                "prompt_style": prompt_style,
+                                "rollout": rd.name,
+                                "gt_failure_t": gt,
+                                "gt_failure_type": rollout.get("failure_type"),
+                                "gt_ambiguous": rollout.get("ambiguous"),
+                                "pred_failure_t": pred.get("failure_timestep"),
+                                "pred_confidence": pred.get("confidence"),
+                                "pred_rationale": pred.get("rationale"),
+                                **metrics,
+                                "latency_s": pred.get("_latency_s", 0),
+                                "input_tokens": pred.get("_input_tokens", 0),
+                                "output_tokens": pred.get("_output_tokens", 0),
+                                "cost_usd": round(cost, 6),
                             }
+                            config_results.append(entry)
+                            all_results.append(entry)
 
-                        gt = rollout["failure_timestep"]
-                        metrics = evaluate_prediction(gt, pred.get("failure_timestep"), rollout["num_steps"])
-                        cost = estimate_cost(model, pred.get("_input_tokens", 0), pred.get("_output_tokens", 0))
-                        total_cost += cost
+                            pred_t = pred.get('failure_timestep')
+                            pred_str = f"{pred_t:>4d}" if pred_t is not None else "   ?"
+                            status = f"gt={gt:3d} pred={pred_str} err={metrics['abs_error']:3d} lat={pred.get('_latency_s',0):.1f}s ${cost:.4f}"
+                            print(f"  {rd.name}: {status}")
 
-                        entry = {
-                            "task": task_name,
-                            "model": model,
-                            "K": K,
-                            "strategy": strategy,
-                            "rollout": rd.name,
-                            "gt_failure_t": gt,
-                            "gt_failure_type": rollout.get("failure_type"),
-                            "gt_ambiguous": rollout.get("ambiguous"),
-                            "pred_failure_t": pred.get("failure_timestep"),
-                            "pred_confidence": pred.get("confidence"),
-                            "pred_rationale": pred.get("rationale"),
-                            **metrics,
-                            "latency_s": pred.get("_latency_s", 0),
-                            "input_tokens": pred.get("_input_tokens", 0),
-                            "output_tokens": pred.get("_output_tokens", 0),
-                            "cost_usd": round(cost, 6),
-                        }
-                        config_results.append(entry)
-                        all_results.append(entry)
-
-                        pred_t = pred.get('failure_timestep')
-                        pred_str = f"{pred_t:>4d}" if pred_t is not None else "   ?"
-                        status = f"gt={gt:3d} pred={pred_str} err={metrics['abs_error']:3d} lat={pred.get('_latency_s',0):.1f}s ${cost:.4f}"
-                        print(f"  {rd.name}: {status}")
-
-                    # Config summary
-                    if config_results:
-                        errs = [r["abs_error"] for r in config_results]
-                        w5 = np.mean([r["within_5"] for r in config_results])
-                        w10 = np.mean([r["within_10"] for r in config_results])
-                        w20 = np.mean([r["within_20"] for r in config_results])
-                        lats = [r["latency_s"] for r in config_results]
-                        costs = [r["cost_usd"] for r in config_results]
-                        print(f"\n  SUMMARY ({len(config_results)} rollouts):")
-                        print(f"    Mean abs error: {np.mean(errs):.1f} (median: {np.median(errs):.1f})")
-                        print(f"    ±5 acc: {w5:.1%}  ±10 acc: {w10:.1%}  ±20 acc: {w20:.1%}")
-                        print(f"    Mean latency: {np.mean(lats):.1f}s  Mean cost: ${np.mean(costs):.4f}/call")
+                        # Config summary
+                        if config_results:
+                            errs = [r["abs_error"] for r in config_results]
+                            w5 = np.mean([r["within_5"] for r in config_results])
+                            w10 = np.mean([r["within_10"] for r in config_results])
+                            w20 = np.mean([r["within_20"] for r in config_results])
+                            lats = [r["latency_s"] for r in config_results]
+                            costs = [r["cost_usd"] for r in config_results]
+                            print(f"\n  SUMMARY ({len(config_results)} rollouts):")
+                            print(f"    Mean abs error: {np.mean(errs):.1f} (median: {np.median(errs):.1f})")
+                            print(f"    ±5 acc: {w5:.1%}  ±10 acc: {w10:.1%}  ±20 acc: {w20:.1%}")
+                            print(f"    Mean latency: {np.mean(lats):.1f}s  Mean cost: ${np.mean(costs):.4f}/call")
 
     # Save all results
     results_path = output_dir / "results.json"
@@ -205,15 +211,15 @@ def _print_summary_table(results: list[dict]):
 
     groups = defaultdict(list)
     for r in results:
-        key = (r["task"], r["model"], r["K"], r["strategy"])
+        key = (r["task"], r["model"], r["K"], r["strategy"], r.get("prompt_style", "direct"))
         groups[key].append(r)
 
-    print(f"\n{'='*90}")
-    print(f"{'Task':<18} {'Model':<25} {'K':>2} {'Strat':<8} {'MAE':>5} {'±5':>5} {'±10':>5} {'±20':>5} {'Lat':>5} {'$/call':>7}")
-    print(f"{'='*90}")
+    print(f"\n{'='*100}")
+    print(f"{'Task':<18} {'Model':<25} {'K':>2} {'Strat':<8} {'Prompt':<8} {'MAE':>5} {'±5':>5} {'±10':>5} {'±20':>5} {'Lat':>5} {'$/call':>7}")
+    print(f"{'='*100}")
 
     for key in sorted(groups.keys()):
-        task, model, K, strategy = key
+        task, model, K, strategy, prompt_style = key
         rs = groups[key]
         mae = np.mean([r["abs_error"] for r in rs])
         w5 = np.mean([r["within_5"] for r in rs])
@@ -221,9 +227,9 @@ def _print_summary_table(results: list[dict]):
         w20 = np.mean([r["within_20"] for r in rs])
         lat = np.mean([r["latency_s"] for r in rs])
         cost = np.mean([r["cost_usd"] for r in rs])
-        print(f"{task:<18} {model:<25} {K:>2} {strategy:<8} {mae:>5.1f} {w5:>4.0%} {w10:>4.0%} {w20:>4.0%} {lat:>4.1f}s ${cost:>.4f}")
+        print(f"{task:<18} {model:<25} {K:>2} {strategy:<8} {prompt_style:<8} {mae:>5.1f} {w5:>4.0%} {w10:>4.0%} {w20:>4.0%} {lat:>4.1f}s ${cost:>.4f}")
 
-    print(f"{'='*90}")
+    print(f"{'='*100}")
 
 
 def main():
@@ -234,6 +240,7 @@ def main():
     parser.add_argument("--K", nargs="+", type=int, default=[8])
     parser.add_argument("--models", nargs="+", default=["claude-sonnet-4-6"])
     parser.add_argument("--strategies", nargs="+", default=["uniform"])
+    parser.add_argument("--prompt-styles", nargs="+", default=["direct"], choices=["direct", "cot"])
     parser.add_argument("--max-rollouts", type=int, default=None)
     args = parser.parse_args()
 
@@ -248,6 +255,7 @@ def main():
         models=args.models,
         output_dir=output_dir,
         max_rollouts=args.max_rollouts,
+        prompt_styles=args.prompt_styles,
     )
 
 
