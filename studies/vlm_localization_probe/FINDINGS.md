@@ -10,8 +10,9 @@ RGB frames, 20 rollouts. GT failure timestep = argmin(hand-to-goal distance).
 Gemini 3 Flash Preview ($0), Gemini 2.5 Flash ($0), Gemini 2.5 Flash-Lite ($0),
 Llama-3.2-11B ($0), Llama-3.2-90B ($0), Phi-4-multimodal ($0).
 
-**Interventions tested (6):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
-annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probing.
+**Interventions tested (7):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
+annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probing,
+annotation ± comparison on multi-image API.
 
 ## Key Findings
 
@@ -24,7 +25,8 @@ annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probi
 | Llama-3.2-90B | GitHub | 53.5 | 37.5 | 0% | 0% | grid-cell (t=42) |
 | Phi-4-multimodal | GitHub | 64.3 | — | 0% | 10% | grid-center (t=85) |
 | Gemini 2.5 Flash | Google | 67.8 | — | 20% | 30% | end (t≈149) |
-| GPT-4o-mini | GitHub | 68.0 | 63.5 | 0% | 10% | late (t≈106,127) |
+| GPT-4o-mini (ann) | GitHub | 68.0 | 63.5 | 0% | 10% | late (t≈106,127) |
+| GPT-4o-mini (no ann) | GitHub | 61.2 | 51.0 | 10% | 20% | late (t≈106) |
 | Llama-3.2-11B | GitHub | 72.9 | 66.5 | 10% | 10% | grid-cell (t=106) |
 | Gemini 2.5 Flash-Lite | Google | 95.2 | 107.5 | 5% | 10% | late |
 
@@ -82,16 +84,20 @@ that drift toward positional priors instead of correcting them. Only Gemini 3 Fl
 Preview showed improvement, but with n=3 — insufficient for significance. Rate limits
 prevented scaling this test.
 
-### 5. Frame annotation provides moderate gains on weak models
+### 5. Frame annotation is model-dependent — helps weak models, hurts GPT-4o-mini
 
 | Model | Unannotated | Annotated | ΔMAE |
 |-------|------------|-----------|------|
 | Gemini 2.5 Flash-Lite | 71.9 | 59.5 | −12.4 (−17%) |
+| GPT-4o-mini | 61.2 | 68.0 | +6.8 (+11%) |
 
 Overlaying "t=X (N%)" on each frame (VTimeCoT-style) improved Flash-Lite's MAE by
-17% and doubled ±10 accuracy (10%→20%). The visual temporal anchors help models that
-lack strong internal temporal reasoning. Could not test on stronger models due to
-Gemini rate limits.
+17% and doubled ±10 accuracy (10%→20%). However, annotation **hurts** GPT-4o-mini
+(MAE +11%, ±10 drops from 20%→0%). Per-rollout: 4/10 favor no-annotation, 3/10 favor
+annotation, 3/10 tied. Both conditions show identical positional bias — predictions
+locked to keyframe timesteps (63, 85, 106, 127). Annotation shifts GPT-4o-mini's
+distribution toward later timesteps (3× at t=127 vs 1×), worsening the late-bias.
+The annotation effect is model-dependent, not universally positive.
 
 ### 6. Two-pass adaptive probing fails — coarse pass too inaccurate to guide refinement
 
@@ -185,14 +191,17 @@ a reliable priority signal when it would be most needed (early training).
 | 014 | Random vs uniform sampling | No improvement (MAE 64.7 vs 63.8) | ✓ |
 | 015 | Two-pass adaptive probing | NEGATIVE (MAE 69.8→71.3) | ✓ |
 | 016 | CoT on Phi-4 | NEGATIVE (MAE 64.3→90.2) | ✓ |
+| 017 | FINDINGS.md synthesis | 10 findings, Gemini still blocked | ✓ |
+| 018 | GPT-4o-mini (annotated) | MAE=68.0, late-bias, native multi-image | ✓ |
+| 019 | GPT-4o-mini annotation ± | Annotation HURTS (+11% MAE), model-dependent | ✓ |
 
 ## Bottom Line
 
 VLMs achieve coarse failure localization (best ±10 accuracy = 44%) but are dominated
 by positional biases rather than visual understanding. All tested interventions
 (more frames, CoT, two-pass refinement, random sampling) either fail or provide
-marginal improvement. Frame annotation is the only consistently positive intervention
-(−17% MAE on weak models). The fundamental bottleneck is visual acuity: distinguishing
+marginal improvement. Frame annotation is model-dependent (−17% on weak Flash-Lite, +11% on GPT-4o-mini)
+— not universally positive. The fundamental bottleneck is visual acuity: distinguishing
 subtle arm position changes at 224×224 resolution with ~30-pixel arm regions. VLM-based
 replay priorities show a promising overlap signal (+12% above uniform) but harmful KL
 divergence, suggesting a confidence-gated hybrid approach as the path forward — if
