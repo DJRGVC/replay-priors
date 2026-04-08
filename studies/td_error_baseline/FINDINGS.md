@@ -10,22 +10,35 @@ training). On hard tasks, it never emerges.
 ## Setup
 
 - **Algorithm:** SAC (MLP policy, 100k replay buffer, batch=256)
-- **Tasks:** MetaWorld reach-v3 (easy) and pick-place-v3 (hard)
+- **Tasks:** MetaWorld reach-v3 (easy, 100k steps) and pick-place-v3 (hard, 300k steps)
 - **Reward:** Sparse binary (1.0 on success, 0.0 otherwise)
 - **Oracle signal:** MetaWorld's dense shaped reward (never used by agent)
 - **Metric:** Spearman rank correlation between |TD-error| and oracle advantage
   (dense_reward − mean), sampled from 5000 replay transitions every 10k steps
-- **Compute:** Modal T4 GPU, ~20 min per 100k-step run
+- **Compute:** Modal T4 GPU, ~20 min per 100k steps
 - **Seeds:** 42, 123
 
-## Key Results (2 seeds, 100k steps)
+## Key Results
 
-| Metric | reach-v3 | pick-place-v3 |
-|--------|----------|---------------|
-| Spearman, first 50k steps | −0.11 to +0.10 (noise, both seeds) | −0.05 to +0.13 (noise) |
-| Spearman, 50k–100k steps | 0.15–0.65 (signal emerges) | −0.11 to +0.24 (still noise) |
-| Policy learns? | Yes, after ~50–60k (seed-dependent) | No, 0% success at 100k |
-| Cross-seed consistency | Both seeds show same pattern; s123 learns ~10k earlier | Both seeds stay near zero |
+### reach-v3 (2 seeds, 100k steps)
+
+| Metric | Result |
+|--------|--------|
+| Spearman, first 50k steps | −0.11 to +0.10 (noise, both seeds) |
+| Spearman, 50k–100k steps | 0.15–0.65 (signal emerges with policy learning) |
+| Policy learns? | Yes, after ~50–60k (seed-dependent) |
+| Cross-seed consistency | Both seeds show same pattern; s123 learns ~10k earlier |
+
+### pick-place-v3 (2 seeds, 300k steps)
+
+| Metric | seed=42 | seed=123 |
+|--------|---------|----------|
+| Spearman, 0–100k | −0.04 to +0.24 (noise) | −0.18 to +0.19 (noise) |
+| Spearman, 100k–200k | +0.07 to +0.28 (weak positive, brief) | −0.01 to +0.30 (weak positive) |
+| Spearman, 200k–300k | **−0.30 to +0.07 (inverts!)** | −0.03 to +0.20 (back to noise) |
+| Policy learns? | Marginal (ep_rew peaks ~0.7 at 185k, drops to 0.1) | No (ep_rew=0 throughout) |
+| Q-value stability | Oscillates wildly (0.02→50→11→0.02) | Collapsed to ~0.0005 |
+| Final Spearman at 300k | **−0.21** (anti-informative) | +0.20 (weak positive) |
 
 ## Figure
 
@@ -44,15 +57,18 @@ In addition to correlation, we measure two priority quality metrics across all s
 - **Priority Gini coefficient:** How concentrated are |TD| priorities? Higher = more
   skewed sampling.
 
-| Metric | reach-v3 (first 40k) | reach-v3 (50-100k) | pick-place-v3 (all) |
-|--------|----------------------|---------------------|---------------------|
-| Top-10% overlap | 7–20% (near chance) | Brief spike to 53–61% mid-learning, then drops back to 6–11% | 8–28% (never above ~2× chance) |
-| Gini coefficient | 0.26–0.48 | 0.39–0.54 | 0.30–0.60 |
+| Metric | reach-v3 (first 40k) | reach-v3 (50-100k) | pick-place-v3 (0-300k) |
+|--------|----------------------|---------------------|------------------------|
+| Top-10% overlap | 7–20% (near chance) | Brief spike to 53–61% mid-learning, then drops back to 6–11% | 8–33% (never reliably above 2× chance) |
+| Gini coefficient | 0.26–0.48 | 0.39–0.54 | 0.25–0.60 |
 
-**Key insight from s123 reach-v3:** The Spearman correlation *inverts* late in training
-(−0.09 to −0.12 at 90–100k steps) despite strong policy performance (ep_rew 379).
-This means the critic is overshooting — high |TD| transitions are now the *least*
-informative ones. TD-PER would actively anti-prioritize useful transitions.
+**Key insight — TD-error inversion:** On *both* tasks, the Spearman correlation *inverts*
+(goes negative) at certain training phases:
+- reach-v3 s123: −0.09 to −0.12 at 90–100k (critic overshooting after policy converges)
+- pick-place-v3 s42: **−0.31 at 280k** (Q-value instability during marginal learning)
+
+When correlation inverts, TD-PER actively *anti-prioritizes* useful transitions — it
+would sample the least informative transitions most frequently.
 
 ![Priority quality metrics](figures/priority_quality_metrics.png)
 
@@ -62,14 +78,22 @@ informative ones. TD-PER would actively anti-prioritize useful transitions.
    after the critic has already learned a reasonable value function — but by then the
    agent is already performing well, so the prioritization adds little.
 
-2. **On hard tasks, TD-error is pure noise.** The critic never converges within 100k
-   steps on pick-place-v3, so |TD| priorities are random with respect to true importance.
-   Q-values diverge wildly, meaning high TD-error = high noise, not high learning signal.
+2. **On hard tasks, TD-error is noisy and can become anti-informative.** Even with 3×
+   more training (300k steps), pick-place-v3 never sustains meaningful correlation.
+   When the policy briefly learns (seed=42, peak ep_rew=0.7 at 185k), Q-values oscillate
+   wildly (0.02→50→11) and TD-error correlation *inverts* to −0.31, meaning TD-PER would
+   actively sample the worst transitions.
 
-3. **This motivates VLM-based prioritization.** A VLM that can identify "interesting"
+3. **Seed variance is extreme on hard tasks.** One seed (42) showed marginal learning
+   with wild Q-value instability; the other (123) showed complete policy collapse with
+   near-zero Q-values. This suggests TD-error PER would be unreliable even on tasks
+   where learning is technically possible.
+
+4. **This motivates VLM-based prioritization.** A VLM that can identify "interesting"
    transitions (novel states, near-success, task-relevant progress) could provide a
    meaningful priority signal from the very first step, without waiting for critic
-   convergence.
+   convergence — and critically, without the inversion problem where high TD-error
+   transitions become anti-informative.
 
 ## Files
 
@@ -89,4 +113,5 @@ informative ones. TD-PER would actively anti-prioritize useful transitions.
 - [x] Single-seed (42) runs on reach-v3 + pick-place-v3, 100k steps
 - [x] Second seed (123) for error bars — figure updated with mean ± std bands
 - [x] Gini coefficient + top-K overlap metrics — top-K at chance, Gini moderate, correlation inverts late
-- [ ] Consider 200k–500k on pick-place-v3 to check if correlation ever emerges
+- [x] Extended 300k runs on pick-place-v3 — correlation never stabilizes, inverts under Q-instability
+- [x] Literature review (§1: 11 alternative PER methods) via lit_review2 subagent

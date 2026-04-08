@@ -35,7 +35,7 @@ def main():
     fig, axes = plt.subplots(1, 3, figsize=(14, 4.5), sharey=False)
 
     colors = {"reach-v3": "#2196F3", "pick-place-v3": "#F44336"}
-    labels = {"reach-v3": "reach-v3 (learns)", "pick-place-v3": "pick-place-v3 (never learns)"}
+    labels = {"reach-v3": "reach-v3 (100k, learns)", "pick-place-v3": "pick-place-v3 (300k)"}
 
     for task, runs in sorted(task_runs.items()):
         # Align steps across seeds
@@ -71,7 +71,7 @@ def main():
     axes[2].axhline(0.0, color="gray", linestyle="--", alpha=0.6)
     axes[2].set_ylabel("Spearman rank corr.")
     axes[2].set_title("Spearman(|TD|, oracle advantage)")
-    axes[2].set_ylim(-0.4, 0.8)
+    axes[2].set_ylim(-0.5, 0.8)
 
     for ax in axes:
         ax.set_xlabel("Env steps (×1000)")

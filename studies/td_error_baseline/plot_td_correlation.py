@@ -121,7 +121,7 @@ def plot_figure(task_data: dict, output_path: str):
             ax.set_ylabel(f"Correlation\n|TD-error| vs Oracle Advantage")
         ax.set_title(f"{metric_name} Correlation")
         ax.legend(loc="best")
-        ax.set_ylim(-0.3, 0.8)
+        ax.set_ylim(-0.5, 0.8)
         ax.grid(alpha=0.3)
 
     fig.suptitle("How (Un)informative Is TD-Error PER in Early Training?",

@@ -9,6 +9,8 @@
 - [x] Create FINDINGS.md documentation + share with siblings
 
 - [x] Run oracle_correlation.py analysis on downloaded snapshots for priority_gini + top-K overlap metrics
-- [ ] Keep a record of relevant literature — lit_review2 subagent running
+- [x] Keep a record of relevant literature — lit_review2 produced §1 (11 methods); pulled into branch
+- [x] 300k pick-place-v3 runs — correlation never stabilizes, inverts under Q-instability
+- [ ] Synthesize cross-study implications with VLM probe results (sibling)
+- [ ] Write summary comparing TD-error PER failure modes with VLM probe accuracy data
 - [ ] Open questions to surface: is "early training" measured in env vs gradient steps? full buffer vs stratified snapshots?
-- [ ] Consider 200k–500k on pick-place-v3 to check if correlation ever emerges given enough training

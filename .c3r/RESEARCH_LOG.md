@@ -80,3 +80,23 @@ Result:     reach-v3: top-10% overlap at chance (7-20%) for first 40k, brief spi
 Decision:   Next iteration: check on lit_review2 subagent progress. Then either (a) run
             extended 200-500k pick-place-v3 to see if correlation ever emerges, or (b) start
             synthesizing cross-study implications with VLM probe results from sibling.
+
+## iter_005 — Extended 300k pick-place-v3 + lit review pull  (2026-04-08T00:30:00Z)
+Hypothesis: Pick-place-v3 will remain uncorrelated at 300k steps because the policy
+            cannot solve the task with sparse rewards, so the critic never calibrates.
+Change:     Ran 300k-step training on pick-place-v3 (seeds 42+123) via Modal. Downloaded
+            new snapshots (110k-300k), ran oracle_correlation.py, regenerated both figures.
+            Pulled lit_review2 §1 (LIT_REVIEW.md) into branch. Updated FINDINGS.md.
+Command:    modal run modal_app.py --tasks pick-place-v3 --seeds "42,123" --total-steps 300000
+            python oracle_correlation.py + plot_td_correlation.py + plot_priority_quality.py
+Result:     HYPOTHESIS PARTIALLY REFUTED — seed42 showed marginal learning (ep_rew peaked
+            0.7 at 185k) but this made things WORSE: Q-values oscillated wildly
+            (0.02→50→11→0.02), and Spearman INVERTED to −0.31 at 280k. TD-PER would
+            have been actively anti-informative. Seed123 never learned (ep_rew=0, policy
+            collapsed, Q→0.0005). Final Spearman: s42=−0.21, s123=+0.20.
+            NEW FINDING: TD-error inversion is not just a reach-v3 late-training
+            artifact — it's a general failure mode when Q-values are unstable.
+            Wall time: s42=71min, s123=66min on T4.
+Decision:   Next iteration: synthesize cross-study implications. Compare TD baseline
+            failure modes with VLM probe's localization data from sibling. Write a joint
+            summary that motivates VLM-based replay prioritization.
