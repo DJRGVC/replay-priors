@@ -39,6 +39,7 @@ COST_PER_1M = {
     "gh:Llama-3.2-90B-Vision-Instruct": {"input": 0.0, "output": 0.0},  # GitHub Models free
     "gh:gpt-4o-mini": {"input": 0.0, "output": 0.0},  # GitHub Models free
     "gh:Phi-4-multimodal-instruct": {"input": 0.0, "output": 0.0},  # GitHub Models free
+    "gh:gpt-4o": {"input": 0.0, "output": 0.0},  # GitHub Models free
 }
 
 

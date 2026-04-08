@@ -6,9 +6,10 @@ rollouts from keyframe images alone?
 **Setup:** MetaWorld reach-v3, 150-step episodes, random policy (all failures), 224×224
 RGB frames, 20 rollouts. GT failure timestep = argmin(hand-to-goal distance).
 
-**Models tested (8):** Claude Sonnet 4.6 ($0.004/call), GPT-4o-mini ($0 via GitHub),
-Gemini 3 Flash Preview ($0), Gemini 2.5 Flash ($0), Gemini 2.5 Flash-Lite ($0),
-Llama-3.2-11B ($0), Llama-3.2-90B ($0), Phi-4-multimodal ($0).
+**Models tested (9):** Claude Sonnet 4.6 ($0.004/call), GPT-4o ($0 via GitHub),
+GPT-4o-mini ($0 via GitHub), Gemini 3 Flash Preview ($0), Gemini 2.5 Flash ($0),
+Gemini 2.5 Flash-Lite ($0), Llama-3.2-11B ($0), Llama-3.2-90B ($0),
+Phi-4-multimodal ($0).
 
 **Interventions tested (7):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
 annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probing,
@@ -21,13 +22,15 @@ annotation ± comparison on multi-image API.
 | Model | API | MAE↓ | Median↓ | ±10 | ±20 | Bias Pattern |
 |-------|-----|------|---------|-----|------|--------------|
 | Claude Sonnet 4.6 | Anthropic | 41.9 | 34.0 | 20% | 35% | center (t≈85) |
+| GPT-4o (ann) | GitHub | 52.7 | 43.5 | 10% | 10% | early-mid (t=42) |
 | Gemini 3 Flash Preview | Google | 54.2 | 14.0 | **44%** | **56%** | start (t=0) |
 | Llama-3.2-90B | GitHub | 53.5 | 37.5 | 0% | 0% | grid-cell (t=42) |
+| GPT-4o-mini (no ann) | GitHub | 61.2 | 51.0 | 10% | 20% | late (t≈106) |
 | Phi-4-multimodal | GitHub | 64.3 | — | 0% | 10% | grid-center (t=85) |
 | Gemini 2.5 Flash | Google | 67.8 | — | 20% | 30% | end (t≈149) |
 | GPT-4o-mini (ann) | GitHub | 68.0 | 63.5 | 0% | 10% | late (t≈106,127) |
-| GPT-4o-mini (no ann) | GitHub | 61.2 | 51.0 | 10% | 20% | late (t≈106) |
 | Llama-3.2-11B | GitHub | 72.9 | 66.5 | 10% | 10% | grid-cell (t=106) |
+| GPT-4o (no ann) | GitHub | 75.8 | 65.0 | 0% | 20% | start (t=0) |
 | Gemini 2.5 Flash-Lite | Google | 95.2 | 107.5 | 5% | 10% | late |
 
 Best MAE: Claude Sonnet (41.9). Best ±10 accuracy: Gemini 3 Flash Preview (44%, but
@@ -41,6 +44,8 @@ Each model defaults to a characteristic position regardless of visual content:
 - **Claude Sonnet:** center-bias (t≈85, the middle keyframe)
 - **Gemini 3 Flash Preview:** start-bias (predicts t=0, "arm remains stationary")
 - **Gemini 2.5 Flash:** end-bias (predicts t≈149)
+- **GPT-4o (multi-image, annotated):** early-mid bias (6/10 at t=42, native multi-image)
+- **GPT-4o (multi-image, no annotation):** start-bias (5/10 at t=0)
 - **GPT-4o-mini (multi-image):** late-bias (t≈106, 127 — despite native multi-image, no grid)
 - **Llama/Phi-4 (grid-tiled):** grid-cell bias (locks onto specific tile positions)
 
@@ -84,20 +89,25 @@ that drift toward positional priors instead of correcting them. Only Gemini 3 Fl
 Preview showed improvement, but with n=3 — insufficient for significance. Rate limits
 prevented scaling this test.
 
-### 5. Frame annotation is model-dependent — helps weak models, hurts GPT-4o-mini
+### 5. Frame annotation is model-dependent — helps weak & strong models, hurts mid-tier
 
 | Model | Unannotated | Annotated | ΔMAE |
 |-------|------------|-----------|------|
 | Gemini 2.5 Flash-Lite | 71.9 | 59.5 | −12.4 (−17%) |
+| GPT-4o | 75.8 | 52.7 | **−23.1 (−30%)** |
 | GPT-4o-mini | 61.2 | 68.0 | +6.8 (+11%) |
 
-Overlaying "t=X (N%)" on each frame (VTimeCoT-style) improved Flash-Lite's MAE by
-17% and doubled ±10 accuracy (10%→20%). However, annotation **hurts** GPT-4o-mini
-(MAE +11%, ±10 drops from 20%→0%). Per-rollout: 4/10 favor no-annotation, 3/10 favor
-annotation, 3/10 tied. Both conditions show identical positional bias — predictions
-locked to keyframe timesteps (63, 85, 106, 127). Annotation shifts GPT-4o-mini's
-distribution toward later timesteps (3× at t=127 vs 1×), worsening the late-bias.
-The annotation effect is model-dependent, not universally positive.
+Overlaying "t=X (N%)" on each frame (VTimeCoT-style) shows a non-monotonic effect:
+- **Weak models (Flash-Lite):** annotation provides needed temporal anchors (−17% MAE)
+- **Strong models (GPT-4o):** annotation dramatically helps (−30% MAE), shifting from
+  start-bias (5/10 at t=0 unannotated) to more distributed predictions (6/10 at t=42 annotated)
+- **Mid-tier models (GPT-4o-mini):** annotation hurts (+11% MAE), shifting distribution
+  toward later timesteps
+
+GPT-4o without annotation has severe start-bias (MAE=75.8, 5/10 at t=0), but with
+annotation MAE drops to 52.7 — comparable to Llama-3.2-90B. The annotation effect is
+U-shaped: both weak and strong models benefit from temporal grounding, while mid-tier
+models are distracted by the overlay text.
 
 ### 6. Two-pass adaptive probing fails — coarse pass too inaccurate to guide refinement
 
@@ -230,15 +240,17 @@ a reliable priority signal when it would be most needed (early training).
 | 019 | GPT-4o-mini annotation ± | Annotation HURTS (+11% MAE), model-dependent | ✓ |
 | 020 | HTML report interface | Self-contained report.html with embedded figures | ✓ |
 | 021 | Literature review + Gemini retry | 6 related papers found, Gemini still 20 RPD exhausted | ✓ |
+| 022 | GPT-4o annotation ± comparison | Ann MAE=52.7, no-ann MAE=75.8 — annotation helps strong models (−30%) | ✓ |
 
 ## Bottom Line
 
 VLMs achieve coarse failure localization (best ±10 accuracy = 44%) but are dominated
 by positional biases rather than visual understanding. All tested interventions
 (more frames, CoT, two-pass refinement, random sampling) either fail or provide
-marginal improvement. Frame annotation is model-dependent (−17% on weak Flash-Lite, +11% on GPT-4o-mini)
-— not universally positive. The fundamental bottleneck is visual acuity: distinguishing
-subtle arm position changes at 224×224 resolution with ~30-pixel arm regions. VLM-based
-replay priorities show a promising overlap signal (+12% above uniform) but harmful KL
-divergence, suggesting a confidence-gated hybrid approach as the path forward — if
-confidence calibration can be solved.
+marginal improvement. Frame annotation has a U-shaped effect: helps weak (−17% Flash-Lite)
+and strong (−30% GPT-4o) models, but hurts mid-tier (+11% GPT-4o-mini). The fundamental
+bottleneck is visual acuity: distinguishing subtle arm position changes at 224×224
+resolution with ~30-pixel arm regions. VLM-based replay priorities show a promising
+overlap signal (+12% above uniform) but harmful KL divergence, suggesting a
+confidence-gated hybrid approach as the path forward — if confidence calibration can
+be solved.
