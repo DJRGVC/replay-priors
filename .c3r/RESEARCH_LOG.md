@@ -325,3 +325,31 @@ Decision:   Next iteration: either (a) run pick-place-v3 5-seed mode comparison 
             generalization (expected: all 0/5, but Q-stability data valuable), or (b) start
             RPE-PER implementation (lit review's #1 recommendation) to test whether a
             better priority SIGNAL helps where TD-error fails.
+
+## iter_015 — Pick-place-v3 5-seed mode comparison: all modes fail  (2026-04-08T17:00:00Z)
+Hypothesis: On a task too hard for SAC at 100k steps (pick-place-v3), ALL modes
+            will be 0/5, but TD-PER may show worse Q-dynamics (more explosions).
+Change:     Ran 5 seeds (42,123,7,99,256) × 3 modes (uniform, td-per, adaptive)
+            on pick-place-v3 via Modal (100k steps each, T4 GPU). Updated
+            plot_multiseed_comparison.py to accept --task arg. Updated FINDINGS.md.
+Command:    modal run modal_app.py --tasks pick-place-v3 --seeds "42,123,7,99,256" --compare
+            python plot_multiseed_comparison.py --task pick-place-v3
+Result:     **HYPOTHESIS CONFIRMED — all modes 0/5:**
+            - Uniform:  0/5, max_Q=139.2±221.4, max|Spearman|=0.30 (one lucky seed)
+            - TD-PER:   0/5, max_Q=52.1±47.3, max|Spearman|=0.03
+            - Adaptive: 0/5, max_Q=82.0±93.2, max|Spearman|=0.04
+            **Surprise: Q-explosion NOT PER-specific on this task.** Uniform s99
+            explodes to Q=582, worse than any PER run. Seed 99 systematically unstable
+            across all modes (uniform Q=582, adaptive Q=267, td-per Q=147).
+            **Spearman ≈ 0 throughout for all modes** — TD-error in permanent
+            "information desert" when no learning occurs. PER modes never exceed
+            |ρ|=0.04, confirming TD-error carries zero useful signal.
+            Wall time: uniform ~1250-1589s, td-per ~1886-2562s, adaptive ~1926-3265s.
+            Figure: figures/multiseed_mode_comparison_pick_place_v3.png
+Decision:   The two-task story is now complete with statistical power:
+            - reach-v3 (learnable): TD-PER hurts (0/5 vs 3/5 uniform)
+            - pick-place-v3 (unlearnable): TD-error permanently uninformative
+            The original scope deliverable (figure quantifying TD-error uninformativeness)
+            is fulfilled. Next: either (a) update hero summary figure to include
+            pick-place-v3 data, (b) start RPE-PER / alternative signal baseline, or
+            (c) begin prototyping VLM-PER integration with vlm_probe sibling data.

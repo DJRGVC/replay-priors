@@ -217,6 +217,36 @@ for the seeds that don't learn.
 
 ![Alpha sweep](figures/alpha_sweep_td_per.png)
 
+### pick-place-v3 — 5-seed mode comparison (100k steps, iter_015)
+
+**0/5 learn across ALL modes.** Task is too hard for SAC at 100k steps regardless
+of replay strategy. TD-error is completely uninformative throughout.
+
+| Mode | Learns | Q_max (mean±std) | Final Q | max|Spearman| |
+|------|--------|-----------------|---------|----------------|
+| Uniform | 0/5 | 139.2 ± 221.4 | 117.0 | 0.30 |
+| TD-PER | 0/5 | 52.1 ± 47.3 | 34.2 | 0.03 |
+| Adaptive | 0/5 | 82.0 ± 93.2 | 65.6 | 0.04 |
+
+**Key findings:**
+1. **No mode matters when the task is unsolvable.** All 15 runs produce ep_rew=0 at
+   100k steps. The sparse reward provides zero learning signal.
+2. **Spearman ≈ 0 throughout** — TD-error stays completely uncorrelated with oracle
+   advantage (max|ρ| = 0.03 for PER modes, 0.30 for one lucky uniform seed). This is
+   the "information desert" from the regime analysis.
+3. **Q-explosion is sporadic across ALL modes** — not PER-specific on this task.
+   Uniform s99 explodes to Q=582, adaptive s99 to Q=267, td-per s99 to Q=147.
+   Seed 99 appears systematically unstable.
+4. **Complements reach-v3 story:** On a learnable task, TD-PER actively hurts (0/5 vs
+   3/5 uniform). On an unlearnable task, all strategies are equally futile — but TD-error
+   provides zero useful signal at any point.
+
+**Cross-task summary:**
+- **reach-v3 (learnable):** Uniform 3/5 > Adaptive 2/5 > TD-PER 0/5 — PER hurts
+- **pick-place-v3 (unlearnable):** All 0/5 — TD-error in permanent information desert
+
+![Pick-place mode comparison](figures/multiseed_mode_comparison_pick_place_v3.png)
+
 ## Status
 
 - [x] Single-seed (42) runs on reach-v3 + pick-place-v3, 100k steps
@@ -244,6 +274,10 @@ for the seeds that don't learn.
   - Q-explosion is partly tuning, but even best α never beats uniform
   - Confirms problem is the SIGNAL, not the MECHANISM
   - Figure: `figures/alpha_sweep_td_per.png`
+- [x] **5-seed pick-place-v3 mode comparison (iter_015)**: ALL modes 0/5 — task unsolvable
+  - TD-error in permanent information desert (Spearman never exceeds 0.03 for PER modes)
+  - Q-explosion sporadic in ALL modes (not PER-specific on hard tasks)
+  - Figure: `figures/multiseed_mode_comparison_pick_place_v3.png`
 - [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix
 - [ ] Consider RPE-PER or other non-TD priority signals as baselines

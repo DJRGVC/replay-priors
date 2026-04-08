@@ -1,9 +1,14 @@
-"""Multi-seed mode comparison: uniform vs TD-PER vs adaptive on reach-v3.
+"""Multi-seed mode comparison: uniform vs TD-PER vs adaptive.
 
 5 seeds × 3 modes = 15 runs. Produces a 6-panel figure with mean±std
 error bands showing that TD-PER hurts learning while uniform is best.
+
+Usage:
+    python plot_multiseed_comparison.py                     # reach-v3 (default)
+    python plot_multiseed_comparison.py --task pick-place-v3
 """
 
+import argparse
 import json
 import os
 from pathlib import Path
@@ -15,13 +20,12 @@ SNAP_ROOT = Path(__file__).parent / "snapshots"
 MODES = ["uniform", "td-per", "adaptive"]
 MODE_LABELS = {"uniform": "Uniform", "td-per": "TD-PER", "adaptive": "Adaptive Mixer"}
 MODE_COLORS = {"uniform": "#2ecc71", "td-per": "#3498db", "adaptive": "#e74c3c"}
-TASK = "reach-v3"
 SEEDS = [42, 123, 7, 99, 256]
 
 
-def load_all_snapshots(mode, seed):
+def load_all_snapshots(mode, seed, task="reach-v3"):
     """Load snapshot data for a given mode+seed run."""
-    snap_dir = SNAP_ROOT / f"{TASK}_s{seed}_{mode}" / "td_snapshots"
+    snap_dir = SNAP_ROOT / f"{task}_s{seed}_{mode}" / "td_snapshots"
     results = []
     for f in sorted(snap_dir.glob("snapshot_*.npz")):
         data = dict(np.load(f, allow_pickle=True))
@@ -37,9 +41,9 @@ def load_all_snapshots(mode, seed):
     return results
 
 
-def aggregate_seeds(mode):
+def aggregate_seeds(mode, task="reach-v3"):
     """Load all seeds for a mode and aggregate by step."""
-    all_runs = {seed: load_all_snapshots(mode, seed) for seed in SEEDS}
+    all_runs = {seed: load_all_snapshots(mode, seed, task) for seed in SEEDS}
 
     # Find common steps
     step_sets = [set(d["step"] for d in run) for run in all_runs.values() if run]
@@ -60,10 +64,10 @@ def aggregate_seeds(mode):
     return agg
 
 
-def main():
+def main(task="reach-v3"):
     fig, axes = plt.subplots(2, 3, figsize=(18, 10))
 
-    all_agg = {mode: aggregate_seeds(mode) for mode in MODES}
+    all_agg = {mode: aggregate_seeds(mode, task) for mode in MODES}
 
     # Panel (a): Episode Return (the key metric)
     ax = axes[0, 0]
@@ -151,7 +155,7 @@ def main():
     for mode in MODES:
         learned = 0
         for seed in SEEDS:
-            snaps = load_all_snapshots(mode, seed)
+            snaps = load_all_snapshots(mode, seed, task)
             max_late_rew = max(
                 (d["ep_rew"] for d in snaps if d["step"] >= 70000),
                 default=0
@@ -178,7 +182,7 @@ def main():
     ax = axes[1, 2]
     for mode in MODES:
         for seed in SEEDS:
-            snaps = load_all_snapshots(mode, seed)
+            snaps = load_all_snapshots(mode, seed, task)
             steps = [d["step"] for d in snaps]
             rews = [d["ep_rew"] for d in snaps]
             ax.plot(steps, rews, "-", color=MODE_COLORS[mode], alpha=0.3, linewidth=1)
@@ -191,22 +195,29 @@ def main():
     ax.legend(fontsize=9)
     ax.grid(True, alpha=0.3)
 
+    # Build title dynamically
+    results_str = ", ".join(
+        f"{MODE_LABELS[m]}: {mode_results[m]}/5"
+        for m in MODES
+    )
     fig.suptitle(
-        "5-Seed Mode Comparison: reach-v3 (100k steps)\n"
-        "TD-PER hurts: 0/5 learn (Q explodes). Uniform best: 3/5 learn. "
-        "Adaptive middling: 2/5 learn.",
+        f"5-Seed Mode Comparison: {task} (100k steps)\n{results_str}",
         fontsize=12, fontweight="bold"
     )
 
     plt.tight_layout(rect=[0, 0, 1, 0.91])
     out_dir = Path(__file__).parent / "figures"
     out_dir.mkdir(exist_ok=True)
+    fname = f"multiseed_mode_comparison_{task.replace('-', '_')}"
     for ext in ["png", "pdf"]:
-        fig.savefig(out_dir / f"multiseed_mode_comparison.{ext}",
+        fig.savefig(out_dir / f"{fname}.{ext}",
                     dpi=150, bbox_inches="tight")
-    print(f"Saved to {out_dir / 'multiseed_mode_comparison.png'}")
+    print(f"Saved to {out_dir / fname}.png")
     plt.close()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--task", default="reach-v3", choices=["reach-v3", "pick-place-v3"])
+    args = parser.parse_args()
+    main(task=args.task)

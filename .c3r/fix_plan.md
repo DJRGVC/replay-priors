@@ -30,5 +30,5 @@
 - [x] **Alpha sweep**: α=0.3 ties uniform (3/5), α=0.1 worse (2/5), α=0.6 worst (0/5). Signal problem, not mechanism.
 - [x] **Hero summary figure** (iter_014): 4-panel pub-quality figure (figures/td_per_summary.png)
 - [x] **Killed lit_review2 subagent** per Daniel; pulled LIT_REVIEW.md onto this branch
-- [ ] **Pick-place-v3 mode comparison**: confirm TD-PER hurts on hard task too (likely even worse)
+- [x] **Pick-place-v3 mode comparison** (iter_015): ALL modes 0/5 — task unsolvable at 100k, TD-error in permanent info desert
 - [ ] **Alternative priority signals**: RPE-PER (lit review #1 rec), RND, or count-based novelty
