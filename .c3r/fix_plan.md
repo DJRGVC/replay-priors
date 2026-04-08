@@ -8,7 +8,7 @@
 - [x] Add a second seed (seed=123) to both tasks for robustness, regenerate figure with error bars
 - [x] Create FINDINGS.md documentation + share with siblings
 
-- [ ] Run oracle_correlation.py analysis on downloaded snapshots for priority_gini + top-K overlap metrics
+- [x] Run oracle_correlation.py analysis on downloaded snapshots for priority_gini + top-K overlap metrics
 - [ ] Keep a record of relevant literature — lit_review2 subagent running
 - [ ] Open questions to surface: is "early training" measured in env vs gradient steps? full buffer vs stratified snapshots?
 - [ ] Consider 200k–500k on pick-place-v3 to check if correlation ever emerges given enough training

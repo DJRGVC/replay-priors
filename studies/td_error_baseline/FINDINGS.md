@@ -35,6 +35,27 @@ training). On hard tasks, it never emerges.
 **Right panel:** Pearson correlation (same data). Both show near-zero correlation in early
 training, with divergence between tasks only after reach-v3's policy starts succeeding.
 
+## Priority Quality Metrics (Gini + Top-K Overlap)
+
+In addition to correlation, we measure two priority quality metrics across all snapshots:
+
+- **Top-10% overlap:** What fraction of the top-10% transitions by |TD| are also in the
+  top-10% by oracle advantage? Chance = 10%.
+- **Priority Gini coefficient:** How concentrated are |TD| priorities? Higher = more
+  skewed sampling.
+
+| Metric | reach-v3 (first 40k) | reach-v3 (50-100k) | pick-place-v3 (all) |
+|--------|----------------------|---------------------|---------------------|
+| Top-10% overlap | 7–20% (near chance) | Brief spike to 53–61% mid-learning, then drops back to 6–11% | 8–28% (never above ~2× chance) |
+| Gini coefficient | 0.26–0.48 | 0.39–0.54 | 0.30–0.60 |
+
+**Key insight from s123 reach-v3:** The Spearman correlation *inverts* late in training
+(−0.09 to −0.12 at 90–100k steps) despite strong policy performance (ep_rew 379).
+This means the critic is overshooting — high |TD| transitions are now the *least*
+informative ones. TD-PER would actively anti-prioritize useful transitions.
+
+![Priority quality metrics](figures/priority_quality_metrics.png)
+
 ## Interpretation
 
 1. **TD-error PER is a lagging indicator.** It only correlates with oracle advantage
@@ -67,5 +88,5 @@ training, with divergence between tasks only after reach-v3's policy starts succ
 
 - [x] Single-seed (42) runs on reach-v3 + pick-place-v3, 100k steps
 - [x] Second seed (123) for error bars — figure updated with mean ± std bands
-- [ ] Gini coefficient + top-K overlap metrics (oracle_correlation.py)
+- [x] Gini coefficient + top-K overlap metrics — top-K at chance, Gini moderate, correlation inverts late
 - [ ] Consider 200k–500k on pick-place-v3 to check if correlation ever emerges

@@ -81,9 +81,13 @@ def analyze_run(snapshot_dir: str):
     for snap in snapshots:
         step = int(snap["step"])
         abs_td = snap["abs_td_errors"]
-        rewards = snap["sparse_rewards"]
+        # Use oracle_advantage (dense-reward derived) if available, else fall back to sparse
+        if "oracle_advantage" in snap:
+            oracle = snap["oracle_advantage"]
+        else:
+            oracle = snap["sparse_rewards"]
 
-        metrics = compute_priority_quality_metrics(abs_td, rewards)
+        metrics = compute_priority_quality_metrics(abs_td, oracle)
         metrics["step"] = step
         metrics["abs_td_mean"] = float(snap["abs_td_mean"])
         metrics["abs_td_std"] = float(snap["abs_td_std"])

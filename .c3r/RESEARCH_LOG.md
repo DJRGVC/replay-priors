@@ -61,3 +61,22 @@ Decision:   Next iteration: run oracle_correlation.py for Gini + top-K overlap m
             on all 4 runs. This will quantify how concentrated TD-error priorities are
             (Gini) and how much overlap exists between top-K by |TD| vs top-K by oracle
             advantage.
+
+## iter_004 — Gini + top-K overlap analysis + priority quality figure  (2026-04-08T06:15:00Z)
+Hypothesis: Top-K overlap between |TD| and oracle advantage will be near chance (10%)
+            early in training, and Gini will show TD priorities are concentrated but on
+            the wrong transitions.
+Change:     Fixed oracle_correlation.py to use oracle_advantage instead of sparse_rewards.
+            Ran analysis on all 4 runs (2 tasks × 2 seeds). Created plot_priority_quality.py
+            producing 3-panel figure (overlap, Gini, Spearman). Updated FINDINGS.md.
+Command:    python oracle_correlation.py --run-dirs snapshots/{reach,pick-place}-v3_s{42,123}
+            python plot_priority_quality.py
+Result:     reach-v3: top-10% overlap at chance (7-20%) for first 40k, brief spike to 53-61%
+            during learning, then drops back to 6-11%. Gini 0.26-0.54 (moderate concentration).
+            pick-place-v3: overlap never exceeds ~2× chance (28% max). Gini 0.30-0.60.
+            NEW FINDING: reach-v3 s123 Spearman inverts to -0.09/-0.12 at 90-100k despite
+            strong policy (ep_rew=379) — critic overshooting makes TD-PER actively
+            anti-informative late in training. Figure: figures/priority_quality_metrics.png.
+Decision:   Next iteration: check on lit_review2 subagent progress. Then either (a) run
+            extended 200-500k pick-place-v3 to see if correlation ever emerges, or (b) start
+            synthesizing cross-study implications with VLM probe results from sibling.
