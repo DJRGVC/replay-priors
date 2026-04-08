@@ -7,6 +7,20 @@ signal in the early training regime on sparse-reward manipulation tasks?
 oracle advantage only emerges after the policy has already learned (~60% through
 training). On hard tasks, it never emerges.
 
+## Summary Figure
+
+![TD-PER Summary](figures/td_per_summary.png)
+
+**Figure 1 (hero figure):** Four-panel summary of the complete TD-error PER baseline study.
+(a) Spearman correlation between |TD-error| and oracle advantage over training — TD-error
+is uninformative (ρ ≈ 0) for 60-80% of training, only becoming a lagging indicator after
+learning has already started. (b) Mode comparison across 5 seeds: TD-PER at default α=0.6
+prevents all seeds from learning (0/5), while even optimally-tuned α=0.3 only matches
+uniform replay, never exceeds it. (c) Q-value dynamics showing the PER positive feedback
+loop: biased resampling of high-|TD| transitions causes critic overfitting and Q-divergence
+(11× higher Q than uniform). (d) Regime classification showing TD-error is in a useful
+"aligned" regime for only 7-50% of training across tasks.
+
 ## Setup
 
 - **Algorithm:** SAC (MLP policy, 100k replay buffer, batch=256)
@@ -130,8 +144,10 @@ it's valid.
 
 | File | Description |
 |------|-------------|
+| `figures/td_per_summary.png` | **4-panel hero figure** — primary deliverable |
+| `figures/td_per_summary.pdf` | Same in PDF for presentations |
 | `SYNTHESIS.md` | **Cross-study synthesis** — headline deliverable |
-| `figures/td_per_regime_map.png` | **6-panel regime map** — main figure |
+| `figures/td_per_regime_map.png` | **6-panel regime map** — detailed regime analysis |
 | `figures/td_per_regime_map.pdf` | Same figure in PDF for presentations |
 | `figures/td_correlation_over_training.png` | Spearman + Pearson over training |
 | `figures/td_correlation_over_training.json` | Raw correlation data |

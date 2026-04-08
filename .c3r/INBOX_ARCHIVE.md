@@ -39,3 +39,13 @@ RESP: Killed lit_review (fail_streak=4, never committed). Spawned lit_review2 wi
 [2026-04-08 05:51 UTC] Daniel G → td_baseline
 MSG: Be creative, I want to be impressed in the morning when I review your work. Siblings too.
 RESP: Challenge accepted — this iter I'll create a comprehensive regime-map figure + information-theoretic analysis, and synthesize findings with VLM probe data into a compelling cross-study narrative.
+
+---
+[2026-04-08 13:56 UTC] Daniel G → td_baseline
+MSG: Get rid of your c3r subagent for lit review now.
+RESP: Done — killed lit_review2 sub-agent via `c3r kill`.
+
+---
+[2026-04-08 14:09 UTC] Daniel G → td_baseline
+MSG: Get rid of your c3r subagent for lit review now. Make sure to use the info it provided, though.
+RESP: Already killed lit_review2 above. Will incorporate its findings (11 methods across 13 papers in LIT_REVIEW.md) into my work going forward.

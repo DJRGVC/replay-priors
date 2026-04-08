@@ -25,16 +25,16 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #7 · ctx 0%
-- **last iter**: 1m ago
+- **status**: paused · iter #13 · ctx 0%
+- **last iter**: 1h ago
 
 ### Recent commits on `agent/vlm_probe`
 ```
-eb5dbee iter_009: Groq backend + RESULTS_SUMMARY.md + --call-delay flag (Gemini image quotas still exhausted, Groq untested pending API key)
-52cae95 iter_008: proprio-as-text augmentation (extract_proprio_text + --proprio flag), negative signal on flash-lite (MAE 107.5 vs 59.5 baseline, n=2 valid due to severe rate-limiting)
-7f7d5d7 iter_007: frame annotation (VTimeCoT-style t=X overlay), MAE 71.9→59.5 on flash-lite
-b14a3cd iter_006: CoT prompt (Summarize→Think→Answer), model-dependent effect
-da77793 iter_005: Gemini 3 Flash probe (MAE=54.2, ±10=44%, start-bias)
+85acc68 iter_015: two-pass adaptive probing on Llama-3.2-90B (NEGATIVE: MAE 69.8→71.3, refinement worsens 6/10 — coarse pass too inaccurate to center refinement window)
+097d91e iter_014: random vs uniform sampling on Llama-3.2-90B (MAE 64.7 vs 63.8, no difference — sampling strategy not the bottleneck)
+f38da79 iter_013: GitHub Models backend + Llama 3.2 Vision probe (11B MAE=72.9, 90B MAE=53.5, grid-position bias from tiling)
+2b3c619 iter_012: GT quality analysis — push/pick-place unsuitable for VLM probing with random policy (100% ambiguous GT, no object contact)
+8b34651 iter_011: two-pass adaptive probing + random sampling strategy (code-only, Gemini quotas still exhausted, no GROQ key)
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
@@ -49,15 +49,21 @@ da77793 iter_005: Gemini 3 Flash probe (MAE=54.2, ±10=44%, start-bias)
 .gitignore
 studies/vlm_localization_probe/FREE_VLM_OPTIONS.md
 studies/vlm_localization_probe/RESULTS_SUMMARY.md
+studies/vlm_localization_probe/analyze_gt_quality.py
 studies/vlm_localization_probe/collect_rollouts.py
 studies/vlm_localization_probe/figures/k_sweep_reach_v3.png
 studies/vlm_localization_probe/plot_k_sweep.py
+studies/vlm_localization_probe/priority_score.py
 studies/vlm_localization_probe/regenerate_meta.py
 studies/vlm_localization_probe/results/k_sweep_consolidated.json
 studies/vlm_localization_probe/results/k_sweep_k32/results.json
 studies/vlm_localization_probe/results/k_sweep_reach/results.json
+studies/vlm_localization_probe/results/random_sampling/results.json
+studies/vlm_localization_probe/results/random_sampling_control/results.json
 studies/vlm_localization_probe/results/results.json
+studies/vlm_localization_probe/results/two_pass/two_pass_results.json
 studies/vlm_localization_probe/run_probe.py
+studies/vlm_localization_probe/two_pass_probe.py
 studies/vlm_localization_probe/vlm_client.py
 ```
 ### Read one with:
@@ -72,17 +78,17 @@ git show agent/vlm_probe:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #36 · ctx 0%
-- **last iter**: 2m ago
+- **status**: paused · iter #60 · ctx 0%
+- **last iter**: 1h ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
-2e5ed86 iter_036: compaction (summarized iters 001-016 into archive; log shrunk 306→175 lines; fix_plan pruned)
-f3fd93f iter_035: cross-ref vlm_probe iter_008 proprio-as-text negative signal into §19h/§19i/§20 (MAE 59.5→107.5, n=2, rate-limit confound, LaRe symbolic-grounding mechanism) → LITERATURE.md (4101→4110 lines)
-b60e582 iter_034: §36 temporal credit assignment survey — GP-LRR Gaussian kernel formally justifies G_i formula (RUDDER/HCA/IRCR/DIASTER/COCOA/GRD/LaRe/GP-LRR — no return decomp paper uses replay priority p_i, σ estimation via leave-one-out GP-LRR, IRCR added as uniform-priority ablation baseline) → LITERATURE.md (3979→4101 lines)
-3f3bfa5 iter_033: §35 VLM-as-verifier + process reward model survey (Robo-Dopamine/Robometer/AgentPRM/VRPRM/OmegaPRM/RLVR — per-step signals never used as replay priority p_i, Robo-Dopamine closest rival, NC1 MAE unreported in PRM literature) → LITERATURE.md (3876→3979 lines)
-1e61fd1 iter_032: §34 world-model failure-proximity survey (DreamerV3/TD-MPC2/GWM/Curious-Replay — no per-transition MetaWorld+priority triple, WM error not failure-aligned, new Curious-Replay ablation baseline) → LITERATURE.md (3769→3876 lines)
+742b52d iter_061: §39m Two-Pass Probe Negative Result — MAE 69.8→71.3, 3-factor failure mode analysis, §54 precision ceiling (5-bit < 7.2-bit), grid-bias resolution-invariant, two-pass ruled out (10391→10493 lines)
+c8750b2 iter_060: §55 Reward Shaping for Temporal Credit Assignment — PBRS/RUDDER/HCA/IRCR/HC-Dice/ReDit/GP-likelihood theoretical lineage, G_i Gaussian kernel multiply justified, info-desert unique advantage (9980→10391 lines)
+711139f iter_059: §39l Cross-Reference — Llama 3.2 Vision + grid-position bias taxonomy, random vs uniform sampling (vlm_probe iters 013-014, 9872→9980 lines)
+3bf6f77 iter_058: §54 Temporal Grounding and Video Understanding in VLMs — Moment-DETR/UniVTG/QD-DETR span literature, TimeChat/VTimeLLM/VidEgoThink architectures, L3 task-difficulty formal analysis, keyframe floor, G14/G15 new gaps, ~35% MAE reduction estimate (9382→9872 lines)
+e945459 iter_057: §53 Annotation Efficiency and Active Learning for Reward Labeling — B-Pref/PEBBLE/SURF/RLAIF/RL-VLM-F survey, G13 formal gap, B3+B4 cost model $980 vs $2-5k (9030→9382 lines)
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```
@@ -111,7 +117,7 @@ git show agent/vlm_litreview:.c3r/RESEARCH_LOG_ARCHIVE.md
 - **role**: generic
 - **focus**: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
 - **status**: paused · iter #1 · ctx 0%
-- **last iter**: 5h ago
+- **last iter**: 8h ago
 - **parent**: td_baseline (this is a sub-agent)
 
 ### Recent commits on `agent/lit_review2`

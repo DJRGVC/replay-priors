@@ -304,3 +304,24 @@ Decision:   The TD-error baseline study's core thesis is now fully supported:
             default settings, (3) even tuned TD-PER only matches uniform, never
             beats it. Next: either pick-place-v3 confirmation or start prototyping
             VLM-based priority signals (the original research goal).
+
+## iter_014 — Hero summary figure + lit review incorporation  (2026-04-08T14:15:00Z)
+Hypothesis: A single 4-panel figure synthesizing all 13 iterations of data will clearly
+            communicate that TD-error PER is uninformative and harmful in sparse-reward
+            early training — the prompt's core deliverable.
+Change:     Created plot_summary_figure.py producing a publication-quality 4-panel figure:
+            (a) Spearman correlation over training with individual seed traces + info
+            desert annotation, (b) mode comparison bar chart including α sweep, (c) Q-value
+            explosion dynamics under PER, (d) regime breakdown showing 7-50% aligned time.
+            Killed lit_review2 subagent per Daniel's request. Pulled LIT_REVIEW.md (§1:
+            11 alternative PER methods) onto this branch for preservation.
+            Updated FINDINGS.md with hero figure reference.
+Command:    python plot_summary_figure.py
+Result:     Figure saved: figures/td_per_summary.{png,pdf}. All 4 panels render correctly.
+            Key numbers confirmed: Uniform 3/5, TD-PER α=0.6 0/5, α=0.3 3/5 (ties),
+            α=0.1 2/5, Adaptive 2/5. Spearman ≈ 0 for 60-80% of training. Pick-place-v3
+            aligned regime only 7-13% vs reach-v3 20-50%.
+Decision:   Next iteration: either (a) run pick-place-v3 5-seed mode comparison to confirm
+            generalization (expected: all 0/5, but Q-stability data valuable), or (b) start
+            RPE-PER implementation (lit review's #1 recommendation) to test whether a
+            better priority SIGNAL helps where TD-error fails.

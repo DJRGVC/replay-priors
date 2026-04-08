@@ -28,5 +28,7 @@
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
 - [x] **Alpha sweep**: α=0.3 ties uniform (3/5), α=0.1 worse (2/5), α=0.6 worst (0/5). Signal problem, not mechanism.
+- [x] **Hero summary figure** (iter_014): 4-panel pub-quality figure (figures/td_per_summary.png)
+- [x] **Killed lit_review2 subagent** per Daniel; pulled LIT_REVIEW.md onto this branch
 - [ ] **Pick-place-v3 mode comparison**: confirm TD-PER hurts on hard task too (likely even worse)
-- [ ] **Alternative priority signals**: random network distillation (RND), reward prediction error (RPE-PER), or count-based novelty
+- [ ] **Alternative priority signals**: RPE-PER (lit review #1 rec), RND, or count-based novelty
