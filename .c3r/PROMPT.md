@@ -178,8 +178,8 @@ context window. The files on disk are your only persistent memory.
    and you need wandb, ask the human to set it via `ask_human.py`.
 
 8. **Stay on your branch.** You are on `agent/vlm_probe`. Sibling agents:
-   td_baseline. If you need a change in a sibling's scope, write a note to
-   `NEEDS_TD_BASELINE.md` and keep moving. Never touch another agent's files.
+   td_baseline,lit_review2. If you need a change in a sibling's scope, write a note to
+   `NEEDS_TD_BASELINE_LIT_REVIEW2.md` and keep moving. Never touch another agent's files.
 9. **Never exit "complete".** Research is open-ended. Do not emit STATUS: COMPLETE,
    EXIT_SIGNAL, or any other termination marker. When the queue is empty, propose a
    new line of inquiry based on the last log entries.

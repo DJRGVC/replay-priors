@@ -11,9 +11,10 @@ GPT-4o-mini ($0 via GitHub), Gemini 3 Flash Preview ($0), Gemini 2.5 Flash ($0),
 Gemini 2.5 Flash-Lite ($0), Llama-3.2-11B ($0), Llama-3.2-90B ($0),
 Phi-4-multimodal ($0).
 
-**Interventions tested (8):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
+**Interventions tested (9):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
 annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probing,
-annotation ± comparison on multi-image API, CoT × annotation 2×2 factorial.
+annotation ± comparison across 4 model tiers, CoT × annotation 2×2 factorial,
+cross-model K sweep.
 
 ## Key Findings
 
@@ -59,7 +60,9 @@ rather than visual understanding.
 yet still exhibits strong late-bias — confirming positional bias is intrinsic to the
 models' temporal reasoning, not an artifact of the grid presentation format.
 
-### 3. More keyframes do not help — the bottleneck is visual understanding, not temporal resolution
+### 3. More keyframes help native multi-image models but not concatenated-grid models
+
+**Claude Sonnet (multi-image API):**
 
 | K | MAE | ±10 | ±20 |
 |---|-----|------|------|
@@ -68,10 +71,23 @@ models' temporal reasoning, not an artifact of the grid presentation format.
 | 16 | 44.4 | 20% | 35% |
 | 32 | 51.5 | — | — |
 
-Tested on Claude Sonnet. MAE is flat from K=4 to K=16 and *worsens* at K=32 (likely
-input noise from 32 similar-looking images). The task requires distinguishing ~0.1-unit
-arm position changes in 224×224 images where the arm occupies ~30 pixels. This is a
-visual acuity problem, not a temporal sampling problem.
+Flat from K=4 to K=16, *worsens* at K=32. Visual acuity, not temporal resolution,
+is the bottleneck.
+
+**GPT-4o-mini (native multi-image via GitHub Models):**
+
+| K | MAE | ±5 | ±10 | ±20 | Notes |
+|---|-----|-----|------|------|-------|
+| 4 | 61.6 | 0% | 10% | 10% | 10/10 predictions at t=99 (extreme fixation) |
+| 8 | 68.0 | 0% | 0% | 10% | late-bias at t=106,127 |
+| 16 | **57.6** | **10%** | **20%** | **30%** | most diverse predictions, first ±5 hit |
+
+K=16 is clearly the best condition — more frames break positional fixation and improve
+accuracy across all metrics. The K=4 extreme (10/10 at single timestep) shows that with
+few frames, the model defaults to a single grid position rather than reasoning about
+content. K=16 provides enough temporal diversity to partially overcome this. The K effect
+is model-dependent: Sonnet (strong, multi-image API) gains nothing from more frames,
+while GPT-4o-mini (mid-tier, also multi-image) benefits substantially.
 
 ### 4. CoT prompting hurts weak/mid models, is neutral on strong models — partially substitutable with annotation
 
@@ -101,25 +117,31 @@ This suggests the beneficial mechanism of both interventions is anchoring attent
 temporal structure. Once that's provided (by either annotation or CoT), the second
 intervention is redundant.
 
-### 5. Frame annotation is model-dependent — helps weak & strong models, hurts mid-tier
+### 5. Frame annotation is model-dependent — non-monotonic across 4 capability tiers
 
-| Model | Unannotated | Annotated | ΔMAE |
-|-------|------------|-----------|------|
-| Gemini 2.5 Flash-Lite | 71.9 | 59.5 | −12.4 (−17%) |
-| GPT-4o | 75.8 | 52.7 | **−23.1 (−30%)** |
-| GPT-4o-mini | 61.2 | 68.0 | +6.8 (+11%) |
+| Model | Tier | Unannotated | Annotated | ΔMAE |
+|-------|------|------------|-----------|------|
+| Phi-4-multimodal | very weak | 104.0 | 108.3 | +4.3 (~0, noise) |
+| Gemini 2.5 Flash-Lite | weak | 71.9 | 59.5 | **−12.4 (−17%)** |
+| GPT-4o-mini | mid | 61.2 | 68.0 | +6.8 (+11%) |
+| GPT-4o | strong | 75.8 | 52.7 | **−23.1 (−30%)** |
 
-Overlaying "t=X (N%)" on each frame (VTimeCoT-style) shows a non-monotonic effect:
-- **Weak models (Flash-Lite):** annotation provides needed temporal anchors (−17% MAE)
-- **Strong models (GPT-4o):** annotation dramatically helps (−30% MAE), shifting from
-  start-bias (5/10 at t=0 unannotated) to more distributed predictions (6/10 at t=42 annotated)
-- **Mid-tier models (GPT-4o-mini):** annotation hurts (+11% MAE), shifting distribution
-  toward later timesteps
+Overlaying "t=X (N%)" on each frame (VTimeCoT-style) shows a non-monotonic effect
+across four capability tiers:
+- **Very weak (Phi-4, grid):** NO effect — 50-60% parse failure rate means annotation
+  can't help; the model's bottleneck is basic output formatting, not temporal reasoning.
+  Both conditions give MAE≈104-108.
+- **Weak (Flash-Lite):** annotation provides needed temporal anchors (−17% MAE)
+- **Mid-tier (GPT-4o-mini):** annotation HURTS (+11% MAE), shifting distribution
+  toward late timesteps — annotation text draws attention to positional priors
+- **Strong (GPT-4o):** annotation dramatically HELPS (−30% MAE), shifting from
+  start-bias (5/10 at t=0 unannotated) to more distributed predictions
 
-GPT-4o without annotation has severe start-bias (MAE=75.8, 5/10 at t=0), but with
-annotation MAE drops to 52.7 — comparable to Llama-3.2-90B. The annotation effect is
-U-shaped: both weak and strong models benefit from temporal grounding, while mid-tier
-models are distracted by the overlay text.
+The pattern suggests annotation works only when the model has enough capability to
+USE temporal anchors (ruling out very weak) but isn't being DISTRACTED by them (ruling
+out mid-tier). Strong models leverage annotation for precise temporal reasoning; weak
+models use it as a crutch for basic temporal ordering; mid-tier models have just enough
+capability to be led astray by the additional text.
 
 ### 6. Two-pass adaptive probing fails — coarse pass too inaccurate to guide refinement
 
@@ -254,16 +276,19 @@ a reliable priority signal when it would be most needed (early training).
 | 021 | Literature review + Gemini retry | 6 related papers found, Gemini still 20 RPD exhausted | ✓ |
 | 022 | GPT-4o annotation ± comparison | Ann MAE=52.7, no-ann MAE=75.8 — annotation helps strong models (−30%) | ✓ |
 | 023 | GPT-4o CoT 2×2 (ann × prompt) | CoT neutral when annotated (52.7→52.2), helps unannotated (75.8→65.0) — CoT & annotation substitutable | ✓ |
+| 024 | HTML report update | Updated report with iters 019-023 data, Gemini 503 | ✓ |
+| 025 | Phi-4 annotation ± + GPT-4o-mini K sweep | Phi-4 ann no effect (MAE 108 vs 104, 50% parse fail); GPT-4o-mini K=16 best (57.6 vs 68.0 K=8) | ✓ |
 
 ## Bottom Line
 
 VLMs achieve coarse failure localization (best ±10 accuracy = 44%) but are dominated
-by positional biases rather than visual understanding. All tested interventions
-(more frames, CoT, two-pass refinement, random sampling) either fail or provide
-marginal improvement. Frame annotation has a U-shaped effect: helps weak (−17% Flash-Lite)
-and strong (−30% GPT-4o) models, but hurts mid-tier (+11% GPT-4o-mini). CoT and
-annotation are partially substitutable — both provide temporal scaffolding, and when
-one is already present, the other adds nothing (GPT-4o 2×2: annotated+CoT ≈ annotated+direct).
+by positional biases rather than visual understanding. Frame annotation has a non-monotonic
+effect across four capability tiers: no effect on very weak models (Phi-4, bottlenecked by
+basic capability), helps weak (−17% Flash-Lite) and strong (−30% GPT-4o), hurts mid-tier
+(+11% GPT-4o-mini). More keyframes help mid-tier native multi-image models (GPT-4o-mini
+K=16 MAE=57.6 vs K=8 68.0) but not strong models (Sonnet flat K=4-16). CoT and annotation
+are partially substitutable temporal scaffolds — both provide temporal anchoring, and when
+one is present the other adds nothing (GPT-4o 2×2: annotated+CoT ≈ annotated+direct).
 The fundamental bottleneck is visual acuity: distinguishing subtle arm position changes at
 224×224 resolution with ~30-pixel arm regions. VLM-based replay priorities show a promising
 overlap signal (+12% above uniform) but harmful KL divergence, suggesting a
