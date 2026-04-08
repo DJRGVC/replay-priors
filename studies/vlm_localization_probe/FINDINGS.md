@@ -11,10 +11,10 @@ GPT-4o-mini ($0 via GitHub), Gemini 3 Flash Preview ($0), Gemini 2.5 Flash ($0),
 Gemini 2.5 Flash-Lite ($0), Llama-3.2-11B ($0), Llama-3.2-90B ($0),
 Phi-4-multimodal ($0).
 
-**Interventions tested (9):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
+**Interventions tested (10):** K sweep (4/8/16/32 keyframes), CoT prompting, frame
 annotation, proprio-as-text, random vs uniform sampling, two-pass adaptive probing,
-annotation ± comparison across 4 model tiers, CoT × annotation 2×2 factorial,
-cross-model K sweep.
+annotation ± comparison across 4 model tiers, CoT × annotation 2×2 factorial (GPT-4o
+and GPT-4o-mini), cross-model K sweep.
 
 ## Key Findings
 
@@ -26,6 +26,7 @@ cross-model K sweep.
 | GPT-4o (ann) | GitHub | 52.7 | 43.5 | 10% | 10% | early-mid (t=42) |
 | Gemini 3 Flash Preview | Google | 54.2 | 14.0 | **44%** | **56%** | start (t=0) |
 | Llama-3.2-90B | GitHub | 53.5 | 37.5 | 0% | 0% | grid-cell (t=42) |
+| GPT-4o-mini (CoT, no ann) | GitHub | 53.2 | 21.0 | 10% | 20% | early (t=21) |
 | GPT-4o-mini (no ann) | GitHub | 61.2 | 51.0 | 10% | 20% | late (t≈106) |
 | Phi-4-multimodal | GitHub | 64.3 | — | 0% | 10% | grid-center (t=85) |
 | Gemini 2.5 Flash | Google | 67.8 | — | 20% | 30% | end (t≈149) |
@@ -89,33 +90,51 @@ content. K=16 provides enough temporal diversity to partially overcome this. The
 is model-dependent: Sonnet (strong, multi-image API) gains nothing from more frames,
 while GPT-4o-mini (mid-tier, also multi-image) benefits substantially.
 
-### 4. CoT prompting hurts weak/mid models, is neutral on strong models — partially substitutable with annotation
+### 4. CoT prompting hurts weak models, helps mid/strong unannotated — substitutable with annotation
 
 | Model | Direct MAE | CoT MAE | Δ | N |
 |-------|-----------|---------|---|---|
 | Gemini 2.5 Flash-Lite | 71.9 | 79.2* | +7.3 | 10 |
 | Gemini 2.5 Flash | 67.8 | 75.1 | +7.3 | 10 |
 | Phi-4-multimodal | 64.3 | 90.2 | **+25.9** | 10 |
+| GPT-4o-mini (annotated) | 68.0 | 66.4 | −1.6 | 10 |
+| GPT-4o-mini (unannotated) | 61.2 | 53.2 | **−8.0** | 10 |
 | GPT-4o (annotated) | 52.7 | 52.2 | −0.5 | 10 |
 | GPT-4o (unannotated) | 75.8 | 65.0 | −10.8 | 10 |
 | Gemini 3 Flash Preview | 54.2 | 22.0 | −32.2 | **3** |
 
 *Estimated from iter_007 control.
 
-CoT (Summarize→Think→Answer) hurts weak/mid models (3/3 negative: +7 to +26 MAE) but
-is **neutral on strong models when annotation is present** (GPT-4o annotated: 52.7→52.2).
-Crucially, CoT **helps unannotated GPT-4o** (75.8→65.0, −14%), revealing that CoT and
-annotation are **partially substitutable** — both provide temporal scaffolding, and when
-you already have annotation, CoT adds nothing further. The full 2×2 on GPT-4o:
+CoT (Summarize→Think→Answer) hurts weak models (3/3 negative: +7 to +26 MAE) but
+**helps mid and strong models when unannotated** (GPT-4o-mini: −13%, GPT-4o: −14%).
+When annotation is already present, CoT is neutral on both mid and strong models
+(GPT-4o-mini: 68.0→66.4; GPT-4o: 52.7→52.2). This reveals CoT and annotation are
+**partially substitutable temporal scaffolds**. Full 2×2 factorials:
 
 | GPT-4o | Direct | CoT |
 |--------|--------|-----|
 | **Annotated** | 52.7 | 52.2 |
 | **Unannotated** | 75.8 | 65.0 |
 
-This suggests the beneficial mechanism of both interventions is anchoring attention to
-temporal structure. Once that's provided (by either annotation or CoT), the second
-intervention is redundant.
+| GPT-4o-mini | Direct | CoT |
+|-------------|--------|-----|
+| **Annotated** | 68.0 | 66.4 |
+| **Unannotated** | 61.2 | **53.2** |
+
+The interaction patterns are **mirror images** across model strength:
+- **GPT-4o (strong):** Annotation is the key lever (−30% MAE). CoT is neutral when
+  annotation is present, helpful without it. Best = annotated (either prompt).
+- **GPT-4o-mini (mid):** Annotation HURTS in both prompt styles. CoT is the key lever
+  when unannotated (−13%). Best = CoT+unannotated (MAE=53.2).
+
+The GPT-4o-mini CoT+unannotated result (MAE=53.2) is competitive with GPT-4o
+annotated (52.7), suggesting CoT can substitute for both annotation AND model
+strength. However, the mechanism differs: GPT-4o-mini CoT+NoAnn shows extreme
+early-bias (7/10 at t=21) which happens to align with GT failure distribution,
+while GPT-4o annotated shows more diverse predictions anchored to annotation labels.
+Annotation interferes with CoT on mid-tier models (66.4 vs 53.2 — annotation adds
++13 MAE to CoT), while annotation reinforces CoT on strong models (52.2 vs 65.0 —
+annotation reduces CoT MAE by 13).
 
 ### 5. Frame annotation is model-dependent — non-monotonic across 4 capability tiers
 
@@ -278,6 +297,7 @@ a reliable priority signal when it would be most needed (early training).
 | 023 | GPT-4o CoT 2×2 (ann × prompt) | CoT neutral when annotated (52.7→52.2), helps unannotated (75.8→65.0) — CoT & annotation substitutable | ✓ |
 | 024 | HTML report update | Updated report with iters 019-023 data, Gemini 503 | ✓ |
 | 025 | Phi-4 annotation ± + GPT-4o-mini K sweep | Phi-4 ann no effect (MAE 108 vs 104, 50% parse fail); GPT-4o-mini K=16 best (57.6 vs 68.0 K=8) | ✓ |
+| 026 | GPT-4o-mini CoT 2×2 complete | CoT+no-ann best (MAE=53.2), mirror-image of GPT-4o: annotation hurts mid-tier in both prompt styles, CoT is key lever. Gemini-3 image quota reset but still rate-limited. | ✓ |
 
 ## Bottom Line
 
@@ -287,10 +307,14 @@ effect across four capability tiers: no effect on very weak models (Phi-4, bottl
 basic capability), helps weak (−17% Flash-Lite) and strong (−30% GPT-4o), hurts mid-tier
 (+11% GPT-4o-mini). More keyframes help mid-tier native multi-image models (GPT-4o-mini
 K=16 MAE=57.6 vs K=8 68.0) but not strong models (Sonnet flat K=4-16). CoT and annotation
-are partially substitutable temporal scaffolds — both provide temporal anchoring, and when
-one is present the other adds nothing (GPT-4o 2×2: annotated+CoT ≈ annotated+direct).
-The fundamental bottleneck is visual acuity: distinguishing subtle arm position changes at
-224×224 resolution with ~30-pixel arm regions. VLM-based replay priorities show a promising
-overlap signal (+12% above uniform) but harmful KL divergence, suggesting a
+are partially substitutable temporal scaffolds — both replicated across two models (GPT-4o
+and GPT-4o-mini): annotation-present→CoT-neutral, annotation-absent→CoT-helps. Strikingly,
+GPT-4o-mini with CoT+no-annotation (MAE=53.2) matches GPT-4o with annotation+no-CoT
+(MAE=52.7), showing CoT can compensate for both annotation AND model strength on mid-tier
+models. However, the mechanisms differ: GPT-4o-mini CoT achieves low MAE through extreme
+early-bias (7/10 at t=21) that aligns with GT distribution, while GPT-4o annotation
+produces more diverse predictions anchored to temporal labels. The fundamental bottleneck is visual acuity: distinguishing subtle arm position
+changes at 224×224 resolution with ~30-pixel arm regions. VLM-based replay priorities show
+a promising overlap signal (+12% above uniform) but harmful KL divergence, suggesting a
 confidence-gated hybrid approach as the path forward — if confidence calibration can
 be solved.
