@@ -26,7 +26,7 @@ Siblings will see it in their next SIBLINGS.md refresh.
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
 - **status**: running · iter #12 · ctx 0%
-- **last iter**: 9m ago
+- **last iter**: 1h ago
 
 ### Recent commits on `agent/td_baseline`
 ```
@@ -82,17 +82,17 @@ git show agent/td_baseline:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #47 · ctx 0%
-- **last iter**: 2m ago
+- **status**: running · iter #56 · ctx 0%
+- **last iter**: 3m ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
-2dd0a09 iter_048: §46 statistical power analysis + signal-not-mechanism cross-ref (td_baseline α-sweep) — p₀=60%, N=14 for 80% power at 30pp, G_i Q-independence, information desert window (6761→7007 lines)
-0233006 iter_047: §39j priority quality analysis cross-ref (vlm_probe 010-011) — KL vs overlap tension, σ empirical [10,15] vs theory [21,37], two-pass probe design, confidence-gated hybrid motivation (6602→6761 lines)
-fd27409 iter_046: §45 VLM-PER Integration — full pseudocode, σ decision tree, tier-1 ablation protocol, NC1-NC8 coverage, one-page spec, sibling coordination (§45a–§45l, 6202→6602 lines)
-c18c7d2 iter_045: §44 σ selection for G_i — theoretical bounds [21,37], GP-LRR leave-one-out estimator, conformal-σ, AREL+ReDit external evidence, σ∈{5,10,20,40,∞} sweep protocol (resolves Q5.2) → LITERATURE.md (5782→6202 lines)
-c493652 iter_044: §43 BOCPD+proprio experiment design — full NC6 protocol (3 estimators, Level 1 gate, ~150-line bocpd_proprio.py spec, expected outcome table, vlm_probe handoff strategy) → LITERATURE.md (5429→5782 lines)
+e945459 iter_057: §53 Annotation Efficiency and Active Learning for Reward Labeling — B-Pref/PEBBLE/SURF/RLAIF/RL-VLM-F survey, G13 formal gap, B3+B4 cost model $980 vs $2-5k (9030→9382 lines)
+8546bd7 iter_056: §52 Curriculum and Staged Training Strategies for VLM-PER — 13-paper CRL survey, G12 formal proposal (binary→VLM signal switch, C1 criterion, 4-arm experiment), taxonomy table (8667→9030 lines)
+3122d97 iter_055: §51 Reward Signal Taxonomy and Unified Comparison Framework — 5-family taxonomy, 8-column table, complementarity pairs A/B/C, G12 new gap, 3 new 2024 PER papers (8328→8667 lines)
+0f64b93 iter_054: §50 VLM-PER Evaluation Protocol — pre-registration, Clopper-Pearson CI, Cohen's h, 4 stopping rules, formal falsification table, σ sweep H_concave, artifact spec (8005→8328 lines)
+f5642be iter_053: compaction (summarized iters 017-036 into summary; log shrunk 307→187 lines)
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```

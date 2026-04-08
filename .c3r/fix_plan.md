@@ -23,7 +23,7 @@
 - [ ] **Complete gemini-3-flash-preview CoT comparison** — need n≥9 to match direct baseline. Rate limits: run when quota resets.
 - [ ] Run remaining 10 rollouts on gemini-3-flash-preview direct for n=20
 - [ ] Run probe on push-v3 and pick-place-v3 (may have more visually distinct failure modes)
-- [ ] Test "random" sampling strategy vs uniform (breaks positional priors — new in iter_011)
+- [x] Test "random" sampling strategy vs uniform — DONE iter_014. No improvement (MAE 64.7 vs 63.8, both ±10=10%). Breaks grid-position clustering but doesn't help accuracy.
 - [ ] Test two-pass adaptive probing (coarse K=4 → refine K=8 around t_hat, new in iter_011)
 - [x] **Implement proprio-as-text augmentation** — DONE iter_008. Code ready (`--proprio` flag). Flash-lite test: n=2 valid (rate-limited), MAE=107.5 vs 59.5 baseline. Negative signal but n too small. Needs retest.
 - [ ] **Retest proprio-as-text with n≥5 valid** — wait for rate limit reset

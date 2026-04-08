@@ -159,12 +159,28 @@ Analyzed GT failure labels across all 3 tasks to assess VLM probing suitability.
 
 **Figure:** `figures/gt_quality_analysis.png` — 2×2 panel analysis
 
+## Sampling Strategy: Random vs Uniform (Llama-3.2-90B, K=8, annotated, grid-tiled)
+
+| Strategy | N | Valid | MAE | Median | ±5 | ±10 | ±20 | Pred clustering |
+|----------|---|-------|-----|--------|-----|------|------|-----------------|
+| uniform | 10 | 9 | 63.8 | 47.0 | 10% | 10% | 20% | 3/9 at t=85 |
+| random | 10 | 9 | 64.7 | 56.5 | 10% | 10% | 20% | none (all unique) |
+
+**Finding:** Random sampling breaks grid-position fixation (no repeated predictions
+vs 3/9 at t=85 for uniform) but does NOT improve accuracy. MAE is nearly identical
+(63.8 vs 64.7), accuracy metrics are identical (±10=10%, ±20=20%). Per-rollout:
+uniform wins 7/10 matchups. The grid-position bias from iter_013 (5/10 at t=42) was
+stochastic — a fresh uniform run shows different bias (3/9 at t=85), confirming high
+run-to-run variance. **Sampling strategy is not the bottleneck for Llama 3.2 Vision;
+the model has weak visual understanding of subtle manipulation failures regardless
+of frame selection.**
+
 ## Open Experiments (quota-gated)
 
 1. Annotation on gemini-3-flash-preview and gemini-2.5-flash
 2. Complete CoT comparison on gemini-3-flash-preview (n≥9)
 3. Push-v3 / pick-place-v3 with trained policy rollouts (needs td_baseline handoff)
-4. Random sampling strategy (breaks positional priors — code ready from iter_011)
+4. ~~Random sampling strategy~~ — DONE iter_014: no improvement over uniform on Llama-3.2-90B
 5. Two-pass adaptive probing (coarse→fine, code ready from iter_011)
 6. Retest proprio-as-text with n≥5 valid
 7. Groq Llama 4 Scout as rate-limit-free alternative
