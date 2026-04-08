@@ -240,6 +240,35 @@ annotations on video frames — closely mirroring our frame annotation intervent
 spatio-temporal constraint monitoring, representing an alternative paradigm
 (programmatic vs direct prediction) for failure detection.
 
+**Multi-image VLM failure modes.** Das et al. (2026,
+[arXiv:2601.07812](https://arxiv.org/abs/2601.07812)) introduce MIMIC, a benchmark
+showing LVLMs pervasively fail to aggregate information across images and struggle
+to track multiple concepts simultaneously. Their attention-masking fix for
+multi-image inputs suggests architectural remedies for the cross-image failures we
+observe in §2 and §8.
+
+**Positional encoding root cause.** "Revisiting Multimodal Positional Encoding in
+VLMs" (ICLR 2026, [arXiv:2510.23095](https://arxiv.org/abs/2510.23095)) shows that
+MRoPE allocates temporal encoding to high-frequency channels only, causing rapid
+attention decay over time. This explains the temporal bias we observe across all
+models (§2): the positional encoding architecture itself is biased against long-range
+temporal reasoning. Their MRoPE-Interleaved fix distributes channels round-robin
+across temporal/spatial axes.
+
+**VLA failure prediction.** FPC-VLA (Yang et al., 2025,
+[arXiv:2509.04018](https://arxiv.org/abs/2509.04018)) uses a VLM supervisor
+triggered at keyframes to predict and correct failures — the closest setup to our
+probe, but fine-tuned rather than zero-shot. RoboFAC (2025,
+[arXiv:2505.12224](https://arxiv.org/abs/2505.12224)) provides a comprehensive
+failure analysis framework. Both confirm that reliable failure detection requires
+fine-tuning, consistent with our zero-shot findings.
+
+**Prioritized replay meets foundation models.** Fatemi (2026,
+[arXiv:2601.02648](https://arxiv.org/abs/2601.02648)) applies prioritized replay
+to LLM RL post-training, finding that intermediate-difficulty samples produce the
+strongest learning signal — paralleling our Finding #9 where VLM priority overlap
+(partial success) is useful but KL (whole-distribution) is harmful.
+
 ## Cross-Study Connection: TD-Error Baseline
 
 The sibling study (`td_error_baseline`) finds TD-error PER is **uninformative in
@@ -298,6 +327,7 @@ a reliable priority signal when it would be most needed (early training).
 | 024 | HTML report update | Updated report with iters 019-023 data, Gemini 503 | ✓ |
 | 025 | Phi-4 annotation ± + GPT-4o-mini K sweep | Phi-4 ann no effect (MAE 108 vs 104, 50% parse fail); GPT-4o-mini K=16 best (57.6 vs 68.0 K=8) | ✓ |
 | 026 | GPT-4o-mini CoT 2×2 complete | CoT+no-ann best (MAE=53.2), mirror-image of GPT-4o: annotation hurts mid-tier in both prompt styles, CoT is key lever. Gemini-3 image quota reset but still rate-limited. | ✓ |
+| 027 | Literature update + pause | 5 new papers added to Related Work; study pausing per Daniel (focus on td_baseline integration) | ✓ |
 
 ## Bottom Line
 
