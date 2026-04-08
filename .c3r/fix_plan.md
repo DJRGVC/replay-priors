@@ -26,6 +26,7 @@
 - [ ] Try "pinned" sampling strategy (first+last frames pinned) vs uniform
 - [x] **Implement proprio-as-text augmentation** — DONE iter_008. Code ready (`--proprio` flag). Flash-lite test: n=2 valid (rate-limited), MAE=107.5 vs 59.5 baseline. Negative signal but n too small. Needs retest.
 - [ ] **Retest proprio-as-text with n≥5 valid** — wait for rate limit reset
+- [ ] **Groq Llama 4 Scout probe** — backend code ready, needs GROQ_API_KEY in .c3r/env.sh
 - [ ] Open questions: definition of "failure" for time-out tasks; vision-only vs vision+proprio-as-text
 - [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 

@@ -34,6 +34,7 @@ COST_PER_1M = {
     "gemini-2.5-flash-lite": {"input": 0.0, "output": 0.0},  # free tier
     "gemini-2.0-flash": {"input": 0.0, "output": 0.0},  # free tier
     "gemini-3-flash-preview": {"input": 0.0, "output": 0.0},  # free tier
+    "meta-llama/llama-4-scout-17b-16e-instruct": {"input": 0.0, "output": 0.0},  # Groq free tier
 }
 
 
@@ -90,6 +91,7 @@ def run_sweep(
     prompt_styles: list[str] | None = None,
     annotate: bool = False,
     use_proprio: bool = False,
+    call_delay: float = 0.0,
 ):
     """Run the full sweep and save results."""
     if prompt_styles is None:
@@ -115,9 +117,15 @@ def run_sweep(
                         print(f"{'='*60}")
 
                         config_results = []
+                        call_count = 0
                         for rollout in rollouts:
                             if rollout["success"]:
                                 continue  # skip successes
+
+                            if call_delay > 0 and call_count > 0:
+                                print(f"    [delay {call_delay:.0f}s between calls]")
+                                time.sleep(call_delay)
+                            call_count += 1
 
                             rd = Path(rollout["_dir"])
                             frames_dir = rd / "frames"
@@ -260,6 +268,8 @@ def main():
                         help="Overlay timestep index + progress on keyframe images (VTimeCoT-style)")
     parser.add_argument("--proprio", action="store_true",
                         help="Include numeric end-effector + goal/object positions as text in prompt")
+    parser.add_argument("--call-delay", type=float, default=0.0,
+                        help="Seconds to wait between API calls (helps with RPM limits)")
     args = parser.parse_args()
 
     data_dir = Path(__file__).parent / args.data_dir
@@ -276,6 +286,7 @@ def main():
         prompt_styles=args.prompt_styles,
         annotate=args.annotate,
         use_proprio=args.proprio,
+        call_delay=args.call_delay,
     )
 
 

@@ -481,6 +481,64 @@ def _call_gemini(
     return result
 
 
+# ── Groq backend ─────────────────────────────────────────────────
+
+def _call_groq(
+    task_description: str,
+    keyframes: list[Image.Image],
+    keyframe_indices: list[int],
+    total_timesteps: int,
+    model: str = "meta-llama/llama-4-scout-17b-16e-instruct",
+    prompt_style: str = "direct",
+    proprio_labels: list[str] | None = None,
+) -> dict:
+    from groq import Groq
+
+    client = Groq()
+
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style, proprio_labels)
+
+    # Build content parts (OpenAI-compatible format)
+    content = [{"type": "text", "text": user_text}]
+    for img, idx in zip(keyframes, keyframe_indices):
+        b64 = _pil_to_base64(img)
+        content.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/png;base64,{b64}"},
+        })
+        content.append({"type": "text", "text": f"↑ Timestep {idx}"})
+
+    if prompt_style == "cot":
+        content.append({"type": "text", "text": "Now follow the 3-step process. After your reasoning, output the JSON on its own line."})
+    else:
+        content.append({"type": "text", "text": "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."})
+
+    max_tokens = 2048 if prompt_style == "cot" else 512
+
+    def _do_call():
+        return client.chat.completions.create(
+            model=model,
+            max_tokens=max_tokens,
+            messages=[
+                {"role": "system", "content": _get_system_prompt(prompt_style)},
+                {"role": "user", "content": content},
+            ],
+        )
+
+    t0 = time.time()
+    response = _retry_on_rate_limit(_do_call)
+    latency = time.time() - t0
+
+    text = response.choices[0].message.content.strip()
+    result = _parse_json_from_text(text)
+
+    result["_latency_s"] = round(latency, 2)
+    result["_input_tokens"] = response.usage.prompt_tokens
+    result["_output_tokens"] = response.usage.completion_tokens
+    result["_model"] = model
+    return result
+
+
 # ── Unified entry point ────────────────────────────────────────────
 
 TASK_DESCRIPTIONS = {
@@ -532,8 +590,10 @@ def predict_failure(
         return _call_openai(**kwargs)
     elif "gemini" in model:
         return _call_gemini(**kwargs)
+    elif "llama" in model or "groq" in model:
+        return _call_groq(**kwargs)
     else:
-        raise ValueError(f"Unknown model family: {model}. Use a Claude, OpenAI, or Gemini model name.")
+        raise ValueError(f"Unknown model family: {model}. Use a Claude, OpenAI, Gemini, or Groq model name.")
 
 
 # ── Quick CLI test ─────────────────────────────────────────────────
