@@ -20,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-from vlm_client import predict_failure, sample_keyframes, TASK_DESCRIPTIONS, annotate_frame
+from vlm_client import predict_failure, sample_keyframes, TASK_DESCRIPTIONS, annotate_frame, extract_proprio_text
 
 
 # ── Cost estimation (approximate, per 1M tokens) ──────────────────
@@ -89,6 +89,7 @@ def run_sweep(
     max_rollouts: int | None = None,
     prompt_styles: list[str] | None = None,
     annotate: bool = False,
+    use_proprio: bool = False,
 ):
     """Run the full sweep and save results."""
     if prompt_styles is None:
@@ -127,6 +128,14 @@ def run_sweep(
                                 print(f"  SKIP {rd.name}: {e}")
                                 continue
 
+                            # Load proprio if requested
+                            proprio_labels = None
+                            if use_proprio:
+                                proprio_path = rd / "proprio.npy"
+                                if proprio_path.exists():
+                                    proprio = np.load(proprio_path)
+                                    proprio_labels = extract_proprio_text(task_name, proprio, indices)
+
                             try:
                                 pred = predict_failure(
                                     task_description=task_desc,
@@ -136,6 +145,7 @@ def run_sweep(
                                     model=model,
                                     prompt_style=prompt_style,
                                     annotate_frames=annotate,
+                                    proprio_labels=proprio_labels,
                                 )
                             except Exception as e:
                                 print(f"  ERROR {rd.name}: {e}")
@@ -161,6 +171,7 @@ def run_sweep(
                                 "strategy": strategy,
                                 "prompt_style": prompt_style,
                                 "annotate": annotate,
+                                "proprio": use_proprio,
                                 "rollout": rd.name,
                                 "gt_failure_t": gt,
                                 "gt_failure_type": rollout.get("failure_type"),
@@ -247,6 +258,8 @@ def main():
     parser.add_argument("--max-rollouts", type=int, default=None)
     parser.add_argument("--annotate", action="store_true",
                         help="Overlay timestep index + progress on keyframe images (VTimeCoT-style)")
+    parser.add_argument("--proprio", action="store_true",
+                        help="Include numeric end-effector + goal/object positions as text in prompt")
     args = parser.parse_args()
 
     data_dir = Path(__file__).parent / args.data_dir
@@ -262,6 +275,7 @@ def main():
         max_rollouts=args.max_rollouts,
         prompt_styles=args.prompt_styles,
         annotate=args.annotate,
+        use_proprio=args.proprio,
     )
 
 

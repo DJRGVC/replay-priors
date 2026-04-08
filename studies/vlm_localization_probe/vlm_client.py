@@ -183,12 +183,50 @@ After your reasoning, output the final answer as a JSON object on its own line:
 {"failure_timestep": <int from the index list>, "confidence": <float 0-1>, "rationale": "<one sentence>"}
 """
 
+def extract_proprio_text(
+    task_name: str,
+    proprio: np.ndarray,
+    keyframe_indices: list[int],
+) -> list[str]:
+    """Extract human-readable proprio features at each keyframe index.
+
+    Returns one string per keyframe describing end-effector and goal/object positions.
+    """
+    labels = []
+    for idx in keyframe_indices:
+        t = min(idx, len(proprio) - 1)
+        hand = proprio[t, 0:3]
+
+        if "reach" in task_name:
+            goal = proprio[0, 36:39]  # static goal
+            dist = np.linalg.norm(hand - goal)
+            labels.append(
+                f"t={idx}: hand=({hand[0]:.3f},{hand[1]:.3f},{hand[2]:.3f}), "
+                f"goal=({goal[0]:.3f},{goal[1]:.3f},{goal[2]:.3f}), "
+                f"dist={dist:.3f}"
+            )
+        elif "push" in task_name or "pick-place" in task_name:
+            obj = proprio[t, 4:7]
+            hand_obj_dist = np.linalg.norm(hand - obj)
+            labels.append(
+                f"t={idx}: hand=({hand[0]:.3f},{hand[1]:.3f},{hand[2]:.3f}), "
+                f"object=({obj[0]:.3f},{obj[1]:.3f},{obj[2]:.3f}), "
+                f"hand-obj dist={hand_obj_dist:.3f}"
+            )
+        else:
+            labels.append(
+                f"t={idx}: hand=({hand[0]:.3f},{hand[1]:.3f},{hand[2]:.3f})"
+            )
+    return labels
+
+
 def _build_user_message(
     task_description: str,
     keyframes: list[Image.Image],
     keyframe_indices: list[int],
     total_timesteps: int,
     prompt_style: str = "direct",
+    proprio_labels: list[str] | None = None,
 ) -> str:
     """Build the text portion of the user message."""
     lines = [
@@ -199,6 +237,13 @@ def _build_user_message(
         f"You are shown {len(keyframes)} keyframes at these timestep indices:",
         f"  {keyframe_indices}",
     ]
+    if proprio_labels:
+        lines += [
+            f"",
+            f"Numeric state at each keyframe (XYZ coordinates in meters):",
+        ]
+        for label in proprio_labels:
+            lines.append(f"  {label}")
     if prompt_style == "cot":
         lines += [
             f"",
@@ -266,6 +311,7 @@ def _call_claude(
     total_timesteps: int,
     model: str = "claude-sonnet-4-6",
     prompt_style: str = "direct",
+    proprio_labels: list[str] | None = None,
 ) -> dict:
     import anthropic
 
@@ -273,7 +319,7 @@ def _call_claude(
 
     # Build content blocks: interleave images with labels
     content = []
-    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style)
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style, proprio_labels)
     content.append({"type": "text", "text": user_text})
 
     for img, idx in zip(keyframes, keyframe_indices):
@@ -322,12 +368,13 @@ def _call_openai(
     total_timesteps: int,
     model: str = "gpt-4o",
     prompt_style: str = "direct",
+    proprio_labels: list[str] | None = None,
 ) -> dict:
     from openai import OpenAI
 
     client = OpenAI()
 
-    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style)
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style, proprio_labels)
 
     # Build content parts
     content = [{"type": "text", "text": user_text}]
@@ -379,13 +426,14 @@ def _call_gemini(
     total_timesteps: int,
     model: str = "gemini-2.5-flash",
     prompt_style: str = "direct",
+    proprio_labels: list[str] | None = None,
 ) -> dict:
     from google import genai
     from google.genai import types
 
     client = genai.Client()
 
-    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style)
+    user_text = _build_user_message(task_description, keyframes, keyframe_indices, total_timesteps, prompt_style, proprio_labels)
 
     # Build content parts: text + interleaved images with labels
     contents = [user_text]
@@ -450,6 +498,7 @@ def predict_failure(
     model: str = "claude-sonnet-4-6",
     prompt_style: str = "direct",
     annotate_frames: bool = False,
+    proprio_labels: list[str] | None = None,
 ) -> dict:
     """Predict the failure timestep using a VLM.
 
@@ -458,6 +507,8 @@ def predict_failure(
                       "cot" (Summarize→Think→Answer structured reasoning)
         annotate_frames: If True, overlay timestep index + progress fraction
                          on each keyframe image (VTimeCoT-style visual anchor).
+        proprio_labels: If provided, list of human-readable proprio state strings
+                        (one per keyframe) to include as text in the prompt.
 
     Returns dict with: failure_timestep, confidence, rationale,
     plus _latency_s, _input_tokens, _output_tokens, _model.
@@ -465,12 +516,22 @@ def predict_failure(
     if annotate_frames:
         keyframes = [annotate_frame(img, idx, total_timesteps) for img, idx in zip(keyframes, keyframe_indices)]
 
+    kwargs = dict(
+        task_description=task_description,
+        keyframes=keyframes,
+        keyframe_indices=keyframe_indices,
+        total_timesteps=total_timesteps,
+        model=model,
+        prompt_style=prompt_style,
+        proprio_labels=proprio_labels,
+    )
+
     if "claude" in model or "sonnet" in model or "opus" in model or "haiku" in model:
-        return _call_claude(task_description, keyframes, keyframe_indices, total_timesteps, model, prompt_style)
+        return _call_claude(**kwargs)
     elif "gpt" in model or "o1" in model or "o3" in model or "o4" in model:
-        return _call_openai(task_description, keyframes, keyframe_indices, total_timesteps, model, prompt_style)
+        return _call_openai(**kwargs)
     elif "gemini" in model:
-        return _call_gemini(task_description, keyframes, keyframe_indices, total_timesteps, model, prompt_style)
+        return _call_gemini(**kwargs)
     else:
         raise ValueError(f"Unknown model family: {model}. Use a Claude, OpenAI, or Gemini model name.")
 

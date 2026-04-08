@@ -66,3 +66,17 @@ Result:     **Frame annotation improves weak-model localization:**
   - All quotas for gemini-2.5-flash and gemini-3-flash-preview exhausted (20 RPD each). Only flash-lite available.
   - Also shared lit review highlights to Discord (standing fix_plan task).
 Decision:   Next iter: test annotation on stronger models (gemini-2.5-flash or gemini-3-flash-preview) once quota resets. The annotation-helps-weak-models finding aligns with §15d "Thinking Drifts" — visual anchors provide the strongest lift where the model has weakest internal temporal reasoning. Also: run push-v3 probe (task diversity) and complete CoT comparison. Gemini quotas are the binding constraint — all 3 models share the same project, 20 RPD each.
+
+## iter_008 — proprio-as-text augmentation  (2026-04-08T08:16Z)
+Hypothesis: Adding numeric end-effector + goal positions (XYZ coords) at each keyframe as text will improve localization by giving VLMs precise spatial info invisible in 224×224 images.
+Change:     Implemented `extract_proprio_text()` in vlm_client.py and `--proprio` flag in run_probe.py. Proprio text appends per-keyframe lines like "t=X: hand=(x,y,z), goal=(x,y,z), dist=D" to the prompt. Tested on gemini-2.5-flash-lite, K=8, annotated+proprio, reach-v3, n=10.
+Command:    python run_probe.py --tasks reach-v3 --K 8 --models gemini-2.5-flash-lite --strategies uniform --max-rollouts 10 --annotate --proprio
+Result:     **Severe rate-limiting: only 2/10 calls succeeded (8 hit 429 after 5 retries).**
+  - Valid predictions: rollout_000 err=117 (gt=10, pred=127), rollout_002 err=98 (gt=8, pred=106)
+  - Valid-only MAE=107.5, ±10=0%, ±20=0%
+  - **Comparison to iter_007 (annotated, no proprio, n=10): MAE=59.5, ±10=20%**
+  - Proprio-as-text appears to HURT flash-lite: both valid predictions show large late-bias, worse than annotation-only
+  - All Gemini tiers (flash-lite, 2.5-flash, 3-flash-preview) severely rate-limited today. gemini-2.5-flash and gemini-3-flash-preview returned 429 on first attempt.
+  - **Caveat: n=2 valid is too small for significance.** The rate-limiting confound means we cannot cleanly attribute the degradation to proprio text vs bad luck on those 2 rollouts.
+  - Also tested gemini-3-flash-preview and gemini-2.5-flash quotas — both immediately 429'd (quotas appear not to have reset despite new day).
+Decision:   Rate limiting is the binding constraint across all Gemini tiers. Next iter: (1) build a comprehensive results summary table from all experiments so far while waiting for quotas, (2) check if there are other free VLM APIs (e.g. Groq with Llama Vision, Together.ai free tier) that could bypass Gemini limits, (3) when quotas reset, retest proprio on flash-lite with n≥5 valid to confirm/deny the negative signal. The proprio code is ready and tested — just needs API access.

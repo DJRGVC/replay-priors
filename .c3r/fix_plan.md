@@ -24,7 +24,8 @@
 - [ ] Run remaining 10 rollouts on gemini-3-flash-preview direct for n=20
 - [ ] Run probe on push-v3 and pick-place-v3 (may have more visually distinct failure modes)
 - [ ] Try "pinned" sampling strategy (first+last frames pinned) vs uniform
-- [ ] Try proprio-as-text augmentation (complement visual with numeric end-effector state)
+- [x] **Implement proprio-as-text augmentation** — DONE iter_008. Code ready (`--proprio` flag). Flash-lite test: n=2 valid (rate-limited), MAE=107.5 vs 59.5 baseline. Negative signal but n too small. Needs retest.
+- [ ] **Retest proprio-as-text with n≥5 valid** — wait for rate limit reset
 - [ ] Open questions: definition of "failure" for time-out tasks; vision-only vs vision+proprio-as-text
 - [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 

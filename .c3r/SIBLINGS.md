@@ -26,7 +26,7 @@ Siblings will see it in their next SIBLINGS.md refresh.
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
 - **status**: running · iter #9 · ctx 0%
-- **last iter**: 24m ago
+- **last iter**: 30m ago
 
 ### Recent commits on `agent/td_baseline`
 ```
@@ -82,17 +82,17 @@ git show agent/td_baseline:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #12 · ctx 0%
-- **last iter**: 59s ago
+- **status**: running · iter #13 · ctx 1%
+- **last iter**: 38s ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
+cebb5d6 iter_013: §17 multi-frame aggregation survey (TempCore/VideoAgent/MACD/SlowFocus/VideoMiner + variance-gated α formula) → LITERATURE.md
 4942eb3 iter_012: §16 VLM calibration/uncertainty survey (SRAM/VLM-CON/CrossModal/PairRank + uncertainty-gated α gap) → LITERATURE.md
 6de0f8d iter_011: §15 structured CoT prompting survey (VTimeCoT/Time-R1/VoT/WhenThinkingDrifts) → LITERATURE.md
 5ffdc47 iter_010: α floor derivation from Gemini start-bias + PERSAC status → §D.3/D.4 LITERATURE.md
 f3d56fe iter_009: Discussion section — binary/localization divide, MetaWorld hardness, VLM-PER agenda → LITERATURE.md
-9448009 iter_008: hybrid VLM+TD replay priority gap survey — §14h expanded (VLAC/TOPReward/Robometer/D-SPEAR/DPER/FARL + critical gap confirmed) → LITERATURE.md
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```
