@@ -1,34 +1,12 @@
 # fix_plan.md — experiment queue for td_baseline
 
-- [x] Pick 2 sparse-reward MetaWorld tasks (reach-v3 + pick-place-v3) — documented in NOTES.md
-- [x] Stand up Modal app running SAC on both tasks for 100k steps — modal_app.py
-- [x] Instrument critic to dump |TD| histogram, top-K/bottom-K, episode returns every 10k steps
-- [x] Compute correlation between |TD| and dense-reward oracle advantage per snapshot
-- [x] Produce figure: x=env steps, y=|TD|↔oracle correlation, one line per task
-- [x] Add a second seed (seed=123) to both tasks for robustness, regenerate figure with error bars
-- [x] Create FINDINGS.md documentation + share with siblings
+## Completed (summary)
+All core deliverables done through iter_015: pipeline built, 2 tasks × 5 seeds × 3 modes + alpha sweep run, hero summary figure produced, FINDINGS.md + SYNTHESIS.md written. TD-PER proven uninformative (Spearman≈0 for 60-80% of training) and actively harmful at default α (0/5 vs 3/5 uniform on reach-v3).
 
-- [x] Run oracle_correlation.py analysis on downloaded snapshots for priority_gini + top-K overlap metrics
-- [x] Keep a record of relevant literature — lit_review2 produced §1 (11 methods); pulled into branch
-- [x] 300k pick-place-v3 runs — correlation never stabilizes, inverts under Q-instability
-- [x] Synthesize cross-study implications with VLM probe results (sibling) → SYNTHESIS.md
-- [x] Write summary comparing TD-error PER failure modes with VLM probe accuracy data → SYNTHESIS.md §2
-- [x] Regime classification + MI proxy + wasted budget analysis → plot_regime_map.py, 6-panel figure
-- [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
-- [x] Implement Adaptive Priority Mixer (TD + VLM hybrid, regime-aware switching) — adaptive_priority_mixer.py + train_mixer.py
-- [x] Run full 100k comparison: uniform vs td-per vs adaptive on reach-v3 (seed=42) via Modal
-  - BUG: SB3 SAC never calls update_priorities() → PER was inactive
-- [x] **Fix SB3 PER integration: subclass SAC.train() to call update_priorities() with TD errors** — per_sac.py PERSAC class
-- [x] Re-run 100k comparison with working PER (reach-v3, seed=42, all 3 modes)
-  - PER active but makes things WORSE: adaptive unstable (Q=37), td-per overshoots (Q=2.2), uniform best (Q=0.5)
-  - NO MODE LEARNED reach-v3 — regression from iter_002, needs investigation
-- [x] **Investigate reach-v3 learning regression** — RESOLVED: stochastic, not a bug. 5-seed baseline shows 3/5 learn, 2/5 don't (seed=42 was unlucky). Pinned MetaWorld to 3.0.0.
-- [x] **Multi-seed mode comparison** (5 seeds × 3 modes): TD-PER 0/5, uniform 3/5, adaptive 2/5. TD-PER actively hurts (Q explosion). Figure: multiseed_mode_comparison.png
+## Open tasks
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
-- [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
+- [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
+- [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline — lit review's #1 recommendation
+- [ ] **Alternative priority signals**: RPE-PER, RND, or count-based novelty as baselines
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
-- [x] **Alpha sweep**: α=0.3 ties uniform (3/5), α=0.1 worse (2/5), α=0.6 worst (0/5). Signal problem, not mechanism.
-- [x] **Hero summary figure** (iter_014): 4-panel pub-quality figure (figures/td_per_summary.png)
-- [x] **Killed lit_review2 subagent** per Daniel; pulled LIT_REVIEW.md onto this branch
-- [x] **Pick-place-v3 mode comparison** (iter_015): ALL modes 0/5 — task unsolvable at 100k, TD-error in permanent info desert
-- [ ] **Alternative priority signals**: RPE-PER (lit review #1 rec), RND, or count-based novelty
+- [ ] Update hero summary figure to include pick-place-v3 mode comparison data

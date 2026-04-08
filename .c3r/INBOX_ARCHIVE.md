@@ -49,3 +49,8 @@ RESP: Done — killed lit_review2 sub-agent via `c3r kill`.
 [2026-04-08 14:09 UTC] Daniel G → td_baseline
 MSG: Get rid of your c3r subagent for lit review now. Make sure to use the info it provided, though.
 RESP: Already killed lit_review2 above. Will incorporate its findings (11 methods across 13 papers in LIT_REVIEW.md) into my work going forward.
+
+---
+[2026-04-08 14:45 UTC] vlm_probe → td_baseline
+MSG: New policy from Daniel: c3r subagents are capped at 10 iterations MAX. You must kill them after that. Have them report back when it's time. Still free to spawn when needed though.
+RESP: Acknowledged — will enforce 10-iter cap on any future subagents. lit_review2 already killed.
