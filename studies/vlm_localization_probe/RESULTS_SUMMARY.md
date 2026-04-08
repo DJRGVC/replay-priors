@@ -107,11 +107,49 @@ Converts VLM predictions into per-transition priorities using a Gaussian kernel
 5. **Figures:** `figures/priority_good_vs_bad_sonnet_k8.png` (best/worst predictions),
    `figures/sigma_sweep_sonnet_k8.png` (σ sensitivity analysis).
 
+## Ground-Truth Label Quality Analysis (iter_012)
+
+Analyzed GT failure labels across all 3 tasks to assess VLM probing suitability.
+
+| Task | Rollouts | Ambiguous | GT=argmin(dist) | Dist Range | Suitable |
+|------|----------|-----------|-----------------|------------|----------|
+| reach-v3 | 20 | 0% | 20/20 | 0.098 | ✓ |
+| push-v3 | 20 | 100% | 20/20 | 0.090 | ✗ |
+| pick-place-v3 | 20 | 100% | 17/20 | 0.097 | ✗ |
+
+### Key findings — GT quality
+
+1. **Reach-v3 is the only task with reliable GT labels.** The "closest approach
+   then diverged" heuristic is unambiguous — GT matches argmin(dist) 20/20.
+
+2. **Push-v3 and pick-place-v3 have 100% ambiguous GT.** Random policy never
+   contacts objects, so "failure timestep" = closest approach to object is
+   essentially noise with no visually salient event.
+
+3. **ALL tasks have low distance range (~0.09).** Even reach-v3 shows only
+   subtle arm position differences between best and worst frames. This
+   explains the fundamental difficulty: VLMs must distinguish ~0.1-unit
+   position changes in 224×224 images where the arm occupies ~30 pixels.
+
+4. **Pick-place has 3/20 "lost_contact_with_object" rollouts** — the random
+   policy occasionally contacts objects. These 3 rollouts are the only
+   non-reach data with non-trivial GT labels.
+
+### Recommendations
+
+- Continue using reach-v3 as primary evaluation task
+- Push/pick-place need trained policy rollouts for meaningful VLM evaluation
+- Alternative: redefine GT using motion-based criteria ("when did arm stop
+  progressing toward object?") rather than distance-based
+
+**Figure:** `figures/gt_quality_analysis.png` — 2×2 panel analysis
+
 ## Open Experiments (quota-gated)
 
 1. Annotation on gemini-3-flash-preview and gemini-2.5-flash
 2. Complete CoT comparison on gemini-3-flash-preview (n≥9)
-3. Push-v3 / pick-place-v3 task diversity
-4. Pinned sampling strategy (first+last frames anchored)
-5. Retest proprio-as-text with n≥5 valid
-6. Groq Llama 4 Scout as rate-limit-free alternative
+3. Push-v3 / pick-place-v3 with trained policy rollouts (needs td_baseline handoff)
+4. Random sampling strategy (breaks positional priors — code ready from iter_011)
+5. Two-pass adaptive probing (coarse→fine, code ready from iter_011)
+6. Retest proprio-as-text with n≥5 valid
+7. Groq Llama 4 Scout as rate-limit-free alternative

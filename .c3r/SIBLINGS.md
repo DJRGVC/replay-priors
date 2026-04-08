@@ -26,7 +26,7 @@ Siblings will see it in their next SIBLINGS.md refresh.
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
 - **status**: running · iter #11 · ctx 0%
-- **last iter**: 19m ago
+- **last iter**: 38m ago
 
 ### Recent commits on `agent/td_baseline`
 ```
@@ -82,17 +82,17 @@ git show agent/td_baseline:.c3r/SIBLINGS.md
 ## vlm_litreview
 - **role**: generic
 - **focus**: Literature review: survey recent papers (2023-2026) on VLM-based failure detection and localization in robotic manipulation. Focus on which VLMs are used, keyframe selection methods, prompting strategies, and accuracy metrics. Summarize findings in studies/vlm_localization_probe/LITERATURE.md.
-- **status**: running · iter #40 · ctx 1%
-- **last iter**: 1m ago
+- **status**: running · iter #43 · ctx 0%
+- **last iter**: 4m ago
 - **parent**: vlm_probe (this is a sub-agent)
 
 ### Recent commits on `agent/vlm_litreview`
 ```
+c493652 iter_044: §43 BOCPD+proprio experiment design — full NC6 protocol (3 estimators, Level 1 gate, ~150-line bocpd_proprio.py spec, expected outcome table, vlm_probe handoff strategy) → LITERATURE.md (5429→5782 lines)
+eee8597 iter_043: §42 complete ablation baseline suite for VLM-PER (11 baselines, 4 clusters, hypothesis matrix, tier 1/2/3 priority) → LITERATURE.md (5130→5429 lines)
+7f4618b iter_042: §41 foundation model-based replay and memory consolidation survey (PGR ICLR 2025, SynthER, SuRe, MemoryVLA, PhysMem, MemRL/Mem-α/Memory-R1, RLEP, D-SPEAR — 16 papers, gap confirmed across generative track, NC7 PGR+G_i hybrid, NC8 SuRe+G_i VLA) → LITERATURE.md (4931→5130 lines)
 f8f371c iter_041: §40 episodic/trajectory-level replay prioritization survey (14 papers, HGR two-level hierarchy, VLM+episode-priority gap confirmed, two-level VLM-PER formulation) → LITERATURE.md (4716→4931 lines)
 26c30f8 iter_040: §39 vlm_probe empirical summary (9 subsections, MAE=41.9 baseline, bias taxonomy, theory-vs-empirical table) → LITERATURE.md (4382→4716 lines)
-0f1351d iter_039: §38 anomaly detection track survey (reconstruction/one-class/OOD/foundation) — gap confirmed: no per-timestep p_i use, MetaWorld gap, pixel-novelty failure, conformal-σ novel connection → LITERATURE.md (4280→4382 lines)
-0fc5625 iter_037: §37 action segmentation + keyframe + VTG + BOCPD survey — no VLM-free method satisfies all 3 t* conditions; NC6 (BOCPD+proprio) proposed → LITERATURE.md (4110→4280 lines)
-2e5ed86 iter_036: compaction (summarized iters 001-016 into archive; log shrunk 306→175 lines; fix_plan pruned)
 ```
 ### Files modified on `agent/vlm_litreview` (relative to `c3r/replay-priors`)
 ```
