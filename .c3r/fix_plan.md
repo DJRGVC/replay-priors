@@ -30,7 +30,9 @@
 - [ ] **Groq Llama 4 Scout probe** — backend code ready, needs GROQ_API_KEY in .c3r/env.sh
 - [x] **GitHub Models backend (Llama 3.2 Vision)** — DONE iter_013. Grid tiling for 1-image limit. 11B MAE=72.9, 90B MAE=53.5. Grid-position bias.
 - [ ] **Test random sampling on Llama-3.2-90B** — may break grid-position bias (no rate limits, can run freely)
-- [ ] **Two-pass adaptive probing on Llama-3.2-90B** — no rate limits, test coarse→fine (code ready from iter_011)
+- [x] **Two-pass adaptive probing on Llama-3.2-90B** — DONE iter_015. NEGATIVE: coarse MAE=69.8→fine MAE=71.3, 6/10 worsened. Coarse pass too inaccurate to center refinement.
+- [ ] **CoT prompting on Llama-3.2-90B** — no rate limits, test if structured reasoning helps mid-tier model (hurt flash-lite, promising on gemini-3-flash)
+- [ ] **Explore other GitHub Models vision models** — Phi-4-multimodal-instruct, etc. May have different biases than Llama grid-position fixation
 - [ ] **Cohere aya-vision-32b** — 1000 req/month free, native multi-image (no grid needed)
 - [ ] Open questions: definition of "failure" for time-out tasks; vision-only vs vision+proprio-as-text
 - [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
