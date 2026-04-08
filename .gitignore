@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Data / artifacts
+data/
+runs/
+logs/
+wandb/
+checkpoints/
+*.mp4
+*.png
+*.jpg
+!docs/**/*.png
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# c3r worktrees live as siblings, but ignore stray state if copied in
+.c3r/state.json
