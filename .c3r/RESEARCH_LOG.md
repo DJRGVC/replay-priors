@@ -37,3 +37,27 @@ Decision:   Next iteration: add seed=123 runs for robustness (error bars in figu
             Also run oracle_correlation.py for Gini + top-K overlap metrics. Consider
             extending to 200k or 500k steps on pick-place-v3 to see if correlation
             ever emerges given enough training.
+
+## iter_003 — Seed=123 runs + FINDINGS.md + lit_review subagent  (2026-04-08T05:50:00Z)
+Hypothesis: Second seed will confirm that TD-error uninformativeness is robust, not
+            seed-dependent. Seed=123 reach-v3 may learn at a slightly different rate
+            but the correlation pattern should match seed=42.
+Change:     Ran seed=123 on both tasks via Modal (100k steps each). Updated
+            plot_td_correlation.py to support multi-seed aggregation with mean±std
+            error bands. Created FINDINGS.md as concise documentation. Updated
+            modal_app.py entrypoint to accept --seeds/--tasks args. Spawned
+            lit_review2 subagent (opus) after killing failed lit_review.
+Command:    modal run studies/td_error_baseline/modal_app.py --seeds 123
+            python plot_td_correlation.py --seeds 42,123
+Result:     reach-v3 s123: Spearman pattern matches s42 — near-zero until ~50k, then
+            rises (0.38→0.57 at 50-60k, earlier than s42's 80-90k jump). Policy
+            learned faster (ep_rew 10→379 by 100k). Interestingly, Spearman drops
+            back to -0.09/-0.09 at 90-100k despite strong policy — critic overshooting.
+            pick-place-v3 s123: Spearman -0.05 to +0.19, never learns (ep_rew=0).
+            Consistent with s42. Figure updated with n=2 error bands, clearly showing
+            the separation between tasks. Created FINDINGS.md. Killed lit_review
+            (fail_streak=4), spawned lit_review2 with opus.
+Decision:   Next iteration: run oracle_correlation.py for Gini + top-K overlap metrics
+            on all 4 runs. This will quantify how concentrated TD-error priorities are
+            (Gini) and how much overlap exists between top-K by |TD| vs top-K by oracle
+            advantage.

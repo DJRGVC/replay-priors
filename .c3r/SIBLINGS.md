@@ -25,10 +25,12 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #0 · ctx 0%
+- **status**: running · iter #1 · ctx 0%
+- **last iter**: 28m ago
 
 ### Recent commits on `agent/vlm_probe`
 ```
+2bb3ae2 iter_002: VLM client + first reach-v3 probe (MAE=41.9, ±10=20%)
 007302f iter_001: collect 60 failure rollouts across 3 MetaWorld tasks
 3b59ea0 scaffold replay-priors umbrella
 ```
@@ -45,6 +47,9 @@ Siblings will see it in their next SIBLINGS.md refresh.
 .claude/settings.json
 studies/vlm_localization_probe/collect_rollouts.py
 studies/vlm_localization_probe/regenerate_meta.py
+studies/vlm_localization_probe/results/results.json
+studies/vlm_localization_probe/run_probe.py
+studies/vlm_localization_probe/vlm_client.py
 ```
 ### Read one with:
 ```

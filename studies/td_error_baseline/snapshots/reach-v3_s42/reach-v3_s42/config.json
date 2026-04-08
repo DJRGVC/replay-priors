@@ -1,7 +1,0 @@
-{
-  "task": "reach-v3",
-  "total_steps": 100000,
-  "seed": 42,
-  "snapshot_interval": 10000,
-  "timestamp": "2026-04-08T04:43:47"
-}

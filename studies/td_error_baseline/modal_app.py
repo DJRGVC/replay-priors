@@ -171,23 +171,29 @@ def download_snapshot_data(task: str, seed: int = 42):
 
 
 @app.local_entrypoint()
-def main():
-    """Run both tasks in parallel on Modal."""
+def main(seeds: str = "42", tasks: str = "reach-v3,pick-place-v3",
+         total_steps: int = 100_000):
+    """Run tasks in parallel on Modal.
+
+    Args:
+        seeds: Comma-separated seeds (e.g. "42" or "42,123")
+        tasks: Comma-separated task names
+        total_steps: Steps per run
+    """
     import json
 
-    tasks = [
-        ("reach-v3", 100_000, 42),
-        ("pick-place-v3", 100_000, 42),
-    ]
+    task_list = [t.strip() for t in tasks.split(",")]
+    seed_list = [int(s.strip()) for s in seeds.split(",")]
 
-    # Launch in parallel
+    # Launch all task×seed combos in parallel
     handles = []
-    for task, steps, seed in tasks:
-        print(f"Launching {task} ({steps} steps, seed={seed})...")
-        handles.append(train_task.spawn(task=task, total_steps=steps, seed=seed))
+    for task in task_list:
+        for seed in seed_list:
+            print(f"Launching {task} ({total_steps} steps, seed={seed})...")
+            handles.append(train_task.spawn(task=task, total_steps=total_steps, seed=seed))
 
     # Collect results
     for h in handles:
         result = h.get()
-        print(f"\n=== {result['task']} ===")
+        print(f"\n=== {result['task']} (seed={result['seed']}) ===")
         print(json.dumps(result, indent=2))
