@@ -27,23 +27,23 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: running · iter #14 · ctx 0%
+- **status**: running · iter #15 · ctx 0%
 
 ### Recent commits on `agent/td_baseline`
 ```
+79e6c77 iter_016: compaction (summarized iters 001-010)
 dc68daf iter_015: pick-place-v3 5-seed mode comparison — all modes 0/5 (task unsolvable at 100k), TD-error in permanent info desert (Spearman<0.04), Q-explosion not PER-specific on hard tasks
 104359b iter_014: hero summary figure + lit review incorporation — 4-panel pub-quality figure (Spearman/mode comparison/Q-explosion/regime breakdown), killed lit_review2 per Daniel, pulled LIT_REVIEW.md onto branch
 c1bdb3e iter_013: alpha sweep — α=0.3 ties uniform (3/5), α=0.1 worse (2/5), α=0.6 worst (0/5); problem is signal not mechanism
 0e9d017 iter_012: 5-seed mode comparison — TD-PER actively hurts (0/5 learn), uniform best (3/5), adaptive middling (2/5)
-12ceb16 iter_011: 5-seed baseline resolves reach-v3 learning regression — stochastic, not a bug
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
 .c3r/INBOX.md
 .c3r/INBOX_ARCHIVE.md
-.c3r/PAUSED
 .c3r/PROMPT.md
 .c3r/RESEARCH_LOG.md
+.c3r/RESEARCH_LOG_ARCHIVE.md
 .c3r/SIBLINGS.md
 .c3r/agent.conf
 .c3r/env.sh
@@ -75,8 +75,8 @@ studies/td_error_baseline/per_sac.py
 ```
 git show agent/td_baseline:.c3r/INBOX.md
 git show agent/td_baseline:.c3r/INBOX_ARCHIVE.md
-git show agent/td_baseline:.c3r/PAUSED
 git show agent/td_baseline:.c3r/PROMPT.md
 git show agent/td_baseline:.c3r/RESEARCH_LOG.md
+git show agent/td_baseline:.c3r/RESEARCH_LOG_ARCHIVE.md
 ```
 
