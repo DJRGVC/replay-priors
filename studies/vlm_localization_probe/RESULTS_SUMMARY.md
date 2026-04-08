@@ -13,6 +13,21 @@ Task: reach-v3 (MetaWorld), 150-step episodes, random policy, K=8 uniform keyfra
 
 **Key finding:** gemini-3-flash-preview has best ±10 (44%) and median (14), but worst-case catastrophic errors inflate MAE above Claude. Claude has consistent center-bias. Each Gemini model has a distinct positional bias (start/end/late).
 
+## GitHub Models — Llama 3.2 Vision (K=8, direct, annotated, grid-tiled)
+
+| Model | N | Valid | MAE | Median | ±5 | ±10 | ±20 | Bias | Cost/call |
+|-------|---|-------|-----|--------|-----|------|------|------|-----------|
+| Llama-3.2-11B-Vision | 10 | 10 | 72.9 | 66.5 | 10% | 10% | 10% | late (t=106) | $0 |
+| Llama-3.2-90B-Vision | 10 | 9 | 53.5 | 37.5 | 0% | 0% | 0% | early-center (t=42) | $0 |
+
+**Notes:**
+- Uses GitHub Models API (free, OpenAI-compatible, auth via `gh auth token`)
+- 1-image limit → frames tiled into 2×4 grid with timestep labels
+- Grid tiling introduces strong grid-position bias: 11B locks onto t=106 (cell 6/8), 90B locks onto t=42 (cell 3/8)
+- 90B has better MAE (53.5 vs 72.9) but paradoxically 0% ±10 — never hits within 10 of GT
+- Both worse than Claude Sonnet (MAE=41.9) and gemini-3-flash-preview (±10=44%)
+- Grid format fundamentally limits multi-image reasoning — models pick visually salient grid cells rather than reasoning about temporal progression
+
 ## K Sweep (claude-sonnet-4-6, direct, no annotation)
 
 | K | N | MAE | ±10 | ±20 | Note |
@@ -153,3 +168,5 @@ Analyzed GT failure labels across all 3 tasks to assess VLM probing suitability.
 5. Two-pass adaptive probing (coarse→fine, code ready from iter_011)
 6. Retest proprio-as-text with n≥5 valid
 7. Groq Llama 4 Scout as rate-limit-free alternative
+8. Test Llama 3.2 90B with CoT prompt (may help given grid format)
+9. Try Cohere c4ai-aya-vision-32b (1000 req/month free, no grid needed)

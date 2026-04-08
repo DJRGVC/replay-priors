@@ -580,6 +580,120 @@ def _call_groq(
     return result
 
 
+# ── Grid tiling (for single-image APIs) ──────────────────────────
+
+def _tile_keyframes(
+    keyframes: list[Image.Image],
+    keyframe_indices: list[int],
+    total_timesteps: int,
+    cols: int = 4,
+) -> Image.Image:
+    """Tile K keyframes into a single grid image with timestep labels.
+
+    Each cell shows the frame with a small label at top-left.
+    Returns a single PIL image suitable for single-image APIs.
+    """
+    from PIL import ImageDraw, ImageFont
+
+    K = len(keyframes)
+    rows = (K + cols - 1) // cols
+    cell_w, cell_h = keyframes[0].size
+
+    grid = Image.new("RGB", (cols * cell_w, rows * cell_h), color=(40, 40, 40))
+    draw = ImageDraw.Draw(grid)
+
+    font_size = max(10, cell_h // 20)
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
+    except (OSError, IOError):
+        font = ImageFont.load_default()
+
+    for i, (img, idx) in enumerate(zip(keyframes, keyframe_indices)):
+        r, c = divmod(i, cols)
+        x0, y0 = c * cell_w, r * cell_h
+        grid.paste(img, (x0, y0))
+        frac = idx / max(total_timesteps - 1, 1)
+        label = f"t={idx} ({frac:.0%})"
+        # Black outline + white text
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                if dx or dy:
+                    draw.text((x0 + 3 + dx, y0 + 3 + dy), label, fill="black", font=font)
+        draw.text((x0 + 3, y0 + 3), label, fill="yellow", font=font)
+
+    return grid
+
+
+# ── GitHub Models backend ─────────────────────────────────────────
+
+def _call_github_models(
+    task_description: str,
+    keyframes: list[Image.Image],
+    keyframe_indices: list[int],
+    total_timesteps: int,
+    model: str = "Llama-3.2-11B-Vision-Instruct",
+    prompt_style: str = "direct",
+    proprio_labels: list[str] | None = None,
+) -> dict:
+    """GitHub Models API — free, OpenAI-compatible, vision-capable."""
+    from openai import OpenAI
+    import subprocess
+
+    # Get token from gh CLI
+    token = os.environ.get("GITHUB_TOKEN") or subprocess.check_output(
+        ["gh", "auth", "token"], text=True
+    ).strip()
+
+    client = OpenAI(
+        base_url="https://models.inference.ai.azure.com",
+        api_key=token,
+    )
+
+    user_text = _build_user_message(
+        task_description, keyframes, keyframe_indices,
+        total_timesteps, prompt_style, proprio_labels,
+    )
+
+    # GitHub Models limits to 1 image per request — tile into grid
+    grid = _tile_keyframes(keyframes, keyframe_indices, total_timesteps)
+    b64 = _pil_to_base64(grid, fmt="JPEG")  # JPEG for smaller payload
+
+    suffix = (
+        "Now follow the 3-step process. After your reasoning, output the JSON on its own line."
+        if prompt_style == "cot" else
+        "Now respond with ONLY the JSON object. No explanation, no markdown — just the raw JSON on one line."
+    )
+    content = [
+        {"type": "text", "text": user_text + f"\n\nThe image below is a {len(keyframes)}-frame grid (left-to-right, top-to-bottom). Each cell is labeled with its timestep.\n\n{suffix}"},
+        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}", "detail": "low"}},
+    ]
+
+    max_tokens = 2048 if prompt_style == "cot" else 512
+
+    def _do_call():
+        return client.chat.completions.create(
+            model=model,
+            max_tokens=max_tokens,
+            messages=[
+                {"role": "system", "content": _get_system_prompt(prompt_style)},
+                {"role": "user", "content": content},
+            ],
+        )
+
+    t0 = time.time()
+    response = _retry_on_rate_limit(_do_call)
+    latency = time.time() - t0
+
+    text = response.choices[0].message.content.strip()
+    result = _parse_json_from_text(text)
+
+    result["_latency_s"] = round(latency, 2)
+    result["_input_tokens"] = getattr(response.usage, "prompt_tokens", 0) or 0
+    result["_output_tokens"] = getattr(response.usage, "completion_tokens", 0) or 0
+    result["_model"] = model
+    return result
+
+
 # ── Unified entry point ────────────────────────────────────────────
 
 TASK_DESCRIPTIONS = {
@@ -631,10 +745,13 @@ def predict_failure(
         return _call_openai(**kwargs)
     elif "gemini" in model:
         return _call_gemini(**kwargs)
+    elif model.startswith("gh:"):
+        kwargs["model"] = model[3:]  # strip "gh:" prefix
+        return _call_github_models(**kwargs)
     elif "llama" in model or "groq" in model:
         return _call_groq(**kwargs)
     else:
-        raise ValueError(f"Unknown model family: {model}. Use a Claude, OpenAI, Gemini, or Groq model name.")
+        raise ValueError(f"Unknown model family: {model}. Use a Claude, OpenAI, Gemini, Groq, or gh:<model> name.")
 
 
 # ── Quick CLI test ─────────────────────────────────────────────────

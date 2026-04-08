@@ -28,6 +28,10 @@
 - [x] **Implement proprio-as-text augmentation** — DONE iter_008. Code ready (`--proprio` flag). Flash-lite test: n=2 valid (rate-limited), MAE=107.5 vs 59.5 baseline. Negative signal but n too small. Needs retest.
 - [ ] **Retest proprio-as-text with n≥5 valid** — wait for rate limit reset
 - [ ] **Groq Llama 4 Scout probe** — backend code ready, needs GROQ_API_KEY in .c3r/env.sh
+- [x] **GitHub Models backend (Llama 3.2 Vision)** — DONE iter_013. Grid tiling for 1-image limit. 11B MAE=72.9, 90B MAE=53.5. Grid-position bias.
+- [ ] **Test random sampling on Llama-3.2-90B** — may break grid-position bias (no rate limits, can run freely)
+- [ ] **Two-pass adaptive probing on Llama-3.2-90B** — no rate limits, test coarse→fine (code ready from iter_011)
+- [ ] **Cohere aya-vision-32b** — 1000 req/month free, native multi-image (no grid needed)
 - [ ] Open questions: definition of "failure" for time-out tasks; vision-only vs vision+proprio-as-text
 - [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 
