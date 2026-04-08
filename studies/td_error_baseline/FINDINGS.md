@@ -120,6 +120,10 @@ it's valid.
 | `plot_regime_map.py` | Regime map figure generation script |
 | `plot_td_correlation.py` | Correlation figure generation script |
 | `plot_priority_quality.py` | Priority quality figure generation script |
+| `figures/mode_comparison_reach_v3.png` | 4-panel mode comparison (iter_008) |
+| `plot_mode_comparison.py` | Mode comparison figure generation script |
+| `adaptive_priority_mixer.py` | Regime-aware PER buffer (SumTree + RegimeDetector) |
+| `train_mixer.py` | Training script supporting adaptive/td-per/uniform modes |
 | `snapshots/` | Per-run snapshot data (TD errors, dense rewards, correlations) |
 | `modal_app.py` | Modal app for running training on cloud GPU |
 | `train.py` | Local training script |
@@ -136,3 +140,10 @@ it's valid.
 - [x] Literature review (§1: 11 alternative PER methods) via lit_review2 subagent
 - [x] Cross-study synthesis with VLM probe + lit review → SYNTHESIS.md + regime map figure
 - [x] Regime classification (4 regimes) + MI proxy + wasted budget analysis
+- [x] Adaptive Priority Mixer implementation (adaptive_priority_mixer.py + train_mixer.py)
+- [x] 100k reach-v3 comparison: adaptive vs td-per vs uniform (iter_008)
+  - **Critical bug found:** SB3 SAC never calls `update_priorities()` → td-per ≈ uniform
+  - Adaptive mode went Q-unstable at 40k despite same effective sampling
+  - Need to hook into SAC's `train()` to actually update PER priorities
+- [ ] Fix SB3 PER integration — monkey-patch or subclass SAC.train() for priority updates
+- [ ] Re-run comparison with working PER

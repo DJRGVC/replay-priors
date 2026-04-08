@@ -148,3 +148,25 @@ Result:     All 3 modes pass smoke test. Regime detector correctly transitions:
 Decision:   Next iteration: run full 100k-step comparison on reach-v3 (all 3 modes,
             seed=42) via Modal to measure whether adaptive switching actually improves
             sample efficiency vs uniform and td-per baselines.
+
+## iter_008 — 100k mode comparison reveals PER integration bug  (2026-04-08T09:15:00Z)
+Hypothesis: Adaptive Priority Mixer will outperform vanilla TD-PER and uniform
+            baselines on reach-v3 by switching to uniform in noise/unstable regimes.
+Change:     Added train_mixer_task() to modal_app.py with --compare flag for
+            parallel 3-mode (adaptive/td-per/uniform) runs. Launched all 3 on Modal
+            T4 GPUs. Created plot_mode_comparison.py for 4-panel comparison figure.
+Command:    modal run modal_app.py --tasks reach-v3 --seeds 42 --compare
+            python plot_mode_comparison.py
+Result:     **CRITICAL BUG: SB3's SAC never calls update_priorities()** on the buffer.
+            All PER priorities remain at initial max_priority=1.0 throughout training.
+            td-per and uniform produced identical |TD| and Q trajectories (confirming
+            PER was inactive). Adaptive mode went Q-unstable at 40k (q_cv=3.04,
+            |TD| exploded to 4.35, Q jumped to 55.29) — possibly due to sum-tree
+            sampling introducing subtle ordering bias vs standard ReplayBuffer.
+            None of the 3 modes learned reach-v3 (ep_rew=0 at 50-90k steps),
+            contrasting with earlier runs using train.py that learned by 60-90k.
+            Runs partially completed: uniform=90k, td-per=60k, adaptive=50k.
+            Figure: figures/mode_comparison_reach_v3.png
+Decision:   Next iteration: fix PER integration by subclassing SAC to override
+            train() and call buffer.update_priorities() with actual TD errors.
+            This is the minimum viable change to make PER actually work with SB3.
