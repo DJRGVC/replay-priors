@@ -176,6 +176,31 @@ for the seeds that don't learn.
 
 ![Multi-seed mode comparison](figures/multiseed_mode_comparison.png)
 
+### reach-v3 — Alpha sweep for TD-PER (5 seeds, 100k steps, iter_013)
+
+**Lower α mitigates Q-explosion but never beats uniform.**
+
+| Mode | α | Learns | Q_mean@100k | |TD|@100k |
+|------|---|--------|-------------|----------|
+| **Uniform** | — | **3/5 (60%)** | 20.8 ± 18.3 | 0.20 ± 0.16 |
+| TD-PER | 0.3 | 3/5 (60%) | 36.6 ± 26.2 | 0.46 ± 0.29 |
+| TD-PER | 0.1 | 2/5 (40%) | 144.6 ± 258.0 | 1.54 ± 2.07 |
+| TD-PER | 0.6 | 0/5 (0%) | 228.3 ± 377.0 | 7.62 ± 12.6 |
+
+**Key findings:**
+1. **α=0.3 ties uniform (3/5 learn)** — less aggressive PER partially mitigates
+   Q-explosion (Q=36.6 vs 228.3), allowing some seeds to learn.
+2. **α=0.1 is non-monotonically worse (2/5)** — very low alpha barely distinguishes
+   priorities, but one seed still explodes catastrophically (Q=660).
+3. **Spearman ≈ 0 across ALL alpha values** — TD-error correlation with oracle
+   advantage is unchanged by prioritization strength.
+4. **Best-case TD-PER matches but never exceeds uniform.** Even with tuned α,
+   PER adds overhead and instability for zero benefit. The problem is the
+   SIGNAL (TD-error is uninformative in sparse-reward early training), not
+   the MECHANISM (prioritized sampling).
+
+![Alpha sweep](figures/alpha_sweep_td_per.png)
+
 ## Status
 
 - [x] Single-seed (42) runs on reach-v3 + pick-place-v3, 100k steps
@@ -199,6 +224,10 @@ for the seeds that don't learn.
   - **TD-PER actively hurts** — Q-value explosion (11×), zero seeds learn
   - Adaptive middling — regime detection helps but PER overhead still hurts
   - Figure: `figures/multiseed_mode_comparison.png`
+- [x] **Alpha sweep (iter_013)**: α=0.3 ties uniform (3/5), α=0.1 worse (2/5), α=0.6 worst (0/5)
+  - Q-explosion is partly tuning, but even best α never beats uniform
+  - Confirms problem is the SIGNAL, not the MECHANISM
+  - Figure: `figures/alpha_sweep_td_per.png`
 - [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix
 - [ ] Consider RPE-PER or other non-TD priority signals as baselines

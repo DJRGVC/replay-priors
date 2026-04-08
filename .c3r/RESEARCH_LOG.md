@@ -278,3 +278,29 @@ Decision:   Next iteration: this study's core question is now answered with
             reward prediction error, or VLM-based priorities),
             (c) investigate whether lower alpha (less aggressive PER) mitigates
             Q-explosion while retaining any benefit.
+
+## iter_013 — Alpha sweep: lower α mitigates but never beats uniform  (2026-04-08T14:30:00Z)
+Hypothesis: Q-explosion under TD-PER is a tuning issue — lower α (less aggressive
+            prioritization) will mitigate Q-divergence and may recover learning.
+Change:     Added alpha parameter to modal_app.py train_mixer_task. Ran 5 seeds ×
+            2 alpha values (0.1, 0.3) for td-per mode on reach-v3 (100k steps).
+            Created plot_alpha_sweep.py for 6-panel comparison figure.
+Command:    modal run modal_app.py --tasks reach-v3 --seeds "42,123,7,99,256" --modes "td-per" --alpha {0.1,0.3}
+            python plot_alpha_sweep.py
+Result:     **Non-monotonic alpha effect — α=0.3 is best PER setting:**
+            - Uniform:       3/5 learn, Q=20.8±18.3  (baseline)
+            - TD-PER α=0.3:  3/5 learn, Q=36.6±26.2  (ties uniform!)
+            - TD-PER α=0.1:  2/5 learn, Q=144.6±258.0 (one seed explodes to Q=660)
+            - TD-PER α=0.6:  0/5 learn, Q=228.3±377.0 (catastrophic, from iter_012)
+            Spearman ≈ 0 across ALL alpha values — TD-error remains uninformative
+            regardless of prioritization strength. α=0.3 mitigates Q-explosion
+            enough for seeds to survive, but provides ZERO benefit over uniform.
+            The problem is the SIGNAL (TD-error is uninformative in sparse-reward
+            early training), not the MECHANISM (prioritized sampling).
+            Wall time: ~1900-2500s per run on Modal T4.
+            Figure: figures/alpha_sweep_td_per.png
+Decision:   The TD-error baseline study's core thesis is now fully supported:
+            (1) TD-error is uninformative early (Spearman≈0), (2) TD-PER hurts at
+            default settings, (3) even tuned TD-PER only matches uniform, never
+            beats it. Next: either pick-place-v3 confirmation or start prototyping
+            VLM-based priority signals (the original research goal).

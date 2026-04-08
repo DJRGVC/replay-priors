@@ -177,7 +177,8 @@ def download_snapshot_data(task: str, seed: int = 42):
     volumes={RESULTS_DIR: vol},
 )
 def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
-                     mode: str = "adaptive", snapshot_interval: int = 10_000):
+                     mode: str = "adaptive", snapshot_interval: int = 10_000,
+                     alpha: float = 0.6):
     """Run SAC training with Adaptive Priority Mixer on Modal."""
     import json
     import os
@@ -198,7 +199,8 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
     from stable_baselines3 import SAC
     from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
 
-    output_dir = os.path.join(RESULTS_DIR, f"{task}_s{seed}_{mode}")
+    alpha_tag = f"_a{alpha}" if alpha != 0.6 else ""
+    output_dir = os.path.join(RESULTS_DIR, f"{task}_s{seed}_{mode}{alpha_tag}")
     os.makedirs(output_dir, exist_ok=True)
 
     config = {
@@ -206,13 +208,14 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
         "total_steps": total_steps,
         "seed": seed,
         "mode": mode,
+        "alpha": alpha,
         "snapshot_interval": snapshot_interval,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
     with open(os.path.join(output_dir, "config.json"), "w") as f:
         json.dump(config, f, indent=2)
 
-    print(f"[modal-mixer] task={task} steps={total_steps} seed={seed} mode={mode}")
+    print(f"[modal-mixer] task={task} steps={total_steps} seed={seed} mode={mode} alpha={alpha}")
     env = make_env(task, seed=seed, sparse=True)
 
     # Choose buffer based on mode
@@ -221,7 +224,7 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
         buffer_kwargs = {}
     else:
         buffer_cls = AdaptivePriorityMixer
-        buffer_kwargs = {"alpha": 0.6, "beta0": 0.4}
+        buffer_kwargs = {"alpha": alpha, "beta0": 0.4}
 
     # Use PERSAC for PER modes (calls update_priorities with TD errors);
     # vanilla SAC for uniform mode
@@ -287,7 +290,8 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
 @app.local_entrypoint()
 def main(seeds: str = "42", tasks: str = "reach-v3,pick-place-v3",
          total_steps: int = 100_000, modes: str = "",
-         compare: bool = False, replicate: bool = False):
+         compare: bool = False, replicate: bool = False,
+         alpha: float = 0.6):
     """Run tasks in parallel on Modal.
 
     Args:
@@ -328,9 +332,10 @@ def main(seeds: str = "42", tasks: str = "reach-v3,pick-place-v3",
         for task in task_list:
             for seed in seed_list:
                 for mode in mode_list:
-                    print(f"Launching {task} mode={mode} ({total_steps} steps, seed={seed})...")
+                    print(f"Launching {task} mode={mode} alpha={alpha} ({total_steps} steps, seed={seed})...")
                     handles.append(train_mixer_task.spawn(
-                        task=task, total_steps=total_steps, seed=seed, mode=mode
+                        task=task, total_steps=total_steps, seed=seed, mode=mode,
+                        alpha=alpha
                     ))
 
         for h in handles:
@@ -343,9 +348,10 @@ def main(seeds: str = "42", tasks: str = "reach-v3,pick-place-v3",
         for task in task_list:
             for seed in seed_list:
                 for mode in mode_list:
-                    print(f"Launching {task} mode={mode} ({total_steps} steps, seed={seed})...")
+                    print(f"Launching {task} mode={mode} alpha={alpha} ({total_steps} steps, seed={seed})...")
                     handles.append(train_mixer_task.spawn(
-                        task=task, total_steps=total_steps, seed=seed, mode=mode
+                        task=task, total_steps=total_steps, seed=seed, mode=mode,
+                        alpha=alpha
                     ))
 
         for h in handles:

@@ -27,6 +27,6 @@
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
 - [ ] Consider RPE-PER (arXiv:2501.18093) as additional baseline
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
-- [ ] **Alpha sweep**: test α=0.1, 0.3 (less aggressive PER) to see if Q-explosion is mitigated while retaining any benefit
+- [x] **Alpha sweep**: α=0.3 ties uniform (3/5), α=0.1 worse (2/5), α=0.6 worst (0/5). Signal problem, not mechanism.
 - [ ] **Pick-place-v3 mode comparison**: confirm TD-PER hurts on hard task too (likely even worse)
 - [ ] **Alternative priority signals**: random network distillation (RND), reward prediction error (RPE-PER), or count-based novelty
