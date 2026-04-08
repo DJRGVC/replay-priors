@@ -109,9 +109,10 @@ def parse_args():
     p.add_argument("--total-steps", type=int, default=100_000)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--mode", type=str, default="adaptive",
-                   choices=["adaptive", "td-per", "uniform"],
+                   choices=["adaptive", "td-per", "uniform", "rpe-per"],
                    help="Prioritization mode: adaptive (regime-switching), "
-                        "td-per (always TD priorities), uniform (standard buffer)")
+                        "td-per (always TD priorities), rpe-per (reward prediction error), "
+                        "uniform (standard buffer)")
     p.add_argument("--snapshot-interval", type=int, default=10_000)
     p.add_argument("--output-dir", type=str, default=None)
     p.add_argument("--buffer-size", type=int, default=100_000)
@@ -128,6 +129,7 @@ def main():
 
     from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
     from per_sac import PERSAC
+    from rpe_sac import RPESAC
 
     if args.output_dir is None:
         args.output_dir = str(
@@ -156,10 +158,16 @@ def main():
             "beta0": args.per_beta0,
         }
 
-    # Use PERSAC (SAC subclass with PER priority updates) for td-per/adaptive modes;
+    # Use RPESAC for rpe-per (reward prediction error priorities),
+    # PERSAC for td-per/adaptive (TD-error priorities),
     # vanilla SAC for uniform mode (no PER needed).
     from stable_baselines3 import SAC as VanillaSAC
-    sac_cls = VanillaSAC if args.mode == "uniform" else PERSAC
+    if args.mode == "uniform":
+        sac_cls = VanillaSAC
+    elif args.mode == "rpe-per":
+        sac_cls = RPESAC
+    else:
+        sac_cls = PERSAC
 
     model = sac_cls(
         "MlpPolicy",

@@ -158,7 +158,8 @@ it's valid.
 | `figures/mode_comparison_reach_v3.png` | 4-panel mode comparison (iter_008) |
 | `plot_mode_comparison.py` | Mode comparison figure generation script |
 | `adaptive_priority_mixer.py` | Regime-aware PER buffer (SumTree + RegimeDetector) |
-| `train_mixer.py` | Training script supporting adaptive/td-per/uniform modes |
+| `rpe_sac.py` | SAC subclass with reward prediction error PER (iter_018) |
+| `train_mixer.py` | Training script supporting adaptive/td-per/uniform/rpe-per modes |
 | `snapshots/` | Per-run snapshot data (TD errors, dense rewards, correlations) |
 | `modal_app.py` | Modal app for running training on cloud GPU |
 | `train.py` | Local training script |
@@ -247,6 +248,39 @@ of replay strategy. TD-error is completely uninformative throughout.
 
 ![Pick-place mode comparison](figures/multiseed_mode_comparison_pick_place_v3.png)
 
+### reach-v3 — RPE-PER: Reward Prediction Error PER (5 seeds, 100k steps, iter_018)
+
+**RPE-PER matches adaptive (2/5) but can't beat uniform (3/5).** Confirms that
+the problem is the priority SIGNAL, not the prioritized sampling MECHANISM.
+
+| Mode | Learns | ep_rew@90k (best seed) | Q_mean@100k | Spearman@100k |
+|------|--------|----------------------|-------------|---------------|
+| **Uniform** | **3/5 (60%)** | 469 | 20.8 ± 18.3 | +0.18 ± 0.12 |
+| RPE-PER | 2/5 (40%) | 473 | 26.2 ± 25.6 | −0.01 ± 0.01 |
+| Adaptive | 2/5 (40%) | 471 | 87.2 ± 72.3 | +0.00 ± 0.02 |
+| TD-PER | **0/5 (0%)** | 31 | 228.3 ± 377.0 | −0.00 ± 0.01 |
+
+**Key findings:**
+1. **RPE-PER avoids Q-explosion** — Q_mean=26.2 vs TD-PER's 228.3. The reward
+   predictor signal doesn't create the same positive feedback loop as TD-error.
+2. **But RPE-PER provides zero benefit over uniform.** 2/5 seeds learn (vs 3/5
+   uniform). The priority signal is uninformative because the reward predictor
+   quickly learns to output 0 (the dominant reward), making RPE ≈ 0 for all
+   transitions except the rare successes.
+3. **rpe_loss → 0 within ~10k steps** — the predictor achieves near-perfect
+   accuracy by always predicting 0. With no prediction errors, all transitions
+   have equal priority → degrades to uniform with IS weight overhead.
+4. **Both TD-error and RPE fail for the same fundamental reason:** in sparse-reward
+   environments, the learning signals these metrics capture are chicken-and-egg
+   problems — they require the agent to have already discovered reward in order
+   to become informative, which is exactly when they're no longer needed.
+
+**Implication for VLM-PER:** These results strongly motivate VLM-based priority
+signals, which can assess transition "interestingness" from visual observation
+without requiring prior reward discovery — breaking the chicken-and-egg cycle.
+
+![4-mode comparison](figures/multiseed_mode_comparison_reach_v3.png)
+
 ## Status
 
 - [x] Single-seed (42) runs on reach-v3 + pick-place-v3, 100k steps
@@ -278,6 +312,10 @@ of replay strategy. TD-error is completely uninformative throughout.
   - TD-error in permanent information desert (Spearman never exceeds 0.03 for PER modes)
   - Q-explosion sporadic in ALL modes (not PER-specific on hard tasks)
   - Figure: `figures/multiseed_mode_comparison_pick_place_v3.png`
+- [x] **RPE-PER baseline (iter_018)**: 2/5 seeds learn — matches adaptive, can't beat uniform
+  - Reward predictor learns to output 0 (rpe_loss → 0 in ~10k steps)
+  - No Q-explosion (unlike TD-PER), but no benefit either
+  - Confirms: problem is the SIGNAL, not the MECHANISM
+  - Figure: `figures/multiseed_mode_comparison_reach_v3.png` (4-mode comparison)
 - [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix
-- [ ] Consider RPE-PER or other non-TD priority signals as baselines

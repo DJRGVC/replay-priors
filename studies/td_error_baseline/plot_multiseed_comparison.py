@@ -1,7 +1,7 @@
-"""Multi-seed mode comparison: uniform vs TD-PER vs adaptive.
+"""Multi-seed mode comparison: uniform vs TD-PER vs adaptive vs RPE-PER.
 
-5 seeds × 3 modes = 15 runs. Produces a 6-panel figure with mean±std
-error bands showing that TD-PER hurts learning while uniform is best.
+5 seeds × 4 modes = 20 runs. Produces a 6-panel figure with mean±std
+error bands showing that all priority signals fail to beat uniform.
 
 Usage:
     python plot_multiseed_comparison.py                     # reach-v3 (default)
@@ -17,9 +17,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 SNAP_ROOT = Path(__file__).parent / "snapshots"
-MODES = ["uniform", "td-per", "adaptive"]
-MODE_LABELS = {"uniform": "Uniform", "td-per": "TD-PER", "adaptive": "Adaptive Mixer"}
-MODE_COLORS = {"uniform": "#2ecc71", "td-per": "#3498db", "adaptive": "#e74c3c"}
+MODES = ["uniform", "td-per", "adaptive", "rpe-per"]
+MODE_LABELS = {
+    "uniform": "Uniform",
+    "td-per": "TD-PER",
+    "adaptive": "Adaptive Mixer",
+    "rpe-per": "RPE-PER",
+}
+MODE_COLORS = {
+    "uniform": "#2ecc71",
+    "td-per": "#3498db",
+    "adaptive": "#e74c3c",
+    "rpe-per": "#9b59b6",
+}
 SEEDS = [42, 123, 7, 99, 256]
 
 

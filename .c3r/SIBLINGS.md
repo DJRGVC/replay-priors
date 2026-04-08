@@ -46,22 +46,21 @@ but that's a safety net — proactive management is your job.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #16 · ctx 0%
-- **last iter**: 3h ago
+- **status**: running · iter #17 · ctx 0%
+- **last iter**: 2m ago
 
 ### Recent commits on `agent/vlm_probe`
 ```
+25d6106 iter_019: GPT-4o-mini annotation ± comparison (annotation HURTS: MAE 68.0→61.2 without, overturns universal-annotation finding)
 aa14bd3 iter_018: GPT-4o-mini native multi-image probe (MAE=68.0, late-bias confirms positional bias is intrinsic not grid-artifact)
 efcd098 iter_017: FINDINGS.md synthesis — 10 key findings across 7 models and 6 interventions, Gemini image quotas still blocked
 5f8bb2e iter_016: CoT on Phi-4 NEGATIVE (MAE 64.3→90.2), Gemini quotas reset, vlm_litreview removed
 85acc68 iter_015: two-pass adaptive probing on Llama-3.2-90B (NEGATIVE: MAE 69.8→71.3, refinement worsens 6/10 — coarse pass too inaccurate to center refinement window)
-097d91e iter_014: random vs uniform sampling on Llama-3.2-90B (MAE 64.7 vs 63.8, no difference — sampling strategy not the bottleneck)
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
 .c3r/INBOX.md
 .c3r/INBOX_ARCHIVE.md
-.c3r/PAUSED
 .c3r/PROMPT.md
 .c3r/RESEARCH_LOG.md
 .c3r/SIBLINGS.md
@@ -81,6 +80,7 @@ studies/vlm_localization_probe/regenerate_meta.py
 studies/vlm_localization_probe/results/cot_llama90b/results.json
 studies/vlm_localization_probe/results/cot_phi4/results.json
 studies/vlm_localization_probe/results/gpt4o_mini/results.json
+studies/vlm_localization_probe/results/gpt4o_mini_noannotate/results.json
 studies/vlm_localization_probe/results/gpt4o_mini_test/results.json
 studies/vlm_localization_probe/results/k_sweep_consolidated.json
 studies/vlm_localization_probe/results/k_sweep_k32/results.json
@@ -95,8 +95,8 @@ studies/vlm_localization_probe/results/results.json
 ```
 git show agent/vlm_probe:.c3r/INBOX.md
 git show agent/vlm_probe:.c3r/INBOX_ARCHIVE.md
-git show agent/vlm_probe:.c3r/PAUSED
 git show agent/vlm_probe:.c3r/PROMPT.md
 git show agent/vlm_probe:.c3r/RESEARCH_LOG.md
+git show agent/vlm_probe:.c3r/SIBLINGS.md
 ```
 
