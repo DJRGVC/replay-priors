@@ -109,9 +109,10 @@ def parse_args():
     p.add_argument("--total-steps", type=int, default=100_000)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--mode", type=str, default="adaptive",
-                   choices=["adaptive", "td-per", "uniform", "rpe-per"],
+                   choices=["adaptive", "td-per", "uniform", "rpe-per", "rnd-per"],
                    help="Prioritization mode: adaptive (regime-switching), "
                         "td-per (always TD priorities), rpe-per (reward prediction error), "
+                        "rnd-per (random network distillation novelty), "
                         "uniform (standard buffer)")
     p.add_argument("--snapshot-interval", type=int, default=10_000)
     p.add_argument("--output-dir", type=str, default=None)
@@ -130,6 +131,7 @@ def main():
     from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
     from per_sac import PERSAC
     from rpe_sac import RPESAC
+    from rnd_sac import RNDSAC
 
     if args.output_dir is None:
         args.output_dir = str(
@@ -166,6 +168,8 @@ def main():
         sac_cls = VanillaSAC
     elif args.mode == "rpe-per":
         sac_cls = RPESAC
+    elif args.mode == "rnd-per":
+        sac_cls = RNDSAC
     else:
         sac_cls = PERSAC
 

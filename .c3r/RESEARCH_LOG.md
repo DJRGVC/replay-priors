@@ -263,3 +263,26 @@ Decision:   Hero figure is now the definitive artifact. Next priorities from fix
             (c) run RPE-PER on pick-place-v3 to fill the gap in the bar chart.
             Leaning toward (a) RND-PER as it completes the "all RL signals fail"
             argument before moving to VLM-based approaches.
+
+## Iteration 21 — RND-PER implementation + 5-seed training launched  (2026-04-10T14:38:00Z)
+Hypothesis: RND-PER (Random Network Distillation novelty) will also fail to
+            beat uniform replay in sparse-reward early training, because early
+            exploration is random regardless of priority signal — novelty-based
+            resampling doesn't help when the agent hasn't discovered rewards yet.
+Change:     Created rnd_sac.py — SAC subclass with fixed random target network
+            and trainable predictor, using per-sample prediction error (state
+            novelty) as PER priority signal. Added "rnd-per" mode to
+            train_mixer.py and modal_app.py. Updated plot_multiseed_comparison.py
+            and plot_summary_figure.py to include RND-PER (orange, #e67e22).
+            Updated FINDINGS.md file table. Launched 5 seeds × rnd-per on
+            reach-v3 via Modal (100k steps each, T4 GPU).
+Command:    modal run modal_app.py --tasks reach-v3 --seeds "42,123,7,99,256" --modes "rnd-per"
+Result:     **TRAINING IN PROGRESS ON MODAL.** Code committed, runs launched.
+            Modal process running for 23+ min (pid 2569764). Output buffered
+            due to `tail -n 80` pipe — will appear when all 5 runs complete.
+            Expected completion: ~30-45 min total (parallel T4 runs).
+Decision:   Next iteration should: (1) check if Modal runs completed by looking
+            at the output file, (2) if complete, download snapshots from Modal
+            volume, (3) generate figures, (4) update FINDINGS.md with results,
+            (5) update hero summary figure and Quarto page. If runs haven't
+            completed, download whatever is available from Modal volume directly.

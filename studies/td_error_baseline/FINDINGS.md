@@ -159,7 +159,8 @@ it's valid.
 | `plot_mode_comparison.py` | Mode comparison figure generation script |
 | `adaptive_priority_mixer.py` | Regime-aware PER buffer (SumTree + RegimeDetector) |
 | `rpe_sac.py` | SAC subclass with reward prediction error PER (iter_018) |
-| `train_mixer.py` | Training script supporting adaptive/td-per/uniform/rpe-per modes |
+| `rnd_sac.py` | SAC subclass with Random Network Distillation novelty PER (iter_021) |
+| `train_mixer.py` | Training script supporting adaptive/td-per/uniform/rpe-per/rnd-per modes |
 | `snapshots/` | Per-run snapshot data (TD errors, dense rewards, correlations) |
 | `modal_app.py` | Modal app for running training on cloud GPU |
 | `train.py` | Local training script |

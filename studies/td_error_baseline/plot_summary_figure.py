@@ -16,7 +16,7 @@ Row 3: Aggregate analysis
   (f) Information regime breakdown — aligned fraction across runs
 
 Data sources: 5-seed reach-v3 + pick-place-v3 (100k steps each) across
-uniform/td-per/adaptive/rpe-per modes, α sweep (0.1, 0.3, 0.6) on reach-v3.
+uniform/td-per/adaptive/rpe-per/rnd-per modes, α sweep (0.1, 0.3, 0.6) on reach-v3.
 """
 
 import json
@@ -43,6 +43,7 @@ C_UNIFORM = "#2ecc71"
 C_TDPER = "#3498db"
 C_ADAPTIVE = "#e74c3c"
 C_RPE = "#9b59b6"
+C_RND = "#e67e22"
 C_ALIGNED = "#2ecc71"
 C_NOISE = "#95a5a6"
 C_INVERTED = "#e74c3c"
@@ -176,6 +177,7 @@ def plot_q_panel(ax, task, seeds, title_label, title_text):
         "Uniform": ("uniform", C_UNIFORM),
         "TD-PER (α=0.6)": ("td-per", C_TDPER),
         "RPE-PER": ("rpe-per", C_RPE),
+        "RND-PER": ("rnd-per", C_RND),
         "Adaptive": ("adaptive", C_ADAPTIVE),
     }
 
@@ -265,6 +267,7 @@ def main():
         ("TD-PER\nα=0.6", "td-per", C_TDPER),
         ("TD-PER\nα=0.1", "td-per_a0.1", "#85c1e9"),
         ("RPE-PER", "rpe-per", C_RPE),
+        ("RND-PER", "rnd-per", C_RND),
         ("Adaptive", "adaptive", C_ADAPTIVE),
     ]
 
@@ -421,7 +424,7 @@ def main():
     # =========================================================================
     fig.suptitle(
         "TD-Error Prioritized Experience Replay Is Uninformative and Harmful\n"
-        "in Sparse-Reward Early Training (reach-v3 + pick-place-v3, 5 seeds x 4 modes)",
+        "in Sparse-Reward Early Training (reach-v3 + pick-place-v3, 5 seeds x 5 modes)",
         fontsize=13, fontweight="bold", y=0.97
     )
 

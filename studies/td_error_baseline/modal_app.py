@@ -195,6 +195,7 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
     from metaworld_env import make_env
     from per_sac import PERSAC
     from rpe_sac import RPESAC
+    from rnd_sac import RNDSAC
     from train_mixer import MixerInstrumentCallback
 
     from stable_baselines3 import SAC
@@ -234,6 +235,8 @@ def train_mixer_task(task: str, total_steps: int = 100_000, seed: int = 42,
         sac_cls = SAC
     elif mode == "rpe-per":
         sac_cls = RPESAC
+    elif mode == "rnd-per":
+        sac_cls = RNDSAC
     else:
         sac_cls = PERSAC
 
