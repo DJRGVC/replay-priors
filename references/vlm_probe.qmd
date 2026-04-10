@@ -7,6 +7,10 @@ author: "vlm_probe (c3r agent)"
 
 Cited by **vlm_probe** during work on: *VLM failure-localization probing for robotic manipulation replay prioritization*. Newest first.
 
+- **Fedus et al. 2020 (ICML)** — *Revisiting Fundamentals of Experience Replay.* Replay ratio and sample diversity matter more than priority accuracy in early training. Supports diversity-based approaches (failure clustering, contrastive ranking) over precise temporal localization as replay priority signals.
+
+- **Christiano et al. 2017 (NeurIPS)** — *Deep RL from Human Preferences.* Pairwise preference for reward learning. The contrastive episode ranking proposal (BAEP Proposal 2) applies the same principle — relative comparison is easier than absolute scoring — to replay prioritization.
+
 - **"More Images More Problems" (arXiv 2601.07812)** — MIMIC benchmark validates our Finding #2: LVLMs fail to aggregate information across multiple images. Directly relevant to multi-image temporal reasoning failures we observe.
 
 - **"Revisiting Multimodal Positional Encoding" (ICLR 2026)** — MRoPE temporal-to-high-frequency allocation provides the *architectural explanation* for why all models show positional bias. High-freq-only temporal encoding leads to rapid attention decay across image positions.

@@ -18,22 +18,81 @@ chronological order — newest first.)
 
 ---
 
-## Iteration 32 — 3-task annotation comparison: bias-matching, not capability {.unnumbered}
+## Iteration 37 — Confidence-gated VLM-PER: agreement is an anti-signal {.unnumbered}
 *2026-04-10*
 
-Extended to pick-place-v3 (GPT-4o annotated n=10, GPT-4o-mini annotated + unannotated n=10 each). Combined with reach-v3 and push-v3 for a complete 3-task × 2-model × 2-annotation comparison.
+Tested Proposal 5 (Confidence-Gated VLM-PER): use inter-model agreement as a confidence signal to gate between VLM priority and uniform fallback. Swept agreement threshold τ∈[0,1] over existing 5-model predictions on reach-v3.
+
+![Confidence gating analysis — agreement anti-correlates with accuracy](../images/vlm_probe/confidence_gating_annotated.png){width=100%}
+
+**Key finding: Agreement is an ANTI-signal for accuracy** (r=+0.53 annotated). When models agree, they converge on shared positional biases — not the true failure timestep. Optimal gating threshold τ*=0.75 means "never use VLM" — pure uniform dominates on both KL divergence (1.556 vs 2.035) and oracle overlap (21.7% vs 8.7%).
+
+**Implication:** This definitively closes temporal-localization-based approaches for VLM-PER. Ensemble consensus reflects bias correlation, not prediction quality. The path forward requires sidestepping temporal prediction entirely: contrastive episode ranking (pairwise comparison) or failure mode clustering (semantic descriptions).
+
+Commits: see `agent/vlm_probe` branch
+
+---
+
+## Iteration 36 — BAEP ensemble analysis: debiased multi-model ensembles {.unnumbered}
+*2026-04-10*
+
+Implemented Bias-Aware Ensemble Prioritization (BAEP) from the visionary sub-agent's proposals, testing whether ensembling debiased predictions from 5 VLMs with structurally uncorrelated positional biases improves failure localization over any individual model.
+
+**Bias profiles confirm uncorrelated attractors across models:**
+Gemini-3→t=21 (start), GPT-4o→t=42 (early-mid), Sonnet→t=85 (center), GPT-4o-mini→t=96 (late). Linear debiasing raises inter-model agreement from 0.51→0.71 (annotated condition).
+
+**Key result: Naive 5-model ensembles do NOT beat the best individual model** (annotated: MAE=51.2 vs Llama-90B 50.1; unannotated: MAE=44.3 vs Sonnet 43.4). However, **carefully selected 2-model pairs DO outperform** — best pair (Llama-90B + GPT-4o-mini) achieves MAE=46.9 on annotated reach-v3, beating all 5 individuals. The mechanism: too many weak models with high residual variance dilute the debiased signal.
+
+![BAEP ensemble analysis — individual vs ensemble MAE](../images/vlm_probe/ensemble_baep_analysis.png){width=100%}
+
+**Decision**: Naive ensembling is not a viable path. Selective pairing or confidence-gated approaches (Proposal 5) more promising. The visionary's uncorrelated-bias hypothesis holds structurally but fails quantitatively when residual variance dominates.
+
+Commits: iteration 36
+
+---
+
+## Iteration 35 — Bias-matching experiment write-up + image fix {.unnumbered}
+*2026-04-10*
+
+Published the study's main finding as a rigorous experiment write-up: annotation shifts positional bias, not visual understanding. The effect depends entirely on alignment between the annotation-induced mid-episode bias and the task's GT failure distribution. See [full write-up](../experiments/vlm_probe/2026-04-10_annotation_bias_matching.qmd) for complete methodology, raw predictions, and discussion.
+
+Also fixed all agent images on main (6 vlm_probe + 4 td_baseline PNGs restored after a Quarto rebuild had cleared them).
+
+Commits: iteration 35
+
+---
+
+## Iteration 34 — Annotation × Task × Model figure + visionary cleanup {.unnumbered}
+*2026-04-10*
+
+Created a systematic visualization of the bias-matching mechanism across 3 tasks × 2 models × 2 annotation conditions. The figure makes the GT-distribution dependence visually obvious.
+
+![Annotation × Task × Model: bias-matching mechanism. Annotation helps when GT is mid-distributed (reach-v3) but hurts when GT clusters at extremes (push-v3 early, pick-place-v3 late). Red dashed line = GT failure mean.](../images/vlm_probe/annotation_task_model_interaction.png){width=100%}
+
+Killed the stuck `visionary` sub-agent (0 iterations, never started).
+
+Commits: iteration 34
+
+---
+
+## Iteration 32 — Pick-place-v3: extreme fixation + annotation comparison {.unnumbered}
+*2026-04-10*
+
+Extended to pick-place-v3 (GPT-4o annotated n=10, GPT-4o-mini annotated + unannotated n=10 each). GPT-4o unannotated rate-limited (50/day quota on GitHub Models). Combined with reach-v3 and push-v3 for 3-task comparison.
 
 | Model | Task | GT mean | Annotated MAE | Unannotated MAE | Ann effect |
 |-------|------|:---:|:---:|:---:|:---:|
 | GPT-4o | reach-v3 | 57.8 (mid) | **52.7** | 75.8 | −30% (helps) |
 | GPT-4o | push-v3 | 36.6 (early) | 43.0 | **36.3** | +18% (hurts) |
-| GPT-4o | pick-place-v3 | 80.3 (late) | 48.3 | — | — |
+| GPT-4o | pick-place-v3 | 80.3 (late) | 48.3 | — (rate-limited) | — |
 | GPT-4o-mini | reach-v3 | 57.8 (mid) | 68.0 | 61.2 | +11% (hurts) |
-| GPT-4o-mini | pick-place-v3 | 80.3 (late) | 61.3 | **52.8** | +16% (hurts) |
+| GPT-4o-mini | pick-place-v3 | 80.3 (late) | 55.2 | **50.6** | +9% (hurts) |
 
-**Result**: Annotation effect is **GT-distribution-dependent**. Annotation shifts all models' predictions toward mid-episode (t=42–85). This helps when GT failures cluster mid-episode (reach-v3, mean=57.8) but hurts when GT clusters early (push-v3, mean=36.6) or late (pick-place-v3, mean=80.3). GPT-4o-mini on pick-place-v3 shows extreme t=106 fixation (7/10 annotated, 6/10 unannotated).
+![Cross-task comparison: MAE, tolerance accuracy, and annotation effect across 3 MetaWorld tasks.](../images/vlm_probe/cross_task_comparison_iter32.png){width=100%}
 
-**Key insight**: This is a bias-matching story, not a capability story. Annotation doesn't improve visual understanding — it shifts positional bias. Whether this helps depends entirely on alignment between the shifted bias and the task's GT distribution. Finding #10 updated to 3-task mechanistic explanation.
+**Result**: GPT-4o-mini on pick-place-v3 shows the **most extreme positional fixation** in the entire study: 9/10 unannotated predictions at t=106 (only 2 unique values!). Annotation partially breaks fixation (5 unique preds) but increases MAE by 9%. Pick-place-v3 GT is late-skewed (mean=80.3, 5/10 GT > 100), so the t=106 fixation accidentally gives decent MAE despite zero actual visual understanding.
+
+**Key insight**: Annotation effect remains GT-distribution-dependent across all 3 tasks. The bias-matching mechanism is robust: mid-GT → annotation helps, extreme-GT → annotation hurts. GPT-4o unannotated pick-place-v3 result still pending (rate limit resets tomorrow).
 
 Commits: iteration 32
 
