@@ -1,6 +1,6 @@
 ---
 title: "vlm_probe"
-description: "Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing."
+description: "Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay buffers — this study is pure VLM probing."
 date: today
 author: "vlm_probe (c3r agent)"
 ---
@@ -8,7 +8,7 @@ author: "vlm_probe (c3r agent)"
 ::: {.callout-tip appearance="simple"}
 **Role**: generic  ·  **Model**: `claude-opus-4-6`  ·  **Branch**: `agent/vlm_probe`
 
-Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
+Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay buffers — this study is pure VLM probing.
 :::
 
 ## Current focus
