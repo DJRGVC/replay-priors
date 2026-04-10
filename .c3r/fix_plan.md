@@ -45,7 +45,9 @@
 - [x] Proposal 5: Confidence-Gated VLM-PER — DONE iter_037. NEGATIVE: agreement anti-correlates with accuracy (r=+0.53). Optimal gate = "never use VLM." Shared positional bias makes consensus an anti-signal.
 - [x] Proposal 2: Contrastive Episode Ranking (CER) — DONE iter_038. NEGATIVE: 100% primacy bias (11/11 always picks Episode A). Accuracy = base rate. Zero signal above chance.
 - [ ] Proposal 3: Task-Adaptive Annotation — annotation format search space, task-conditioned selection. Quick win.
-- [ ] Proposal 4: Failure Mode Clustering — VLM descriptions + embeddings, diversity-weighted replay. Novel direction.
+- [x] Proposal 4 Step 1: Failure mode description collection — DONE iter_039. 3 tasks, 2 models, high diversity (η²=0.34-0.99). First positive non-temporal signal.
+- [ ] Proposal 4 Step 2: Embed descriptions + cluster — use sentence-transformers or API embedding, test cluster quality (silhouette, NMI vs GT)
+- [ ] Proposal 4 Step 3: Diversity-weighted replay priorities — compute priorities from cluster membership, compare to uniform baseline
 - [ ] Proposal 6: Phase-Segmented Replay — categorical phase judgments (easier than temporal). Needs semi-trained policy.
 - [ ] Proposal 7: Retrospective Failure Narration — narration specificity as priority signal. Most speculative.
 

@@ -1,0 +1,141 @@
+[
+  {
+    "rollout": "rollout_000",
+    "gt_failure_t": 136,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "{\n  \"failure_mode\": \"The Sawyer robot arm failed to pick up the puck from the table.\",\n  \"failure_category\": \"never_reached\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\"The robot arm's gripper remained open and empty at all times.\", \"No puck is within the grasp range of the robot arm.\"]",
+    "failure_category": "parse_error",
+    "severity": "unknown",
+    "visual_cues": [],
+    "_latency_s": 4.92,
+    "_raw_response": "{\n  \"failure_mode\": \"The Sawyer robot arm failed to pick up the puck from the table.\",\n  \"failure_category\": \"never_reached\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\"The robot arm's gripper remained open and empty at all times.\", \"No puck is within the grasp range of the robot arm.\"]"
+  },
+  {
+    "rollout": "rollout_001",
+    "gt_failure_t": 14,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm failed to grasp the puck, leading to an incomplete task.",
+    "failure_category": "other",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robot arm is positioned above the table without the puck.",
+      "No lifting or movement of the puck by the robot arm is observed."
+    ],
+    "_latency_s": 4.93,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm failed to grasp the puck, leading to an incomplete task.\",\n  \"failure_category\": \"other\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\"The robot arm is positioned above the table without the puck.\", \"No lifting or movement of the puck by the robot arm is observed.\"]\n}"
+  },
+  {
+    "rollout": "rollout_002",
+    "gt_failure_t": 125,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The Sawyer robot arm failed to grasp the puck and made an unsuccessful attempt to lift it.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robot's gripper is open and not gripping the puck at any point in the sequence.",
+      "The robot's body is stationary throughout each frame, indicating it did not move to adjust its grip or position.",
+      "The robot's arm remains horizontal, as if it is trying to lift the puck, but without actually grasping it."
+    ],
+    "_latency_s": 68.57,
+    "_raw_response": "{\n  \"failure_mode\": \"The Sawyer robot arm failed to grasp the puck and made an unsuccessful attempt to lift it.\",\n  \"failure_category\": \"stuck\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\n    \"The robot's gripper is open and not gripping the puck at any point in the sequence.\",\n    \"The robot's body is stationary throughout each frame, indicating it did not move to adjust its grip or position.\",\n    \"The robot's arm remains horizontal, as if it is trying to lift the puck, but without actually grasping it.\"\n  ]\n}"
+  },
+  {
+    "rollout": "rollout_003",
+    "gt_failure_t": 17,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm did not grasp the puck and instead lifted the bottom of the object away from the table, causing the robot to lose control of the object and fail to place it at the target position.",
+    "failure_category": "other",
+    "severity": "severe",
+    "visual_cues": [
+      "The robot arm's base moves vertically without grabbing the puck.",
+      "The robot's gripper appears to be lifted above the deck and not on the puck.",
+      "The robot arm tilts to the side, indicating instability or misjudged motions."
+    ],
+    "_latency_s": 8.27,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm did not grasp the puck and instead lifted the bottom of the object away from the table, causing the robot to lose control of the object and fail to place it at the target position.\",\n  \"failure_category\": \"other\",\n  \"severity\": \"severe\",\n  \"visual_cues\": [\n    \"The robot arm's base moves vertically without grabbing the puck.\",\n    \"The robot's gripper appears to be lifted above the deck and not on the puck.\",\n    \"The robot arm tilts to the side, indicating instability or misjudged motions.\"\n  ]\n}"
+  },
+  {
+    "rollout": "rollout_004",
+    "gt_failure_t": 149,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm attempted to pick up the puck but overshot the target position, failing to place it as required.",
+    "failure_category": "overshot",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robot arm is at the raised position instead of on the table, indicating it did not perform the task correctly."
+    ],
+    "_latency_s": 5.15,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm attempted to pick up the puck but overshot the target position, failing to place it as required.\",\n  \"failure_category\": \"overshot\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\"The robot arm is at the raised position instead of on the table, indicating it did not perform the task correctly.\"]\n}"
+  },
+  {
+    "rollout": "rollout_005",
+    "gt_failure_t": 2,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot's end effector did not reach the target position due to incorrect path planning or overextension.",
+    "failure_category": "size_mismatch",
+    "severity": "mild",
+    "visual_cues": [
+      "The robot's end effector is reaching above the screen, likely due to the elevation difference between the target and the table."
+    ],
+    "_latency_s": 5.12,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot's end effector did not reach the target position due to incorrect path planning or overextension.\",\n  \"failure_category\": \"size_mismatch\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\"The robot's end effector is reaching above the screen, likely due to the elevation difference between the target and the table.\"]\n}"
+  },
+  {
+    "rollout": "rollout_006",
+    "gt_failure_t": 52,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "Sawyer robot arm failed to appropriately grasp and lift the puck. It crashed into the table multiple times before and after attempting to pick up the puck.",
+    "failure_category": "crash",
+    "severity": "severe",
+    "visual_cues": [
+      "upside down segment of fluid kinematic bodies",
+      "crash impacts on the table",
+      "sudden changes in the arm's posture and orientation"
+    ],
+    "_latency_s": 6.51,
+    "_raw_response": "{\n  \"failure_mode\": \"Sawyer robot arm failed to appropriately grasp and lift the puck. It crashed into the table multiple times before and after attempting to pick up the puck.\",\n  \"failure_category\": \"crash\",\n  \"severity\": \"severe\",\n  \"visual_cues\": [\n    \"upside down segment of fluid kinematic bodies\",\n    \"crash impacts on the table\",\n    \"sudden changes in the arm's posture and orientation\"\n  ]\n}"
+  },
+  {
+    "rollout": "rollout_007",
+    "gt_failure_t": 121,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot failed to lift the puck and place it at the elevated target position.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robot arm appears to be in a static position without any significant movement or lifting action to pick up the puck."
+    ],
+    "_latency_s": 5.0,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot failed to lift the puck and place it at the elevated target position.\",\n  \"failure_category\": \"stuck\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\"The robot arm appears to be in a static position without any significant movement or lifting action to pick up the puck.\"]\n}"
+  },
+  {
+    "rollout": "rollout_008",
+    "gt_failure_t": 42,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The Sawyer robot arm failed to grasp the puck, instead it placed the puck on the table.",
+    "failure_category": "alway_ent",
+    "severity": "severe",
+    "visual_cues": [
+      "The robot arm is not grasping the puck at any of the frames",
+      "The puck remains on the table throughout the episode"
+    ],
+    "_latency_s": 5.26,
+    "_raw_response": "{\n  \"failure_mode\": \"The Sawyer robot arm failed to grasp the puck, instead it placed the puck on the table.\",\n  \"failure_category\": \"alway_ent\", \n  \"severity\": \"severe\",\n  \"visual_cues\": [\"The robot arm is not grasping the puck at any of the frames\", \"The puck remains on the table throughout the episode\"]\n}"
+  },
+  {
+    "rollout": "rollout_009",
+    "gt_failure_t": 145,
+    "gt_failure_type": "lost_contact_with_object",
+    "failure_mode": "The robot arm attempted to pick up the puck but failed to grasp it properly, causing the puck to be dropped.",
+    "failure_category": "stuck",
+    "severity": "mild",
+    "visual_cues": [
+      "The robot arm is not grasping the puck in the first keyframe.",
+      "The robot arm slightly moves but the puck remains on the table in the second keyframe.",
+      "The robot arm has dropped the puck on the table in the third keyframe.",
+      "The robot arm is not visible in the fourth keyframe, indicating it may have moved out of the frame or stopped."
+    ],
+    "_latency_s": 8.23,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm attempted to pick up the puck but failed to grasp it properly, causing the puck to be dropped.\",\n  \"failure_category\": \"stuck\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\"The robot arm is not grasping the puck in the first keyframe.\", \"The robot arm slightly moves but the puck remains on the table in the second keyframe.\", \"The robot arm has dropped the puck on the table in the third keyframe.\", \"The robot arm is not visible in the fourth keyframe, indicating it may have moved out of the frame or stopped.\"]\n}"
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "model": "gh:gpt-4o",
+  "task": "reach-v3",
+  "K": 4,
+  "n_rollouts": 3,
+  "n_pairs": 3,
+  "n_valid": 0,
+  "correct": 0,
+  "accuracy": 0,
+  "results": [
+    {
+      "pair": [
+        "rollout_000",
+        "rollout_001"
+      ],
+      "gt_a": 10,
+      "gt_b": 69,
+      "gt_earlier": "A",
+      "gt_gap": 59,
+      "error": "Rate limited after 5 retries"
+    },
+    {
+      "pair": [
+        "rollout_000",
+        "rollout_002"
+      ],
+      "gt_a": 10,
+      "gt_b": 8,
+      "gt_earlier": "B",
+      "gt_gap": 2,
+      "error": "Rate limited after 5 retries"
+    },
+    {
+      "pair": [
+        "rollout_001",
+        "rollout_002"
+      ],
+      "gt_a": 69,
+      "gt_b": 8,
+      "gt_earlier": "B",
+      "gt_gap": 61,
+      "error": "Rate limited after 5 retries"
+    }
+  ]
+}

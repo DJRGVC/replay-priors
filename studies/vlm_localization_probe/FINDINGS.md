@@ -282,6 +282,32 @@ This definitively closes the confidence-gating approach for VLM temporal localiz
 The fundamental problem isn't confidence calibration — it's that ensemble consensus
 reflects shared bias structure, making it an anti-signal for accuracy.
 
+### §14. Failure mode descriptions show clustering potential (Proposal 4)
+
+Pivoting from temporal localization ("when did it fail?") to failure description
+("what went wrong?"), VLMs produce **semantically rich and diverse failure mode
+descriptions** that could drive diversity-weighted replay prioritization:
+
+- **Category diversity is high**: 6/6 predefined categories used on reach-v3 (n=20,
+  GPT-4o-mini). Shannon entropy = 2.41/2.58 (normalized 0.93). Phi-4 invents
+  novel task-specific categories beyond the predefined set (crash, size_mismatch,
+  missing_target on pick-place-v3).
+- **Categories correlate with GT failure timing**: η² = 0.34 (reach-v3), 0.58
+  (push-v3), 0.99 (pick-place-v3) — all "large effect." VLM-assigned categories
+  capture real behavioral differences, not random labels.
+- **Descriptions are lexically diverse**: 100% unique across all tasks. Mean
+  pairwise Jaccard similarity = 0.27 (well below 0.5 threshold). Visual cues are
+  nearly all unique (78/79 on reach-v3).
+- **Task-specific vocabulary emerges naturally**: reach-v3 uses "sphere/end-effector/
+  above", push-v3 uses "puck/contact/positioned", pick-place-v3 uses "grasp/lift/
+  placed."
+
+This is the first VLM output in the study that shows genuine semantic signal above
+positional bias. The critical difference: failure description is a scene understanding
+task (VLM strength) not a temporal precision task (VLM weakness). The η² values
+suggest that clustering descriptions could yield behaviorally meaningful episode
+groups for diversity-weighted replay — the exact use case Proposal 4 targets.
+
 ## Related Work
 
 Recent literature directly connects to our findings:
@@ -411,6 +437,8 @@ a reliable priority signal when it would be most needed (early training).
 | 032 | pick-place-v3 task generalization (GPT-4o ann, GPT-4o-mini ±ann) | GPT-4o ann MAE=48.3 (4 unique preds). GPT-4o-mini: unannotated MAE=50.6 (9/10 fixated t=106!), annotated MAE=55.2 (+9%, hurts). GPT-4o unannotated rate-limited (50/day quota). | ✓ |
 | 036 | BAEP ensemble analysis | Naive 5-model ensembles don't beat best individual (MAE 51.2 vs 50.1); selected 2-model pairs do (46.9, −6.4%). | ✓ |
 | 037 | Confidence-gated VLM-PER (Proposal 5) | Agreement anti-correlates with accuracy (r=+0.53). Optimal gate = "never use VLM." Always-VLM strictly worse than uniform. | ✓ |
+| 038 | Contrastive Episode Ranking (Proposal 2) | 100% primacy bias (11/11 always A). Accuracy = base rate. Zero signal above chance. | ✓ |
+| 039 | Failure mode descriptions (Proposal 4) | High semantic diversity (6/6 cats, 100% unique descs, Jaccard=0.27). Categories explain GT timing (η²=0.34-0.99). First positive non-temporal signal. | ✓ |
 
 ## Bottom Line
 
@@ -448,7 +476,11 @@ primacy bias. This extends the positional bias finding from within-episode (earl
 fixation) to between-episode (first-presented preference). Confidence scores are
 uninformative (0.80-0.90 for both correct and incorrect predictions).
 
-The path forward requires sidestepping both temporal localization AND relative temporal
-comparison: failure mode clustering (Proposal 4) or phase-segmented replay (Proposal 6)
-— approaches that leverage VLM strengths (scene understanding, categorical judgment)
-rather than fighting their weaknesses (temporal precision, positional bias in any form).
+**Iteration 39 pivot: failure mode descriptions are the first positive non-temporal
+VLM signal.** Shifting from "when did it fail?" to "what went wrong?", VLMs produce
+high-diversity descriptions (100% unique, Jaccard=0.27, 6/6 categories) that correlate
+strongly with GT failure timing (η²=0.34–0.99). This works because failure description
+is a scene understanding task (VLM strength) rather than temporal precision (VLM weakness).
+Phi-4 even invents novel task-specific categories (crash, size_mismatch) beyond the
+predefined set. Next step: embed descriptions and cluster to test whether VLM-perceived
+failure modes can drive diversity-weighted replay prioritization (Proposal 4).

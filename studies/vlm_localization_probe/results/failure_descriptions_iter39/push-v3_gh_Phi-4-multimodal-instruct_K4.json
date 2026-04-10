@@ -1,0 +1,147 @@
+[
+  {
+    "rollout": "rollout_000",
+    "gt_failure_t": 1,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm continuously pushes the puck without moving it closer to the goal position.",
+    "failure_category": "oscillated",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robot arm is swinging repeatedly without making progress with the puck",
+      "The puck remains in the same position throughout the frames",
+      "The absence of the puck sliding towards the goal"
+    ],
+    "_latency_s": 5.94,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm continuously pushes the puck without moving it closer to the goal position.\",\n  \"failure_category\": \"oscillated\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\"The robot arm is swinging repeatedly without making progress with the puck\", \"The puck remains in the same position throughout the frames\", \"The absence of the puck sliding towards the goal\"]\n}"
+  },
+  {
+    "rollout": "rollout_001",
+    "gt_failure_t": 14,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm stopped moving and did not push the puck to the target position.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "The black rectangular object, presumably the puck, is not in motion towards the target.",
+      "The robot arm is centered above the table without any attempt to move or push the puck.",
+      "The black object returns to the same position without any continuation of the task.",
+      "The typical motion of the arm ends abruptly, indicating a stall in the robot's operation."
+    ],
+    "_latency_s": 8.2,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm stopped moving and did not push the puck to the target position.\",\n  \"failure_category\": \"stuck\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\n    \"The black rectangular object, presumably the puck, is not in motion towards the target.\",\n    \"The robot arm is centered above the table without any attempt to move or push the puck.\",\n    \"The black object returns to the same position without any continuation of the task.\",\n    \"The typical motion of the arm ends abruptly, indicating a stall in the robot's operation.\"\n  ]\n}"
+  },
+  {
+    "rollout": "rollout_002",
+    "gt_failure_t": 67,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm did not make contact with the puck and instead, it pushed a ball.",
+    "failure_category": "other",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robotic arm was positioned correctly but did not touch the puck, likely because it was pushing a ball instead."
+    ],
+    "_latency_s": 5.11,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm did not make contact with the puck and instead, it pushed a ball.\",\n  \"failure_category\": \"other\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\n    \"The robotic arm was positioned correctly but did not touch the puck, likely because it was pushing a ball instead.\"\n  ]\n}"
+  },
+  {
+    "rollout": "rollout_003",
+    "gt_failure_t": 82,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The Sawyer robot arm failed to push the puck to the target position, likely losing contact with the puck.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robot arm's end effector is at the same position at the end of each keyframe, indicating it may not have moved after the initial attempt.",
+      "The puck is not at the target position at any of the keyframes."
+    ],
+    "_latency_s": 6.89,
+    "_raw_response": "{\n  \"failure_mode\": \"The Sawyer robot arm failed to push the puck to the target position, likely losing contact with the puck.\",\n  \"failure_category\": \"stuck\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\"The robot arm's end effector is at the same position at the end of each keyframe, indicating it may not have moved after the initial attempt.\", \"The puck is not at the target position at any of the keyframes.\"]\n}"
+  },
+  {
+    "rollout": "rollout_004",
+    "gt_failure_t": 60,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The Sawyer robot arm failed to make contact with the puck and instead pushed it to the left of the target.",
+    "failure_category": "wrong_direction",
+    "severity": "mild",
+    "visual_cues": [
+      "Scaling percentage decreases as the arm moves towards the right.",
+      "The green indicator near the table reveals incorrect arm pressure position.",
+      "The arm moves left - opposite direction of the tug."
+    ],
+    "_latency_s": 6.04,
+    "_raw_response": "{\n  \"failure_mode\": \"The Sawyer robot arm failed to make contact with the puck and instead pushed it to the left of the target.\",\n  \"failure_category\": \"wrong_direction\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\n    \"Scaling percentage decreases as the arm moves towards the right.\",\n    \"The green indicator near the table reveals incorrect arm pressure position.\",\n    \"The arm moves left - opposite direction of the tug.\"\n  ]\n}"
+  },
+  {
+    "rollout": "rollout_005",
+    "gt_failure_t": 58,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm did not make contact with the puck and instead managed to push it away from its target position.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "The robotic arm is positioned correctly over the puck but it does not grasp it. The arm's end effector remains stationary over the puck instead of pushing it."
+    ],
+    "_latency_s": 5.45,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm did not make contact with the puck and instead managed to push it away from its target position.\",\n  \"failure_category\": \"stuck\",\n  \"severity\": \"moderate\",\n  \"visual_cues\": [\"The robotic arm is positioned correctly over the puck but it does not grasp it. The arm's end effector remains stationary over the puck instead of pushing it.\"]\n}"
+  },
+  {
+    "rollout": "rollout_006",
+    "gt_failure_t": 64,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot's gripper was able to make contact with the puck, but somehow got stuck or was unable to slide it toward the target position. This could be because the gripper applied too much force, causing the grip to become too strong and unable to slide the puck, or because the gripper's position or force did not match the correct trajectory to the target, either overshooting the target or getting stuck due to improper control.",
+    "failure_category": "other",
+    "severity": "mild",
+    "visual_cues": [
+      "The gripper made contact with the puck at timestamp 49",
+      "At timestamp 99, the gripper was likely pushing the puck but did not reach the target position at timestamp 149",
+      "No visual evidence of the puck being pushed along the correct trajectory",
+      "No visual evidence of the gripper managing to release the puck into the target position"
+    ],
+    "_latency_s": 11.65,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot's gripper was able to make contact with the puck, but somehow got stuck or was unable to slide it toward the target position. This could be because the gripper applied too much force, causing the grip to become too strong and unable to slide the puck, or because the gripper's position or force did not match the correct trajectory to the target, either overshooting the target or getting stuck due to improper control.\",\n  \"failure_category\": \"other\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\"The gripper made contact with the puck at timestamp 49\", \"At timestamp 99, the gripper was likely pushing the puck but did not reach the target position at timestamp 149\", \"No visual evidence of the puck being pushed along the correct trajectory\", \"No visual evidence of the gripper managing to release the puck into the target position\"]\n}"
+  },
+  {
+    "rollout": "rollout_007",
+    "gt_failure_t": 10,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The pugnaco was not able to reach the puck, was not able to interact with it, and was not able to move it to the goal endpoint.",
+    "failure_category": "never_reached",
+    "severity": "severe",
+    "visual_cues": [
+      "Sawyer arm was positioned incorrectly, multiple positions in progress",
+      "Sawyer arm was not positioned correctly, multiple times"
+    ],
+    "_latency_s": 5.99,
+    "_raw_response": "{\n  \"failure_mode\": \"The pugnaco was not able to reach the puck, was not able to interact with it, and was not able to move it to the goal endpoint.\",\n  \"failure_category\": \"never_reached\",\n  \"severity\": \"severe\",\n  \"visual_cues\": [\"Sawyer arm was positioned incorrectly, multiple positions in progress\", \"Sawyer arm was not positioned correctly, multiple times\"]\n}"
+  },
+  {
+    "rollout": "rollout_008",
+    "gt_failure_t": 3,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm did not make contact with the puck and instead dropped it, missing the target position.",
+    "failure_category": "missing_target",
+    "severity": "mild",
+    "visual_cues": [
+      "The puck is seen in front of the arm but does not move towards the target, indicating a lack of contact.",
+      "The robot arm's gripper is open and not making contact with the surface of the puck.",
+      "The target position is located further away from the initial position of the puck than the robot arm can reach.",
+      "The end effector of the robot arm does not appear to be in contact with the puck at any point."
+    ],
+    "_latency_s": 8.93,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm did not make contact with the puck and instead dropped it, missing the target position.\",\n  \"failure_category\": \"missing_target\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\n    \"The puck is seen in front of the arm but does not move towards the target, indicating a lack of contact.\",\n    \"The robot arm's gripper is open and not making contact with the surface of the puck.\",\n    \"The target position is located further away from the initial position of the puck than the robot arm can reach.\",\n    \"The end effector of the robot arm does not appear to be in contact with the puck at any point.\"\n  ]\n}"
+  },
+  {
+    "rollout": "rollout_009",
+    "gt_failure_t": 7,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm failed to push the puck as it did not make contact with it.",
+    "failure_category": "stuck",
+    "severity": "mild",
+    "visual_cues": [
+      "The robot arm's grippers are not in contact with the puck at any keyframe."
+    ],
+    "_latency_s": 5.39,
+    "_raw_response": "{\n  \"failure_mode\": \"The robot arm failed to push the puck as it did not make contact with it.\",\n  \"failure_category\": \"stuck\",\n  \"severity\": \"mild\",\n  \"visual_cues\": [\n    \"The robot arm's grippers are not in contact with the puck at any keyframe.\"\n  ]\n}"
+  }
+]

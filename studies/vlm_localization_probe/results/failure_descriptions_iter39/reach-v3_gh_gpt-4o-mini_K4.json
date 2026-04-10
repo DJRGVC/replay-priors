@@ -1,0 +1,321 @@
+[
+  {
+    "rollout": "rollout_000",
+    "gt_failure_t": 10,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The end-effector failed to reach the target position indicated by the small sphere, remaining above it without making contact.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is hovering above the target",
+      "incorrect alignment with the sphere",
+      "no visible movement towards the target over the frames",
+      "position may be obstructed by the table or other objects"
+    ],
+    "_latency_s": 8.89,
+    "_raw_response": "{\"failure_mode\":\"The end-effector failed to reach the target position indicated by the small sphere, remaining above it without making contact.\",\"failure_category\":\"stuck\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is hovering above the target\",\"incorrect alignment with the sphere\",\"no visible movement towards the target over the frames\",\"position may be obstructed by the table or other objects\"]}"
+  },
+  {
+    "rollout": "rollout_001",
+    "gt_failure_t": 69,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robotic arm failed to correctly position the end-effector over the target due to an inadequate path planning.",
+    "failure_category": "wrong_direction",
+    "severity": "moderate",
+    "visual_cues": [
+      "arm is misaligned with the target position",
+      "end-effector does not approach the sphere",
+      "robotic movements appear hesitant",
+      "no contact is made with the target"
+    ],
+    "_latency_s": 3.87,
+    "_raw_response": "{\"failure_mode\":\"The robotic arm failed to correctly position the end-effector over the target due to an inadequate path planning.\",\"failure_category\":\"wrong_direction\",\"severity\":\"moderate\",\"visual_cues\":[\"arm is misaligned with the target position\",\"end-effector does not approach the sphere\",\"robotic movements appear hesitant\",\"no contact is made with the target\"]}"
+  },
+  {
+    "rollout": "rollout_002",
+    "gt_failure_t": 8,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm's end-effector did not reach the target position, appearing to hover above it without making contact.",
+    "failure_category": "never_reached",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is directly above the target",
+      "no movement towards the target",
+      "the robot arm is in a neutral pose",
+      "target position remains unattained"
+    ],
+    "_latency_s": 3.6,
+    "_raw_response": "{\"failure_mode\":\"The robot arm's end-effector did not reach the target position, appearing to hover above it without making contact.\",\"failure_category\":\"never_reached\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is directly above the target\",\"no movement towards the target\",\"the robot arm is in a neutral pose\",\"target position remains unattained\"]}"
+  },
+  {
+    "rollout": "rollout_003",
+    "gt_failure_t": 1,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm did not reach the target position and instead moved vertically away from the desired location.",
+    "failure_category": "wrong_direction",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is not aligned with the target sphere",
+      "arm is moving upward instead of toward the target",
+      "target sphere remains stationary in position",
+      "robot arm has excessive vertical movement"
+    ],
+    "_latency_s": 3.42,
+    "_raw_response": "{\"failure_mode\":\"The robot arm did not reach the target position and instead moved vertically away from the desired location.\",\"failure_category\":\"wrong_direction\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is not aligned with the target sphere\",\"arm is moving upward instead of toward the target\",\"target sphere remains stationary in position\",\"robot arm has excessive vertical movement\"]}"
+  },
+  {
+    "rollout": "rollout_004",
+    "gt_failure_t": 109,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm did not successfully reach the target position within the episode duration, remaining stationary in the neutral pose.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "robot is stationary",
+      "end effector is above target but not moving",
+      "no visible progress towards target"
+    ],
+    "_latency_s": 3.73,
+    "_raw_response": "{\"failure_mode\":\"The robot arm did not successfully reach the target position within the episode duration, remaining stationary in the neutral pose.\",\"failure_category\":\"stuck\",\"severity\":\"moderate\",\"visual_cues\":[\"robot is stationary\",\"end effector is above target but not moving\",\"no visible progress towards target\"]}"
+  },
+  {
+    "rollout": "rollout_005",
+    "gt_failure_t": 14,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to accurately position the end-effector over the target sphere, indicating a lack of precision in its movement.",
+    "failure_category": "overshot",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is misaligned with the target position",
+      "robot arm appears to extend beyond the intended reach",
+      "movement paths are erratic or not fluid",
+      "no contact is made with the target sphere"
+    ],
+    "_latency_s": 1.82,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to accurately position the end-effector over the target sphere, indicating a lack of precision in its movement.\",\"failure_category\":\"overshot\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is misaligned with the target position\",\"robot arm appears to extend beyond the intended reach\",\"movement paths are erratic or not fluid\",\"no contact is made with the target sphere\"]}"
+  },
+  {
+    "rollout": "rollout_006",
+    "gt_failure_t": 16,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The end-effector failed to reach the target position accurately, likely due to miscalculated trajectory or control errors.",
+    "failure_category": "overshot",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is above target sphere",
+      "trajectory appears to have missed the target",
+      "no contact made with the target",
+      "robot arm movement is not aligned with the sphere's position"
+    ],
+    "_latency_s": 64.09,
+    "_raw_response": "{\"failure_mode\":\"The end-effector failed to reach the target position accurately, likely due to miscalculated trajectory or control errors.\",\"failure_category\":\"overshot\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is above target sphere\",\"trajectory appears to have missed the target\",\"no contact made with the target\",\"robot arm movement is not aligned with the sphere's position\"]}"
+  },
+  {
+    "rollout": "rollout_007",
+    "gt_failure_t": 149,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to move the end-effector to the target position and instead oscillated around a point.",
+    "failure_category": "oscillated",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is not reaching the target sphere",
+      "arm appears to be moving back and forth",
+      "no forward progress towards target",
+      "final position remains away from the sphere"
+    ],
+    "_latency_s": 3.74,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to move the end-effector to the target position and instead oscillated around a point.\",\"failure_category\":\"oscillated\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is not reaching the target sphere\",\"arm appears to be moving back and forth\",\"no forward progress towards target\",\"final position remains away from the sphere\"]}"
+  },
+  {
+    "rollout": "rollout_008",
+    "gt_failure_t": 61,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to extend adequately toward the target position, remaining too far from the sphere.",
+    "failure_category": "never_reached",
+    "severity": "severe",
+    "visual_cues": [
+      "end-effector is consistently above the target position",
+      "robot arm appears to be stationary against the neutral pose",
+      "no movement towards the target seen across all frames",
+      "target remains unattained throughout the episode"
+    ],
+    "_latency_s": 3.52,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to extend adequately toward the target position, remaining too far from the sphere.\",\"failure_category\":\"never_reached\",\"severity\":\"severe\",\"visual_cues\":[\"end-effector is consistently above the target position\",\"robot arm appears to be stationary against the neutral pose\",\"no movement towards the target seen across all frames\",\"target remains unattained throughout the episode\"]}"
+  },
+  {
+    "rollout": "rollout_009",
+    "gt_failure_t": 141,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The end-effector failed to reach the target position, remaining too far from the sphere throughout the episode.",
+    "failure_category": "other",
+    "severity": "severe",
+    "visual_cues": [
+      "end-effector is consistently above the target sphere",
+      "no downward motion towards the sphere",
+      "arm maintains a neutral pose without reaching",
+      "target remains uncontacted in all frames"
+    ],
+    "_latency_s": 3.61,
+    "_raw_response": "{\"failure_mode\":\"The end-effector failed to reach the target position, remaining too far from the sphere throughout the episode.\",\"failure_category\":\"other\",\"severity\":\"severe\",\"visual_cues\":[\"end-effector is consistently above the target sphere\",\"no downward motion towards the sphere\",\"arm maintains a neutral pose without reaching\",\"target remains uncontacted in all frames\"]}"
+  },
+  {
+    "rollout": "rollout_010",
+    "gt_failure_t": 91,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to position the end-effector accurately over the target sphere, resulting in a missed reach.",
+    "failure_category": "other",
+    "severity": "severe",
+    "visual_cues": [
+      "end-effector is above the table but not aligned with the target sphere",
+      "no visible indication of contact with the target",
+      "the trajectory appears imprecise and miscalculated",
+      "the arm remains stationary without completing the task"
+    ],
+    "_latency_s": 3.58,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to position the end-effector accurately over the target sphere, resulting in a missed reach.\",\"failure_category\":\"other\",\"severity\":\"severe\",\"visual_cues\":[\"end-effector is above the table but not aligned with the target sphere\",\"no visible indication of contact with the target\",\"the trajectory appears imprecise and miscalculated\",\"the arm remains stationary without completing the task\"]}"
+  },
+  {
+    "rollout": "rollout_011",
+    "gt_failure_t": 79,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robotic arm failed to move the end-effector towards the target position, remaining stationary throughout the frames without showing any progress.",
+    "failure_category": "stuck",
+    "severity": "severe",
+    "visual_cues": [
+      "end-effector does not move towards the target sphere",
+      "robot maintains a constant position",
+      "lack of any trajectory change",
+      "absence of movement in subsequent frames"
+    ],
+    "_latency_s": 3.44,
+    "_raw_response": "{\"failure_mode\":\"The robotic arm failed to move the end-effector towards the target position, remaining stationary throughout the frames without showing any progress.\",\"failure_category\":\"stuck\",\"severity\":\"severe\",\"visual_cues\":[\"end-effector does not move towards the target sphere\",\"robot maintains a constant position\",\"lack of any trajectory change\",\"absence of movement in subsequent frames\"]}"
+  },
+  {
+    "rollout": "rollout_012",
+    "gt_failure_t": 11,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm did not move its end-effector to the target position but instead remained in a neutral pose without advancing toward the sphere.",
+    "failure_category": "never_reached",
+    "severity": "severe",
+    "visual_cues": [
+      "end-effector is stationary",
+      "target sphere is not within reach",
+      "robot arm remains in starting position",
+      "no movement observed towards target"
+    ],
+    "_latency_s": 4.11,
+    "_raw_response": "{\"failure_mode\":\"The robot arm did not move its end-effector to the target position but instead remained in a neutral pose without advancing toward the sphere.\",\"failure_category\":\"never_reached\",\"severity\":\"severe\",\"visual_cues\":[\"end-effector is stationary\",\"target sphere is not within reach\",\"robot arm remains in starting position\",\"no movement observed towards target\"]}"
+  },
+  {
+    "rollout": "rollout_013",
+    "gt_failure_t": 150,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm did not reach the target position and remained above it without making contact.",
+    "failure_category": "never_reached",
+    "severity": "moderate",
+    "visual_cues": [
+      "target sphere is visible but not touched",
+      "end-effector is hovering above the target position",
+      "robot arm appears stationary with respect to target",
+      "trajectory does not connect to the sphere"
+    ],
+    "_latency_s": 3.16,
+    "_raw_response": "{\"failure_mode\":\"The robot arm did not reach the target position and remained above it without making contact.\",\"failure_category\":\"never_reached\",\"severity\":\"moderate\",\"visual_cues\":[\"target sphere is visible but not touched\",\"end-effector is hovering above the target position\",\"robot arm appears stationary with respect to target\",\"trajectory does not connect to the sphere\"]}"
+  },
+  {
+    "rollout": "rollout_014",
+    "gt_failure_t": 80,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to reach the target position marked by the sphere, remaining stationary as it attempted to move.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "arm positioned above the table",
+      "target sphere remains unapproached",
+      "no significant movement towards target",
+      "robot appears to be in a stable position"
+    ],
+    "_latency_s": 3.89,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to reach the target position marked by the sphere, remaining stationary as it attempted to move.\",\"failure_category\":\"stuck\",\"severity\":\"moderate\",\"visual_cues\":[\"arm positioned above the table\",\"target sphere remains unapproached\",\"no significant movement towards target\",\"robot appears to be in a stable position\"]}"
+  },
+  {
+    "rollout": "rollout_015",
+    "gt_failure_t": 66,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to correctly align its end-effector with the target position, resulting in an incomplete movement towards the sphere.",
+    "failure_category": "other",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is hovering above but not touching the target sphere",
+      "robot arm appears to be positioned incorrectly",
+      "there is a lack of movement towards the target in subsequent frames",
+      "the workspace shows a clear target that is not reached"
+    ],
+    "_latency_s": 3.7,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to correctly align its end-effector with the target position, resulting in an incomplete movement towards the sphere.\",\"failure_category\":\"other\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is hovering above but not touching the target sphere\",\"robot arm appears to be positioned incorrectly\",\"there is a lack of movement towards the target in subsequent frames\",\"the workspace shows a clear target that is not reached\"]}"
+  },
+  {
+    "rollout": "rollout_016",
+    "gt_failure_t": 4,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to move its end-effector toward the target position, resulting in no progress toward the task.",
+    "failure_category": "stuck",
+    "severity": "severe",
+    "visual_cues": [
+      "end-effector remains stationary",
+      "lack of movement towards target",
+      "robot arm in neutral pose",
+      "no trajectory adjustments observed"
+    ],
+    "_latency_s": 3.44,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to move its end-effector toward the target position, resulting in no progress toward the task.\",\"failure_category\":\"stuck\",\"severity\":\"severe\",\"visual_cues\":[\"end-effector remains stationary\",\"lack of movement towards target\",\"robot arm in neutral pose\",\"no trajectory adjustments observed\"]}"
+  },
+  {
+    "rollout": "rollout_017",
+    "gt_failure_t": 38,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to reach the target position as it did not move towards the sphere despite the task requirements.",
+    "failure_category": "other",
+    "severity": "moderate",
+    "visual_cues": [
+      "robot arm in neutral pose",
+      "target sphere is stationary and in place",
+      "robot arm does not exhibit forward movement",
+      "all frames show similar arm positioning"
+    ],
+    "_latency_s": 63.62,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to reach the target position as it did not move towards the sphere despite the task requirements.\",\"failure_category\":\"other\",\"severity\":\"moderate\",\"visual_cues\":[\"robot arm in neutral pose\",\"target sphere is stationary and in place\",\"robot arm does not exhibit forward movement\",\"all frames show similar arm positioning\"]}"
+  },
+  {
+    "rollout": "rollout_018",
+    "gt_failure_t": 30,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to reach the target position accurately, remaining at an incorrect height and not closing the gap to the target.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is above the target position",
+      "arm is extended but not moving toward the target",
+      "no visible contact with the sphere",
+      "robot remains stationary during frames"
+    ],
+    "_latency_s": 3.74,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to reach the target position accurately, remaining at an incorrect height and not closing the gap to the target.\",\"failure_category\":\"stuck\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is above the target position\",\"arm is extended but not moving toward the target\",\"no visible contact with the sphere\",\"robot remains stationary during frames\"]}"
+  },
+  {
+    "rollout": "rollout_019",
+    "gt_failure_t": 39,
+    "gt_failure_type": "closest_approach_then_diverged",
+    "failure_mode": "The robot arm failed to accurately position the end-effector to the target location, indicating a lack of precision in movement.",
+    "failure_category": "overshot",
+    "severity": "moderate",
+    "visual_cues": [
+      "end-effector is above the target but not aligned",
+      "target is not reached",
+      "robot arm appears to have moved closer but overshot the sphere's position",
+      "dynamics of the arm suggest potential errors in motor control"
+    ],
+    "_latency_s": 4.16,
+    "_raw_response": "{\"failure_mode\":\"The robot arm failed to accurately position the end-effector to the target location, indicating a lack of precision in movement.\",\"failure_category\":\"overshot\",\"severity\":\"moderate\",\"visual_cues\":[\"end-effector is above the target but not aligned\",\"target is not reached\",\"robot arm appears to have moved closer but overshot the sphere's position\",\"dynamics of the arm suggest potential errors in motor control\"]}"
+  }
+]

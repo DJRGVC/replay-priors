@@ -1,0 +1,56 @@
+[
+  {
+    "task": "pick-place-v3 (Phi-4)",
+    "n": 9,
+    "n_categories": 6,
+    "category_entropy": 2.419,
+    "eta_squared": 0.988,
+    "unique_descriptions": 9,
+    "mean_jaccard": 0.218,
+    "clustering_viable": true,
+    "category_distribution": {
+      "other": 2,
+      "stuck": 3,
+      "overshot": 1,
+      "size_mismatch": 1,
+      "crash": 1,
+      "alway_ent": 1
+    }
+  },
+  {
+    "task": "push-v3 (Phi-4)",
+    "n": 10,
+    "n_categories": 6,
+    "category_entropy": 2.322,
+    "eta_squared": 0.582,
+    "unique_descriptions": 10,
+    "mean_jaccard": 0.274,
+    "clustering_viable": true,
+    "category_distribution": {
+      "oscillated": 1,
+      "stuck": 4,
+      "other": 2,
+      "wrong_direction": 1,
+      "never_reached": 1,
+      "missing_target": 1
+    }
+  },
+  {
+    "task": "reach-v3",
+    "n": 20,
+    "n_categories": 6,
+    "category_entropy": 2.409,
+    "eta_squared": 0.34,
+    "unique_descriptions": 20,
+    "mean_jaccard": 0.273,
+    "clustering_viable": true,
+    "category_distribution": {
+      "stuck": 6,
+      "wrong_direction": 2,
+      "never_reached": 4,
+      "overshot": 3,
+      "oscillated": 1,
+      "other": 4
+    }
+  }
+]

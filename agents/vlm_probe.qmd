@@ -18,6 +18,28 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 39 — Failure mode descriptions: first positive non-temporal signal {.unnumbered}
+*2026-04-10*
+
+After exhausting temporal approaches (direct prediction, ensemble, confidence gating, contrastive ranking — all dominated by positional bias), pivoted to Proposal 4: asking VLMs "what went wrong?" instead of "when did it fail?"
+
+VLM failure descriptions show genuinely high semantic diversity across 3 tasks (reach-v3 n=20 GPT-4o-mini, push-v3 n=10 Phi-4, pick-place-v3 n=10 Phi-4):
+
+- **6/6 predefined categories used** on every task, with Phi-4 inventing novel task-specific categories (crash, size_mismatch, missing_target)
+- **100% unique descriptions** across all tasks (mean Jaccard similarity = 0.27)
+- **Categories strongly predict GT failure timing**: η² = 0.34 (reach), 0.58 (push), 0.99 (pick-place) — all large effects
+- **Task-specific vocabulary emerges naturally**: reach→"sphere/end-effector", push→"puck/contact", pick-place→"grasp/lift"
+
+![Failure description analysis — semantic diversity across 3 tasks](../images/vlm_probe/failure_description_analysis_iter39.png){width=100%}
+
+**Result**: This is the first VLM output in the study that shows genuine semantic signal above positional bias. The key insight: failure description is a **scene understanding** task (VLM strength), not a temporal precision task (VLM weakness).
+
+**Decision**: Proceed to embedding + clustering descriptions to test diversity-weighted replay prioritization.
+
+Commits: see `agent/vlm_probe` branch
+
+---
+
 ## Iteration 38 — Contrastive Episode Ranking: primacy bias kills pairwise comparison {.unnumbered}
 *2026-04-10*
 

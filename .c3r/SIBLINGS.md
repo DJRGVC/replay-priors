@@ -27,15 +27,15 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: running · iter #20 · ctx 0%
+- **status**: running · iter #24 · ctx 0%
 
 ### Recent commits on `agent/td_baseline`
 ```
-e31d1c1 iter_022: Rigorous experiment write-up — 35-run study documented with full methodology, results, and figures
-42b77c1 iter_021: RND-PER baseline — novelty PER ties uniform (3/5), all 5 RL signals now tested, none beat uniform
-19dab3c iter_021: RND-PER implementation + 5-seed Modal training launched (awaiting results)
-0044f01 iter_020: Hero figure updated with RPE-PER as 4th mode in 6-panel summary
-c53c049 iter_019: Quarto page + references + INBOX catchup — full study write-up with hero figure and 7 cited papers
+5ef2775 iter_025: SYNTHESIS.md rewrite — vlm_probe findings invalidate VLM-PER architecture, identify non-temporal directions
+be9f56c iter_025: Cross-study synthesis — unified priority signal landscape figure (7 approaches, 0 beat uniform)
+2d89339 iter_024: State-space visitation analysis — dense reward proxy reveals exploration divergence mechanism
+86369fa iter_023: fix_plan update — seed-switching done, state-space visitation next
+98c9ace iter_023: Exploration bifurcation — seed-switching analysis reveals priority signals redirect exploration, not improve it
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
@@ -65,11 +65,11 @@ images/lit_review2/.gitkeep
 images/shared/.gitkeep
 images/td_baseline/.gitkeep
 images/td_baseline/alpha_sweep_td_per.png
+images/td_baseline/cross_study_synthesis.png
 images/td_baseline/multiseed_mode_comparison_pick_place_v3.png
 images/td_baseline/multiseed_mode_comparison_reach_v3.png
-images/td_baseline/td_per_summary.png
-images/vlm_probe/.gitkeep
-... and 47 more
+images/td_baseline/seed_switching_analysis.png
+... and 54 more
 ```
 ### Read one with:
 ```
