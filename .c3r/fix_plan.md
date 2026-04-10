@@ -30,6 +30,7 @@
 - [ ] **Retest proprio-as-text with n≥5 valid** — wait for rate limit reset
 - [ ] **Groq Llama 4 Scout probe** — backend code ready, needs GROQ_API_KEY in .c3r/env.sh
 - [x] **GitHub Models backend (Llama 3.2 Vision)** — DONE iter_013. Grid tiling for 1-image limit. 11B MAE=72.9, 90B MAE=53.5. Grid-position bias.
+- [x] **GPT-4o K sweep (K=4/8/16)** — DONE iter_030. K=4 best MAE (49.0), K=16 best ±20 (40%). Bias-variance tradeoff: fewer frames→fixation, more frames→diversity.
 - [ ] **Test random sampling on Llama-3.2-90B** — may break grid-position bias (no rate limits, can run freely)
 - [x] **Two-pass adaptive probing on Llama-3.2-90B** — DONE iter_015. NEGATIVE: coarse MAE=69.8→fine MAE=71.3, 6/10 worsened. Coarse pass too inaccurate to center refinement.
 - [x] **CoT prompting on Phi-4 (GitHub Models)** — DONE iter_016. NEGATIVE: MAE 64.3→90.2 (+40%). CoT definitively ruled out for mid/weak models (3/3 negative). Only gemini-3-flash-preview suggestive (n=3).

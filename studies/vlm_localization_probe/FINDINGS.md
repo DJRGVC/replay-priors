@@ -83,12 +83,27 @@ is the bottleneck.
 | 8 | 68.0 | 0% | 0% | 10% | late-bias at t=106,127 |
 | 16 | **57.6** | **10%** | **20%** | **30%** | most diverse predictions, first ±5 hit |
 
-K=16 is clearly the best condition — more frames break positional fixation and improve
-accuracy across all metrics. The K=4 extreme (10/10 at single timestep) shows that with
-few frames, the model defaults to a single grid position rather than reasoning about
-content. K=16 provides enough temporal diversity to partially overcome this. The K effect
-is model-dependent: Sonnet (strong, multi-image API) gains nothing from more frames,
-while GPT-4o-mini (mid-tier, also multi-image) benefits substantially.
+**GPT-4o (strong, native multi-image via GitHub Models):**
+
+| K | MAE | ±5 | ±10 | ±20 | Unique preds | Dominant position |
+|---|-----|-----|------|------|-------------|-------------------|
+| 4 | **49.0** | 0% | 0% | 10% | 3 | t=49 (7/10) |
+| 8 | 52.7 | 10% | 10% | 10% | 3 | t=42 (6/10) |
+| 16 | 53.7 | **10%** | **20%** | **40%** | **6** | t=0,29 (3/10 each) |
+
+**K effect reveals a bias-variance tradeoff.** Fewer frames → extreme positional fixation
+(K=4 GPT-4o: 7/10 at t=49, K=4 GPT-4o-mini: 10/10 at t=99) producing low variance but
+strong bias. More frames → diversified predictions (K=16 GPT-4o: 6 unique values) with
+better tolerance accuracy (±20) but potential new failure modes (start-bias at t=0).
+
+The pattern is model-dependent:
+- **Sonnet (strong):** flat K=4–16, gains nothing from more frames
+- **GPT-4o (strong):** K=4 best MAE (49.0), K=16 best ±20 (40%) — MAE/tolerance tradeoff
+- **GPT-4o-mini (mid-tier):** K=16 best on both MAE AND ±20 — more frames unambiguously help
+
+Mid-tier models benefit most from more frames because they have more to gain from temporal
+resolution. Strong models already extract what they can from fewer frames, so adding more
+frames mainly introduces new positional attractors (t=0 start-bias in K=16).
 
 ### 4. CoT prompting hurts weak models, helps mid/strong unannotated — substitutable with annotation
 
@@ -333,6 +348,8 @@ a reliable priority signal when it would be most needed (early training).
 | 026 | GPT-4o-mini CoT 2×2 complete | CoT+no-ann best (MAE=53.2), mirror-image of GPT-4o: annotation hurts mid-tier in both prompt styles, CoT is key lever. Gemini-3 image quota reset but still rate-limited. | ✓ |
 | 027 | Literature update + pause | 5 new papers added to Related Work; study pausing per Daniel (focus on td_baseline integration) | ✓ |
 | 028 | Gemini-3-flash-preview annotation ± | NO effect: 8/10 predictions identical (MAE 69.9→67.3, −4%). Breaks U-shaped narrative — annotation is architecture-specific not strength-dependent. | ✓ |
+| 029 | Quarto page bootstrap | agents/vlm_probe.qmd + references/vlm_probe.qmd + figures | ✓ |
+| 030 | GPT-4o K sweep (K=4/8/16) | K=4 best MAE (49.0), K=16 best ±20 (40%): bias-variance tradeoff. Mid-tier benefits most from more frames. | ✓ |
 
 ## Bottom Line
 
@@ -343,9 +360,11 @@ by positional biases rather than visual understanding. Frame annotation effect i
 hurts mid-tier (+11% GPT-4o-mini), NO effect on Gemini-3-flash-preview (strong, 8/10
 identical predictions), but dramatically helps GPT-4o (−30%). The Gemini result breaks
 the earlier U-shaped narrative — two strong models respond oppositely to annotation,
-likely due to different multimodal fusion architectures. More keyframes help mid-tier
-native multi-image models (GPT-4o-mini K=16 MAE=57.6 vs K=8 68.0) but not strong models
-(Sonnet flat K=4-16). CoT and annotation are partially substitutable temporal scaffolds —
+likely due to different multimodal fusion architectures. More keyframes reveal a **bias-variance tradeoff**: K=4 produces extreme positional
+fixation (GPT-4o 7/10 at t=49, GPT-4o-mini 10/10 at t=99) with low MAE but 0% tolerance
+accuracy; K=16 diversifies predictions (6 unique values) with best ±20 (40%) but slightly
+higher MAE. Mid-tier models (GPT-4o-mini) benefit most from more frames (K=16 best on
+both MAE and ±20); strong models (Sonnet) are flat; GPT-4o shows the tradeoff most clearly. CoT and annotation are partially substitutable temporal scaffolds —
 both replicated across two models (GPT-4o and GPT-4o-mini): annotation-present→CoT-neutral,
 annotation-absent→CoT-helps. Strikingly, GPT-4o-mini with CoT+no-annotation (MAE=53.2)
 matches GPT-4o with annotation+no-CoT (MAE=52.7), showing CoT can compensate for both

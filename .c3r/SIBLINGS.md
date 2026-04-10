@@ -80,39 +80,6 @@ git show agent/td_baseline:.c3r/PROMPT.md
 git show agent/td_baseline:.c3r/RESEARCH_LOG.md
 ```
 
-## lit_review2
-- **role**: generic
-- **focus**: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
-- **status**: paused · iter #1 · ctx 0%
-- **parent**: td_baseline (this is a sub-agent)
-
-### Recent commits on `agent/lit_review2`
-```
-8770137 iter_001: §1 alternatives to TD-error PER — 11 methods surveyed across 13 papers
-3b59ea0 scaffold replay-priors umbrella
-```
-### Files modified on `agent/lit_review2` (relative to `c3r/replay-priors`)
-```
-.c3r/INBOX.md
-.c3r/INBOX_ARCHIVE.md
-.c3r/PROMPT.md
-.c3r/RESEARCH_LOG.md
-.c3r/SIBLINGS.md
-.c3r/agent.conf
-.c3r/env.sh
-.c3r/fix_plan.md
-.claude/settings.json
-studies/td_error_baseline/LIT_REVIEW.md
-```
-### Read one with:
-```
-git show agent/lit_review2:.c3r/INBOX.md
-git show agent/lit_review2:.c3r/INBOX_ARCHIVE.md
-git show agent/lit_review2:.c3r/PROMPT.md
-git show agent/lit_review2:.c3r/RESEARCH_LOG.md
-git show agent/lit_review2:.c3r/SIBLINGS.md
-```
-
 ## quarto-fixer
 - **role**: quarto-fixer
 - **focus**: Fix failed Pages build (run 24261865659)

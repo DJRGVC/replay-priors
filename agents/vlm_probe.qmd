@@ -18,6 +18,27 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 30 — GPT-4o K sweep reveals bias-variance tradeoff {.unnumbered}
+*2026-04-10*
+
+Ran K=4/8/16 sweep on GPT-4o (annotated, direct prompt, reach-v3, n=10) to complement the GPT-4o-mini K sweep from iter 25.
+
+| K | MAE | ±5 | ±10 | ±20 | Unique preds | Dominant position |
+|---|-----|-----|------|------|-------------|-------------------|
+| 4 | **49.0** | 0% | 0% | 10% | 3 | t=49 (7/10) |
+| 8 | 52.7 | 10% | 10% | 10% | 3 | t=42 (6/10) |
+| 16 | 53.7 | **10%** | **20%** | **40%** | **6** | t=0,29 (3/10 each) |
+
+![K sweep comparison: GPT-4o vs GPT-4o-mini vs Sonnet](../images/vlm_probe/k_sweep_gpt4o_comparison.png){width=100%}
+
+**Result**: Fewer frames produce extreme positional fixation (low variance, high bias) — K=4 has best MAE but 0% ±10. More frames diversify predictions, improving tolerance accuracy (K=16: 40% ±20) but introducing new failure modes (start-bias at t=0). This **bias-variance tradeoff** is model-dependent: mid-tier GPT-4o-mini benefits unambiguously from K=16 (best on all metrics), strong Sonnet is flat, and GPT-4o shows the tradeoff most clearly.
+
+**Decision**: Finding #3 updated to reflect the K-as-bias-variance-tradeoff interpretation. Next: Gemini CoT completion (quota-gated).
+
+Commits: iteration 30
+
+---
+
 ## Iteration 29 — Quarto page bootstrap {.unnumbered}
 *2026-04-10*
 
