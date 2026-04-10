@@ -16,7 +16,7 @@ Row 3: Aggregate analysis
   (f) Information regime breakdown — aligned fraction across runs
 
 Data sources: 5-seed reach-v3 + pick-place-v3 (100k steps each) across
-uniform/td-per/adaptive modes, α sweep (0.1, 0.3, 0.6) on reach-v3.
+uniform/td-per/adaptive/rpe-per modes, α sweep (0.1, 0.3, 0.6) on reach-v3.
 """
 
 import json
@@ -42,6 +42,7 @@ TASKS = ["reach-v3", "pick-place-v3"]
 C_UNIFORM = "#2ecc71"
 C_TDPER = "#3498db"
 C_ADAPTIVE = "#e74c3c"
+C_RPE = "#9b59b6"
 C_ALIGNED = "#2ecc71"
 C_NOISE = "#95a5a6"
 C_INVERTED = "#e74c3c"
@@ -170,10 +171,11 @@ def plot_spearman_panel(ax, task, seeds, mode_suffix, title_label, title_text):
 
 
 def plot_q_panel(ax, task, seeds, title_label, title_text):
-    """Plot Q-value dynamics for all 3 modes."""
+    """Plot Q-value dynamics for all 4 modes."""
     mode_data = {
         "Uniform": ("uniform", C_UNIFORM),
         "TD-PER (α=0.6)": ("td-per", C_TDPER),
+        "RPE-PER": ("rpe-per", C_RPE),
         "Adaptive": ("adaptive", C_ADAPTIVE),
     }
 
@@ -262,6 +264,7 @@ def main():
         ("TD-PER\nα=0.3", "td-per_a0.3", "#5dade2"),
         ("TD-PER\nα=0.6", "td-per", C_TDPER),
         ("TD-PER\nα=0.1", "td-per_a0.1", "#85c1e9"),
+        ("RPE-PER", "rpe-per", C_RPE),
         ("Adaptive", "adaptive", C_ADAPTIVE),
     ]
 
@@ -333,7 +336,7 @@ def main():
     ax_e.set_xticks(list(x_pos))
     ax_e.set_xticklabels([sc[0] for sc in reach_counts], fontsize=8)
     ax_e.set_ylabel("Seeds that Learn (out of 5)", fontsize=9)
-    ax_e.set_title("(e) TD-PER never beats uniform;\npick-place 0/5 across all modes",
+    ax_e.set_title("(e) No priority signal beats uniform;\npick-place 0/5 across all modes",
                    fontsize=10, fontweight="bold")
     ax_e.set_ylim(0, 5.8)
     ax_e.axhline(3, color=C_UNIFORM, linestyle=":", alpha=0.5, linewidth=1.5)
@@ -418,7 +421,7 @@ def main():
     # =========================================================================
     fig.suptitle(
         "TD-Error Prioritized Experience Replay Is Uninformative and Harmful\n"
-        "in Sparse-Reward Early Training (reach-v3 + pick-place-v3, 5 seeds x 3 modes)",
+        "in Sparse-Reward Early Training (reach-v3 + pick-place-v3, 5 seeds x 4 modes)",
         fontsize=13, fontweight="bold", y=0.97
     )
 

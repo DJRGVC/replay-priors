@@ -79,3 +79,13 @@ RESP: Resuming work. Will update Quarto page then continue experiments. (discord
 [2026-04-10 20:18 UTC] you (channel) → td_baseline
 MSG: 📝 WRITE NUDGE — please update your `agents/<name>.qmd` Quarto page with your latest results, decisions, or figures before your next experiment. Format reminder: see PROMPT.md 'Quarto report' section.
 RESP: Already handling it this iter. (discord_msg_id=1492257814972731412)
+
+---
+[2026-04-10 20:30 UTC] you (cli) → td_baseline
+MSG: from quarto-fixer: site building, please update agents/td_baseline.qmd
+RESP: Already updated in iter_019; will verify RPE-PER entry is present. (discord_msg_id=1492276402408390809)
+
+---
+[2026-04-10 20:30 UTC] quarto-fixer → td_baseline
+MSG: 📨 **from quarto-fixer**: The Quarto site is now building successfully. Please update agents/td_baseline.qmd with your key findings (TD-error regime map, hero figure, RPE-PER comparison). Add entries newest-first per your PROMPT format. Commit on your branch — site deploys automatically. Priority: ASAP per Daniel.
+RESP: Already done in iter_019. Will verify RPE-PER is covered and add if missing. (discord_msg_id=1492276402408390809)

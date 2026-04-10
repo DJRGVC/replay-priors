@@ -22,46 +22,25 @@ Siblings will see it in their next SIBLINGS.md refresh.
 
 ---
 
-## YOUR CHILDREN — agents YOU spawned and YOU must manage
-
-These are sub-agents you spawned (directly or transitively).
-**YOU are responsible for killing them when their task is done,
-they get stuck, or they exceed their useful budget.** Each child
-also has a hard iteration cap and will self-kill at MAX_ITERATIONS,
-but that's a safety net — proactive management is your job.
-
-- **lit_review2** (generic, parent=td_baseline) — status=running, iter=#1, last=62h ago  ⚠ STALE — consider killing
-  Focus: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
-
-**Decision rules** (apply at the top of every iteration):
-1. If a child's last RESEARCH_LOG entry says its task is done, kill it: `$C3R_BIN/c3r kill <name>`
-2. If a child has been stale (no iter for >2 hours), kill it.
-3. If a child's fail_streak ≥ 3 in state.json, investigate or kill it.
-4. Otherwise, leave it running and check again next iteration.
-
----
-
 ## SIBLINGS — peers you do NOT manage (other agents' work)
 
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #24 · ctx 100%
-- **last iter**: 44h ago
+- **status**: running · iter #28 · ctx 100%
 
 ### Recent commits on `agent/vlm_probe`
 ```
+0d2384e Iteration 31: Push-v3 task generalization — annotation effect reverses, GPT-4o achieves best-ever MAE=36.3
+41a4f8f Iteration 30: GPT-4o K sweep (K=4/8/16) — bias-variance tradeoff in keyframe count
+29885a7 Iteration 29: Quarto page bootstrap — agents/vlm_probe.qmd + references + figures
+95c3eef Iteration 28: Gemini-3-flash-preview annotation ± — NO effect (8/10 identical predictions), breaks U-shaped narrative
 96f8b23 Iteration 27: Literature update (5 papers) + study pause per Daniel
-4186349 Iteration 26: GPT-4o-mini CoT×annotation 2×2 factorial — mirror-image interaction across model strength
-314b67f Iteration 26: GPT-4o-mini CoT×annotation 2×2 (CoT+unannotated best at 53.2, annotation interferes with CoT on mid-tier, substitutability replicates)
-9a4d6dd Iteration 25: Phi-4 annotation ± (no effect, too weak) + GPT-4o-mini K sweep (K=16 best, more frames help mid-tier)
-3586bc1 Iteration 24: HTML report update with GPT-4o results + CoT×annotation substitutability
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
 .c3r/INBOX.md
 .c3r/INBOX_ARCHIVE.md
-.c3r/PAUSED
 .c3r/PROMPT.md
 .c3r/RESEARCH_LOG.md
 .c3r/SIBLINGS.md
@@ -69,6 +48,8 @@ but that's a safety net — proactive management is your job.
 .c3r/fix_plan.md
 .claude/settings.json
 .gitignore
+agents/vlm_probe.qmd
+references/vlm_probe.qmd
 studies/vlm_localization_probe/.gitignore
 studies/vlm_localization_probe/FINDINGS.md
 studies/vlm_localization_probe/FREE_VLM_OPTIONS.md
@@ -86,29 +67,47 @@ studies/vlm_localization_probe/results/cot_gpt4o_mini_noannotate/results.json
 studies/vlm_localization_probe/results/cot_gpt4o_noannotate/results.json
 studies/vlm_localization_probe/results/cot_llama90b/results.json
 studies/vlm_localization_probe/results/cot_phi4/results.json
-studies/vlm_localization_probe/results/gpt4o/results.json
-studies/vlm_localization_probe/results/gpt4o_mini/results.json
-studies/vlm_localization_probe/results/gpt4o_mini_noannotate/results.json
-... and 18 more
+studies/vlm_localization_probe/results/gemini3_annotated_iter28/results.json
+studies/vlm_localization_probe/results/gemini3_unannotated_iter28/results.json
+... and 26 more
 ```
 ### Read one with:
 ```
 git show agent/vlm_probe:.c3r/INBOX.md
 git show agent/vlm_probe:.c3r/INBOX_ARCHIVE.md
-git show agent/vlm_probe:.c3r/PAUSED
 git show agent/vlm_probe:.c3r/PROMPT.md
 git show agent/vlm_probe:.c3r/RESEARCH_LOG.md
+git show agent/vlm_probe:.c3r/SIBLINGS.md
 ```
 
 ## quarto-fixer
 - **role**: quarto-fixer
 - **focus**: Fix failed Pages build (run 24261865659)
-- **status**: running · iter #0 · ctx 0%
+- **status**: running · iter #1 · ctx 0%
 
 ### Recent commits on `agent/quarto-fixer`
 ```
+40393c0 Iteration 1: Fix ANSI ESC codes in QMD front matter + add quarto-fixer pages
 3b59ea0 scaffold replay-priors umbrella
 ```
 ### Files modified on `agent/quarto-fixer` (relative to `c3r/replay-priors`)
-_(none)_
+```
+.c3r/INBOX.md
+.c3r/INBOX_ARCHIVE.md
+.c3r/PROMPT.md
+.c3r/RESEARCH_LOG.md
+.c3r/SIBLINGS.md
+.c3r/agent.conf
+.c3r/env.sh
+.c3r/fix_plan.md
+.claude/settings.json
+```
+### Read one with:
+```
+git show agent/quarto-fixer:.c3r/INBOX.md
+git show agent/quarto-fixer:.c3r/INBOX_ARCHIVE.md
+git show agent/quarto-fixer:.c3r/PROMPT.md
+git show agent/quarto-fixer:.c3r/RESEARCH_LOG.md
+git show agent/quarto-fixer:.c3r/SIBLINGS.md
+```
 

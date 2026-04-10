@@ -240,3 +240,26 @@ Result:     Quarto page complete with 6 entries covering the full study arc. Her
 Decision:   Next iteration: update hero summary figure to include RPE-PER as 4th mode
             (currently only shows 3 modes). Then consider RND-PER baseline or begin
             VLM-PER prototyping using vlm_probe sibling's data.
+
+## Iteration 20 — Hero figure updated with RPE-PER as 4th mode  (2026-04-10T21:00:00Z)
+Hypothesis: Adding RPE-PER to the hero summary figure (panels c/d Q-dynamics +
+            panel e bar chart) will strengthen the "signal not mechanism" narrative
+            by showing 4 independent priority signals all failing to beat uniform.
+Change:     Modified plot_summary_figure.py: added RPE-PER to plot_q_panel mode_data,
+            added RPE-PER bar to panel (e) modes_reach list, updated figure title
+            from "3 modes" to "4 modes", updated panel (e) title. Regenerated
+            td_per_summary.{png,pdf}. Copied to images/td_baseline/ for Quarto.
+            Updated agents/td_baseline.qmd with new entry. Processed INBOX (quarto-fixer
+            site-ready notification — page was already done in iter_019).
+Command:    python studies/td_error_baseline/plot_summary_figure.py
+Result:     Figure renders correctly with 6 bars in panel (e): Uniform 3/5,
+            TD-PER α=0.3 3/5, TD-PER α=0.6 0/5, TD-PER α=0.1 2/5, RPE-PER 2/5,
+            Adaptive 2/5. RPE-PER also appears in Q-dynamics panels (purple line,
+            Q≈26 — no explosion, confirming RPE avoids the feedback loop but still
+            provides no benefit). Pick-place-v3 has no RPE-PER data (not run).
+Decision:   Hero figure is now the definitive artifact. Next priorities from fix_plan:
+            (a) RND-PER baseline (count-based novelty — last standard signal to test),
+            (b) VLM-PER prototype using vlm_probe sibling's data, or
+            (c) run RPE-PER on pick-place-v3 to fill the gap in the bar chart.
+            Leaning toward (a) RND-PER as it completes the "all RL signals fail"
+            argument before moving to VLM-based approaches.
