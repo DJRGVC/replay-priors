@@ -18,6 +18,19 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 34 — Annotation × Task × Model figure + visionary cleanup {.unnumbered}
+*2026-04-10*
+
+Created a systematic visualization of the bias-matching mechanism across 3 tasks × 2 models × 2 annotation conditions. The figure makes the GT-distribution dependence visually obvious.
+
+![Annotation × Task × Model: bias-matching mechanism. Annotation helps when GT is mid-distributed (reach-v3) but hurts when GT clusters at extremes (push-v3 early, pick-place-v3 late). Red dashed line = GT failure mean.](../images/vlm_probe/annotation_task_model_interaction.png){width=100%}
+
+Killed the stuck `visionary` sub-agent (0 iterations, never started).
+
+Commits: iteration 34
+
+---
+
 ## Iteration 32 — 3-task annotation comparison: bias-matching, not capability {.unnumbered}
 *2026-04-10*
 
