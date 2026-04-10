@@ -27,7 +27,7 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: paused · iter #18 · ctx 0%
+- **status**: idle · iter #18 · ctx 0%
 
 ### Recent commits on `agent/td_baseline`
 ```
