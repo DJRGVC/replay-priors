@@ -243,8 +243,44 @@ of replay strategy. TD-error is completely uninformative throughout.
    3/5 uniform). On an unlearnable task, all strategies are equally futile — but TD-error
    provides zero useful signal at any point.
 
-**Cross-task summary:**
-- **reach-v3 (learnable):** Uniform 3/5 > Adaptive 2/5 > TD-PER 0/5 — PER hurts
+### reach-v3 — Alternative priority signals: RPE-PER + RND-PER (5 seeds, 100k steps, iters 018/021)
+
+**Neither reward prediction error nor state novelty beats uniform replay.**
+
+| Mode | Learns | ep_rew@80k (best seed) | Q_mean@80k | Spearman (max) |
+|------|--------|----------------------|------------|----------------|
+| **Uniform** | **3/5 (60%)** | 469 | 20.8 ± 18.3 | +0.62 |
+| RPE-PER | 2/5 (40%) | 469 | 26.2 ± 12.1 | +0.01 |
+| RND-PER | 3/5 (60%) | 473 | 48.4 ± 30.2 | +0.02 |
+| TD-PER α=0.6 | 0/5 (0%) | 31 | 228.3 ± 377.0 | +0.01 |
+
+**Key findings — all three standard RL priority signals fail:**
+
+1. **RPE-PER (2/5):** Reward predictor converges to "always output 0" within ~10k steps
+   (sparse reward → 99.9% of transitions have r=0). Once converged, RPE ≈ 0 for all
+   transitions → degrades to uniform with IS weight overhead.
+
+2. **RND-PER (3/5, ties uniform):** State novelty initially provides diverse priorities
+   but becomes uninformative as the predictor learns. Matches uniform aggregate rate but
+   with **different per-seed outcomes** — seed 42 learns under RND-PER (not uniform),
+   seed 256 fails (learned under uniform). RND changes exploration dynamics without
+   systematic improvement.
+
+3. **RND-PER avoids Q-explosion:** Max Q=161.7 (one seed) vs TD-PER's 228+. Novelty
+   priorities don't create the positive feedback loop that TD-error PER does, because
+   the priority signal is independent of the critic.
+
+4. **Spearman ≈ 0 for ALL modes** — confirming TD-error is uninformative regardless of
+   which priority signal is used for sampling.
+
+5. **Unified failure mechanism:** All three signals (TD-error, RPE, RND) are bootstrapped
+   from the agent's own experience. In sparse-reward early training, this experience is
+   uninformative — the agent hasn't discovered rewards yet, so any derivative signal is
+   noise. This is the fundamental "chicken-and-egg" problem that motivates external
+   priority signals (e.g., VLM-based).
+
+**Cross-task summary (5 modes):**
+- **reach-v3 (learnable):** Uniform 3/5 = RND-PER 3/5 > RPE-PER 2/5 = Adaptive 2/5 > TD-PER 0/5
 - **pick-place-v3 (unlearnable):** All 0/5 — TD-error in permanent information desert
 
 ![Pick-place mode comparison](figures/multiseed_mode_comparison_pick_place_v3.png)

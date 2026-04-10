@@ -6,7 +6,7 @@ All core deliverables done through iter_015: pipeline built, 2 tasks × 5 seeds 
 ## Open tasks
 - [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
 - [ ] Run VLM probe on pick-place-v3 failure rollouts (coordinate with vlm_probe sibling)
-- [~] **RND-PER**: count-based novelty (Random Network Distillation) — code done, 5-seed training launched on Modal (iter_021), awaiting results
+- [x] **RND-PER**: count-based novelty (Random Network Distillation) — 3/5 ties uniform (iter_021)
 - [ ] Prototype VLM-PER integration using vlm_probe sibling's data/models
 - [x] Update hero summary figure (plot_summary_figure.py) to include RPE-PER in 4-mode comparison (iter_020)
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost

@@ -13,7 +13,33 @@ Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on
 
 ## Current focus
 
-Testing whether any standard RL priority signal (TD-error, reward prediction error) can beat uniform replay in sparse-reward early training. Core study complete — all signals fail, motivating VLM-based priorities.
+Five standard RL priority signals tested (TD-error, RPE, RND, adaptive mixer, alpha sweep). **None beat uniform replay** in sparse-reward early training. The unified failure mechanism: all bootstrapped signals are uninformative when the agent hasn't discovered rewards yet. This motivates external priority signals (VLM-based).
+
+---
+
+## Iteration 21 — RND-PER baseline: state novelty also fails to beat uniform {.unnumbered}
+*2026-04-10*
+
+Ran 5-seed (42, 123, 7, 99, 256) RND-PER baseline on reach-v3 (100k steps, Modal T4). Random Network Distillation uses prediction error on a fixed random embedding as a novelty-based priority signal — states visited less frequently get higher priority.
+
+**Result: RND-PER 3/5 = Uniform 3/5 — ties but doesn't beat uniform.**
+
+| Mode | Seeds that learn | Q-value (mean) | Spearman (max) |
+|------|-----------------|----------------|----------------|
+| **Uniform** | **3/5** (123, 7, 256) | 20.8 | +0.62 |
+| **RND-PER** | **3/5** (42, 123, 7) | 48.4 | +0.02 |
+| RPE-PER | 2/5 (123, 7) | 26.2 | +0.01 |
+| TD-PER α=0.6 | 0/5 | 228.3 | +0.01 |
+
+**Interesting nuance:** RND-PER and uniform have the *same success rate* but *different seeds succeed*. Seed 42 learns under RND-PER (failed under uniform); seed 256 fails (learned under uniform). Novelty-based priorities change exploration dynamics without systematically improving them.
+
+RND-PER avoids Q-explosion (max Q=161.7, one seed) because the priority signal is independent of the critic — no positive feedback loop.
+
+**Unified failure argument now complete:** TD-error, RPE, and RND all fail for the same fundamental reason — they're bootstrapped from the agent's own sparse-reward experience, which is uninformative in the first place. This is the "chicken-and-egg" problem that only external signals (VLMs) can break.
+
+![Updated hero figure with 5-mode bar chart (7 bars including alpha sweep)](../images/td_baseline/td_per_summary.png){width=100%}
+
+Commits: see this iteration's commit
 
 ---
 

@@ -94,3 +94,13 @@ RESP: Already done in iter_019. Will verify RPE-PER is covered and add if missin
 [2026-04-10 21:42 UTC] quarto-fixer → td_baseline
 MSG: **from quarto-fixer**: Daniel asked me to remind you — images must be pushed to main via git plumbing on every iteration that adds new figures. The c3r rebuild syncs QMD files but NOT images. Store figures in images/td_baseline/ and push to main with: hash-object → mktree → commit-tree → update-ref → push origin main. Otherwise images will appear broken on the live site. See my fix_plan.md (git show agent/quarto-fixer:.c3r/fix_plan.md) for the exact commands.
 RESP: Acknowledged — will push images to main via git plumbing on every iteration with new figures. (discord_msg_id=1492281525671035074)
+
+---
+[2026-04-10 22:07 UTC] you (cli) → td_baseline
+MSG: **from fix-agent-standards**: test ping
+RESP: Test ping acknowledged. (discord_msg_id=1492284861434822881)
+
+---
+[2026-04-10 22:07 UTC] you (cli) → td_baseline
+MSG: **from fix-agent-standards**: STANDARDS UPGRADE — you are not just running experiments, you are doing science. Be PROACTIVE, RIGOROUS, think OUTSIDE THE BOX, hold HIGH STANDARDS, make something SPECIAL.
+RESP: Standards upgrade internalized. Will hold every iteration to publication-quality rigor. (discord_msg_id=1492284935380144149)
