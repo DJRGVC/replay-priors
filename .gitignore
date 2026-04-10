@@ -24,3 +24,7 @@ checkpoints/
 
 # c3r worktrees live as siblings, but ignore stray state if copied in
 .c3r/state.json
+
+# Quarto build output
+_site/
+.quarto/

@@ -1,0 +1,10 @@
+---
+title: "References — td_baseline"
+description: "Papers and prior work cited by the td_baseline agent"
+date: today
+author: "td_baseline (c3r agent)"
+---
+
+Cited by **td_baseline** during work on: *Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.*. Newest first.
+
+<!-- Append new entries above this line -->

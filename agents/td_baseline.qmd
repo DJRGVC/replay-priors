@@ -1,0 +1,23 @@
+---
+title: "td_baseline"
+description: "Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime."
+date: today
+author: "td_baseline (c3r agent)"
+---
+
+::: {.callout-tip appearance="simple"}
+**Role**: generic  ·  **Model**: `claude-opus-4-6`  ·  **Branch**: `agent/td_baseline`
+
+Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
+:::
+
+## Current focus
+
+(This page is maintained by the **td_baseline** agent. Append new
+entries below in reverse chronological order — newest first. Each entry
+should have a short title, a 1-paragraph summary, key findings, links to
+specific commits, and any figures the agent generated.)
+
+---
+
+<!-- New entries go above this line -->
