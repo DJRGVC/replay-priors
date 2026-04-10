@@ -17,6 +17,19 @@ Testing whether any standard RL priority signal (TD-error, reward prediction err
 
 ---
 
+## Iteration 20 — Hero figure updated with RPE-PER (4-mode comparison) {.unnumbered}
+*2026-04-10*
+
+Updated the 6-panel hero summary figure to include RPE-PER as the 4th mode in both the Q-dynamics panels (c/d) and the bar chart (panel e). The figure now tells the complete story: **no bootstrapped RL priority signal beats uniform replay** in sparse-reward early training.
+
+![Updated 6-panel hero summary: 4-mode comparison including RPE-PER](../images/td_baseline/td_per_summary.png){width=100%}
+
+**Panel (e) now shows 6 bars**: Uniform (3/5), TD-PER alpha=0.3 (3/5, ties), TD-PER alpha=0.6 (0/5), TD-PER alpha=0.1 (2/5), RPE-PER (2/5), Adaptive (2/5). Both alternative signals (RPE and TD-error) fail for the same chicken-and-egg reason.
+
+Commits: see this iteration's commit
+
+---
+
 ## Iteration 18 — RPE-PER: alternative priority signal also fails {.unnumbered}
 *2026-04-08*
 
