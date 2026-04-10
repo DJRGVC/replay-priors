@@ -36,6 +36,8 @@ website:
             text: vlm_probe
           - href: agents/lit_review2.qmd
             text: lit_review2
+          - href: agents/quarto-fixer.qmd
+            text: quarto-fixer
       # AGENT_MENU_END
       - href: experiments.qmd
         text: Experiments
