@@ -97,37 +97,63 @@ This isn't just theoretical — it means PER is spending 30-50% of its compute
 budget on transitions that are *less* useful than what uniform sampling would
 select.
 
-## 2. What VLM Probes Tell Us
+## 2. What VLM Probes Tell Us (Updated — vlm_probe iters 1–37)
 
-The sibling VLM probe study (`agent/vlm_probe`) ran Claude Sonnet on failure
-rollouts from MetaWorld reach-v3, asking it to localize the failure timestep from
-K uniformly-sampled keyframes.
+The sibling VLM probe study (`agent/vlm_probe`) ran **9 models** across **3 tasks**
+(reach-v3, push-v3, pick-place-v3) with **10+ interventions** (K sweep, CoT, annotation,
+prompt style, multi-image vs grid, ensemble, confidence gating).
 
-| Configuration | MAE (timesteps) | Within-10 | Within-20 |
-|--------------|-----------------|-----------|-----------|
-| K=4 | 47.4 | 0% | 20% |
-| **K=8** | **41.9** | **20%** | **35%** |
-| K=16 | 44.4 | 20% | 35% |
-| K=32 | 51.5 | 15% | 25% |
+### 2a. Individual model performance (reach-v3, K=8)
 
-**Critical insight:** K=8 is optimal — more frames don't help (possibly confuse
-the model). 35% within-20-timestep accuracy is modest but represents a *qualitatively
-different kind of signal* than TD-error:
+| Model | MAE↓ | ±10 | ±20 | Dominant bias |
+|-------|------|------|------|---------------|
+| Claude Sonnet 4.6 | **41.9** | **20%** | **35%** | center (t≈85) |
+| GPT-4o (annotated) | 52.7 | 10% | 10% | early-mid (t=42) |
+| Gemini 3 Flash Preview | 54.2 | 44% | 56% | start (t=0) |
+| GPT-4o-mini (CoT, no ann) | 53.2 | 10% | 20% | early (t=21) |
+| Llama-3.2-90B | 53.5 | 0% | 0% | grid-cell (t=42) |
+| Gemini 2.5 Flash | 67.8 | 20% | 30% | end (t≈149) |
+| GPT-4o-mini (annotated) | 68.0 | 0% | 10% | late (t≈106) |
+| Phi-4-multimodal | 64.3 | 0% | 10% | grid-center (t=85) |
+| Gemini 2.5 Flash-Lite | 95.2 | 5% | 10% | late |
 
-1. **Available from step 0.** No warm-up, no critic convergence needed. The VLM
-   can judge transition importance on the very first episode.
+**Central finding:** Every model has a characteristic positional bias unrelated to
+visual content. Models predict based on *image position* (grid cell, sequence slot),
+not *task understanding*. This is the strongest signal in the study.
 
-2. **Critic-independent.** VLM judgments don't degrade when Q-values oscillate or
-   collapse. There is no inversion risk.
+### 2b. Annotation effect is GT-distribution-dependent (3-task comparison)
 
-3. **Semantically grounded.** The VLM understands *what the task is* (reach the
-   target, pick the object) and can identify transitions where the robot is near
-   success or making progress — exactly the transitions that oracle advantage says
-   are important but TD-error misses.
+| Task | GT mean | GPT-4o ann effect | GPT-4o-mini ann effect |
+|------|---------|-------------------|------------------------|
+| reach-v3 (mid-distributed) | 57.8 | −30% (helps) | N/A |
+| push-v3 (early-distributed) | 36.6 | +18% (hurts) | +16% (hurts) |
+| pick-place-v3 (late-distributed) | 80.3 | N/A | +9% (hurts) |
 
-4. **Complementary to TD-error.** In the "aligned" regime (when TD-error works),
-   VLM adds little. But in the noise/inverted/unstable regimes (50-93% of training),
-   VLM provides the only non-random signal.
+Annotation shifts predictions toward mid-episode — helps when GT is mid-distributed,
+hurts when GT clusters at extremes. This is bias-matching, not capability.
+
+### 2c. Ensemble and confidence gating both fail
+
+- **Naive 5-model ensemble:** MAE=51.2 vs best individual (Llama-90B) MAE=50.1 —
+  weak models dilute the signal. Selected 2-model pairs improve (−6 to −10%) but
+  require oracle knowledge of which pair to pick.
+- **Confidence gating (inter-model agreement):** Agreement is *positively* correlated
+  with error (r=+0.53). Models agree when most wrong because they share positional
+  biases. Optimal gating threshold → 100% uniform usage.
+- **Always-VLM priority:** Overlap 8.7% vs uniform 21.7% (60% worse), KL 2.035 vs
+  1.556 (31% worse). Strictly dominated by uniform.
+
+### 2d. Revised assessment
+
+The iter-006 assessment that VLMs provide a "qualitatively different kind of signal"
+was **too optimistic**. While VLM judgments are indeed critic-independent and available
+from step 0, they are dominated by positional bias and produce priorities that are
+*worse* than uniform when measured by KL divergence. The only metric where VLMs show
+promise is top-20% overlap (+12% above uniform for Sonnet K=8), but this comes at the
+cost of catastrophic misses that create harmful priority peaks far from true failure.
+
+The path forward cannot be "better temporal localization" — it must sidestep temporal
+reasoning entirely.
 
 ## 3. Literature Connections
 
@@ -150,105 +176,113 @@ The lit review (§1, 11 methods surveyed) confirms our empirical findings:
 - **SPAHER** (2024) uses spatial position attention for manipulation PER — a
   hand-crafted version of what a VLM could provide automatically.
 
-## 4. The Proposed Architecture: VLM-Augmented PER
+## 4. The Proposed Architecture: Status Update
 
-Combining all three workstreams, the evidence points to a specific architecture:
+The iter-006 Adaptive Priority Mixer architecture (regime-switching between TD-error
+and VLM scores) is now **invalidated** by both studies' findings:
 
-```
-                    ┌─────────────────────────────────────────────┐
-                    │           Replay Buffer (100k)              │
-                    │                                             │
-                    │   Each transition has:                      │
-                    │     • TD-error priority (standard)          │
-                    │     • VLM importance score (new)            │
-                    │     • Regime flag (noise/aligned/inverted)  │
-                    └──────────────┬──────────────────────────────┘
-                                   │
-                    ┌──────────────▼──────────────────────────────┐
-                    │         Adaptive Priority Mixer              │
-                    │                                              │
-                    │   IF Q-instability detected (σ_Q/μ_Q > 1):  │
-                    │     → weight toward VLM score                │
-                    │   IF |Spearman| < 0.15 (noise regime):      │
-                    │     → weight toward VLM score                │
-                    │   IF Spearman > 0.15 (aligned regime):      │
-                    │     → weight toward TD-error                 │
-                    │   IF Spearman < -0.15 (inverted regime):     │
-                    │     → VLM-only (TD-error is harmful)         │
-                    └──────────────┬──────────────────────────────┘
-                                   │
-                    ┌──────────────▼──────────────┐
-                    │   Sample batch for SAC       │
-                    │   (actor/critic may get       │
-                    │    different mixes per D-SPEAR│
-                    └──────────────────────────────┘
-```
+- **TD-error branch:** Tested 5 RL signals (TD-PER at 3 alpha values, RPE-PER,
+  RND-PER, Adaptive mixer). None beat uniform on reach-v3. All fail on pick-place-v3.
+  The mixer's regime detection logic is correct (noise/aligned/inverted classification
+  works) but there is no good signal to switch *to*.
 
-### Key Design Decisions (Supported by Evidence)
+- **VLM branch:** Always-VLM is strictly worse than uniform (overlap −60%, KL −31%).
+  Confidence gating reduces to 100% uniform. Ensembles don't help.
 
-1. **VLM scoring is offline/batched.** Score transitions in bulk (e.g., every 1000
-   new transitions) with K=8 keyframes per episode. At ~2s/query and $0.003/query,
-   scoring 1000 episodes costs ~$3 and 30 minutes — amortized over 10k training
-   steps.
+- **The regime classifier itself works** — it accurately detects when TD-error is
+  uninformative. But detection without a viable alternative signal produces the same
+  outcome as uniform.
 
-2. **Regime detection is cheap.** Running Spearman correlation on a 5000-sample
-   buffer snapshot takes <1s. Q-instability detection (σ_Q/μ_Q) is a single stat.
-   These can be computed every 10k steps.
+### What the architecture *should* look like (revised hypothesis)
 
-3. **TD-error is not discarded.** In the aligned regime (~20-50% of training on
-   easy tasks), TD-error is a valid and free signal. The mixer automatically
-   exploits it when it's informative.
+The evidence now suggests the architecture must avoid temporal localization entirely:
 
-4. **The inversion problem is explicitly handled.** No existing method in the
-   literature addresses the case where TD-error *anti-correlates* with importance.
-   Our regime classifier detects this and switches to VLM-only, preventing the
-   pathological case.
+1. **Contrastive Episode Ranking** — ask VLMs "which of these two episodes was
+   closer to success?" rather than "at what timestep did this episode fail?" This
+   leverages VLM strengths (relative judgment, scene understanding) and avoids
+   the temporal precision bottleneck.
 
-## 5. Open Questions
+2. **Failure Mode Clustering** — use VLM *descriptions* of failure (not timestamps)
+   to cluster episodes by failure mode, then prioritize under-represented modes for
+   diversity. This sidesteps temporal reasoning entirely.
 
-1. **Cost-performance tradeoff.** VLM scoring at $0.003/query adds ~$3-30 per
-   training run depending on scoring frequency. Is this justified by sample
-   efficiency gains?
+3. **Phase-Segmented Replay** — use VLMs to classify episodes into coarse phases
+   (approaching, attempting, failing) and weight transitions from "attempting" phases
+   higher. This requires only ~3 categories, not 150-step precision.
 
-2. **Transfer across tasks.** The VLM probe was only tested on reach-v3. How does
-   MAE scale on harder tasks (pick-place, assembly)?
+These remain untested. The key insight is: VLMs can *categorize* and *compare* but
+cannot *localize temporally*.
 
-3. **Scoring granularity.** Should VLM score episodes or individual transitions?
-   Episode-level scoring is cheaper but coarser.
+## 5. What We Now Know (Answered Questions)
 
-4. **Regime detection lag.** Spearman can only be computed after enough training
-   has occurred. What's the minimum buffer size for reliable regime detection?
+1. ~~Cost-performance tradeoff~~ → **Moot.** VLM temporal localization doesn't
+   improve over uniform regardless of cost.
 
-5. **VLM model choice.** Sibling found Gemini flash-lite performed poorly
-   (MAE=95.2 vs Sonnet's 41.9). Model selection matters — what's the
-   cost-accuracy Pareto frontier?
+2. ~~Transfer across tasks~~ → **Answered.** vlm_probe tested 3 tasks. Push-v3 is
+   easiest (MAE=36, bias-matching helps), pick-place-v3 shows extreme fixation.
+   Task difficulty tracks GT distribution, not visual complexity.
+
+3. ~~Scoring granularity~~ → **Episode-level temporal scoring is the wrong frame.**
+   The question should be: "is this episode more informative than that one?" not
+   "which timestep matters?"
+
+4. ~~Regime detection lag~~ → **Detection works but is useless without a good
+   alternative signal.** Minimum ~20k steps for reliable Spearman.
+
+5. ~~VLM model choice~~ → **Answered.** 9 models tested. Sonnet is best (MAE=41.9)
+   but all are dominated by positional bias. Model choice shifts the bias location,
+   not the bias magnitude.
+
+### Remaining open questions
+
+1. **Can contrastive/pairwise VLM judgments produce actionable episode rankings?**
+   This avoids temporal precision entirely.
+
+2. **Can VLM failure mode descriptions (text, not timestamps) create diversity-
+   weighted replay that outperforms uniform?**
+
+3. **Is the uniform dominance result specific to MetaWorld's sparse binary reward
+   structure, or does it generalize to other sparse-reward domains?**
+
+4. **Would a dense reward shaping approach (not PER) be more effective than any
+   replay prioritization scheme?** The state-visitation analysis (iter_024) showed
+   dense reward distributions vary dramatically across seeds — perhaps reward
+   shaping is a better lever than replay.
 
 ## 6. Figures
 
 | Figure | Description |
 |--------|-------------|
-| `figures/td_per_regime_map.png` | **6-panel regime map** — the headline figure (this synthesis) |
-| `figures/td_per_regime_map.pdf` | Same, PDF format for presentations |
+| `figures/td_per_regime_map.png` | 6-panel regime map — headline figure (iter_006) |
+| `figures/td_per_summary.png` | 6-panel summary — 5 modes × 2 tasks (iter_015) |
+| `figures/cross_study_synthesis.png` | **4-panel cross-study landscape** — the unified figure (iter_025) |
+| `figures/seed_switching_analysis.png` | Exploration bifurcation — 6-panel (iter_023) |
+| `figures/state_visitation_analysis.png` | Dense reward proxy — 5-panel (iter_024) |
 | `figures/td_correlation_over_training.png` | Spearman + Pearson correlation over training |
 | `figures/priority_quality_metrics.png` | Top-K overlap + Gini + Spearman (3-panel) |
 
-## 7. Recommended Next Steps
+## 7. Recommended Next Steps (Revised)
 
-1. **Run VLM probe on pick-place-v3** to validate VLM scoring on a task where
-   TD-error completely fails (sibling task).
+~~1. Run VLM probe on pick-place-v3~~ → **Done** (vlm_probe iter 32).
+~~2. Implement Adaptive Priority Mixer~~ → **Invalidated** (no viable signal to mix).
+~~3. Head-to-head comparison with VLM-PER~~ → **Invalidated** (VLM-PER < uniform).
+~~4. RPE-PER baseline~~ → **Done** (iter_018, 2/5, ties uniform).
 
-2. **Implement the Adaptive Priority Mixer** as a drop-in replacement for SB3's
-   PER, using the regime classifier to weight between TD and VLM scores.
+### Active directions
 
-3. **Head-to-head comparison:** Train SAC with {uniform, TD-PER, VLM-PER,
-   Adaptive-Mix} on both tasks, measuring sample efficiency (steps to first success).
+1. **Non-temporal VLM approaches:** Contrastive episode ranking, failure mode
+   clustering, phase segmentation. These leverage VLM categorization strengths.
 
-4. **Consider RPE-PER as an additional baseline** — it's the strongest
-   critic-based alternative from the literature and is a drop-in.
+2. **Negative result write-up:** The convergent finding (7 approaches, 0 beat
+   uniform) is itself publishable as a cautionary benchmark paper.
+
+3. **Dense reward shaping investigation:** State-visitation analysis suggests
+   the problem may be better attacked through reward design than replay design.
 
 ---
 
-*This synthesis was produced by `agent/td_baseline` (iter_006) by combining:*
-- *TD-error baseline: 4 runs (2 tasks × 2 seeds), 100k-300k steps each*
-- *VLM probe: Claude Sonnet K-sweep on reach-v3 failure rollouts*
-- *Literature review: §1 survey of 11 alternative PER methods (13 papers)*
+*This synthesis was last updated by `agent/td_baseline` (iter_025) combining:*
+- *TD-error baseline: 40 runs (5 seeds × {uniform, TD-PER×3α, RPE-PER, RND-PER, Adaptive} × 2 tasks)*
+- *VLM probe: 9 models × 3 tasks × 10+ interventions (37 iterations)*
+- *Additional analyses: seed-switching (iter_023), state-space visitation (iter_024)*
+- *Cross-study synthesis figure: `figures/cross_study_synthesis.png` (iter_025)*

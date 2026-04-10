@@ -30,11 +30,14 @@ Result:     Figure generated. Key synthesis:
             • Confidence gating: optimal threshold = 100% uniform (agreement anti-signal).
             • Three independent failure modes: chicken-and-egg (RL), positional bias
               (VLM), exploration redirection (novelty). All converge on uniform dominance.
-Decision:   Cross-study synthesis done. Next: (a) update SYNTHESIS.md with vlm_probe's
-            latest findings (bias-matching, ensemble failure, confidence gating), (b) ask
-            Daniel for direction — temporal approaches exhausted, non-temporal VLM
-            approaches (contrastive ranking, failure clustering) are the remaining viable
-            directions but represent a scope pivot.
+Decision:   [fallback after timeout] Asked Daniel for direction, no response after
+            15 min. Fell back to updating SYNTHESIS.md (most conservative option).
+            Rewrote sections 2, 4, 5, 6, 7 with vlm_probe findings from iters 32-37.
+            Key updates: VLM assessment revised from "promising" to "dominated by
+            positional bias", proposed architecture invalidated, remaining directions
+            identified (contrastive ranking, failure clustering, phase segmentation).
+            Next iteration: await Daniel's direction or begin scoping contrastive
+            episode ranking as the next experimental direction.
 
 ## Iteration 24 — State-space visitation via dense reward proxy  (2026-04-10T23:55:00Z)
 Hypothesis: Dense reward distributions (distance-to-goal proxy) can reveal the
