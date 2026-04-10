@@ -17,6 +17,21 @@ Five standard RL priority signals tested (TD-error, RPE, RND, adaptive mixer, al
 
 ---
 
+## Iteration 24 — State-Space Visitation Analysis: Dense Reward as Exploration Proxy {.unnumbered}
+*2026-04-10*
+
+Used per-sample dense reward distributions (distance-to-goal proxy in MetaWorld) to visualize **where in state space** different priority regimes direct exploration. This reveals the mechanism behind seed-switching: priority signals don't uniformly improve exploration — they create **bimodal exploration outcomes** where some seeds get pushed toward reward-bearing regions while others get trapped in self-reinforcing replay loops.
+
+![State-space visitation under priority regimes — 5-panel analysis](../images/td_baseline/state_visitation_analysis.png){width=100%}
+
+**Key finding — seed 42 at 50k steps:** Under uniform replay, mean dense reward = 1.16 (far from goal, sr=0.000). Under RND-PER, mean dense reward = 3.19 (closer to goal, sr=0.173). The novelty signal literally redirected this seed's exploration into higher-reward state regions. But seed 99 under RND-PER gets trapped: Q values diverge to 162 while visiting low-dense-reward states — the novelty signal creates a self-reinforcing loop sampling "interesting but useless" states.
+
+**Implication for VLM-PER:** A good priority signal must be *monotonically informative* — higher priority should genuinely correspond to states closer to task-relevant regions. TD-error and RND novelty fail this because they amplify noise in the absence of reward signal.
+
+Commits: `iter_024`
+
+---
+
 ## Iteration 23 — Exploration Bifurcation: Seed-Switching Under Priority Regimes {.unnumbered}
 *2026-04-10*
 

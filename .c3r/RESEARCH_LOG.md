@@ -13,6 +13,33 @@ Decision:   The baseline study is now comprehensively finished. Five independent
             change WHICH seeds learn?) as this could reveal something about exploration
             diversity under different priority regimes.
 
+## Iteration 24 — State-space visitation via dense reward proxy  (2026-04-10T23:55:00Z)
+Hypothesis: Dense reward distributions (distance-to-goal proxy) can reveal the
+            spatial mechanism behind seed-switching — priority signals redirect
+            exploration into different state-space regions.
+Change:     Created plot_state_visitation.py — 5-panel figure using per-sample
+            dense rewards from all reach-v3 snapshots as exploration proxy.
+            Violin plots of distributions across modes×timesteps, seed 42
+            diagnostic comparison, Q-vs-dense-reward scatter, mean dense reward
+            trajectories, and quantitative summary.
+Command:    python3 plot_state_visitation.py
+Result:     Key findings:
+            • Seed 42 at 50k: uniform mean_dr=1.16 (far), RND-PER mean_dr=3.19
+              (close to goal). Novelty signal literally pushed exploration toward
+              reward-bearing regions (sr: 0→0.173).
+            • Seed 99/RND-PER: Q→162 with low dense reward — trapped in novelty
+              loop sampling "interesting but useless" states.
+            • Violin plots show RND-PER creates wider, right-shifted distributions
+              vs uniform's tight, low-mean distributions at 50k.
+            • Q-vs-dense-reward scatter reveals decoupling: high Q does not imply
+              high dense reward under priority regimes (pathological).
+Decision:   State-space visitation analysis complete. The mechanism is clear:
+            priority signals create bimodal exploration outcomes. Next priorities:
+            (a) head-to-head comparison including VLM-PER when vlm_probe has
+            a working priority scorer, (b) prototype VLM-PER integration, or
+            (c) ask Daniel for direction given both baseline and mechanistic
+            analyses are now comprehensive.
+
 ## Iteration 22 — Rigorous experiment write-up for Quarto  (2026-04-10T23:00:00Z)
 Hypothesis: A publication-quality experiment page will make the study's findings
             accessible to collaborators and serve as a permanent record of the
