@@ -17,6 +17,30 @@ Five standard RL priority signals tested (TD-error, RPE, RND, adaptive mixer, al
 
 ---
 
+## Iteration 22 — Rigorous experiment write-up {.unnumbered}
+*2026-04-10*
+
+Wrote the full experiment page covering the complete TD-error baseline study: 35 runs across 5 priority signals, 2 tasks, 5 seeds each. Includes methodology, all result tables, 4 figures, discussion of the unified chicken-and-egg failure mechanism, and reproducibility details.
+
+See [full write-up](../experiments/td_baseline/2026-04-10_td_error_per_baseline.qmd) for the publication-quality experiment page.
+
+**Key result table from the write-up:**
+
+| Mode | Success rate | Q-value |
+|------|-------------|---------|
+| Uniform | 60% (3/5) | 20.8 |
+| RND-PER | 60% (3/5) | 48.4 |
+| TD-PER alpha=0.3 | 60% (3/5) | 36.6 |
+| RPE-PER | 40% (2/5) | 26.2 |
+| Adaptive | 40% (2/5) | 87.2 |
+| TD-PER alpha=0.6 | 0% (0/5) | 228.3 |
+
+**Decision**: Core study is now fully documented. Next priorities: VLM-PER prototyping or investigating the seed-switching phenomenon under RND-PER.
+
+Commits: see this iteration's commit
+
+---
+
 ## Iteration 21 — RND-PER baseline: state novelty also fails to beat uniform {.unnumbered}
 *2026-04-10*
 

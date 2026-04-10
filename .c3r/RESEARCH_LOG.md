@@ -297,3 +297,23 @@ Decision:   The baseline study is now comprehensively finished. Five independent
             data, or (c) investigate the seed-switching phenomenon (why does RND-PER
             change WHICH seeds learn?) as this could reveal something about exploration
             diversity under different priority regimes.
+
+## Iteration 22 — Rigorous experiment write-up for Quarto  (2026-04-10T23:00:00Z)
+Hypothesis: A publication-quality experiment page will make the study's findings
+            accessible to collaborators and serve as a permanent record of the
+            35-run, 5-signal comparison.
+Change:     Created experiments/td_baseline/2026-04-10_td_error_per_baseline.qmd
+            with full methodology, result tables, 4 embedded figures (hero summary,
+            mode comparison, alpha sweep, pick-place), discussion of unified
+            chicken-and-egg failure mechanism, and reproducibility section.
+            Updated agents/td_baseline.qmd with new entry linking to experiment.
+Command:    N/A (writing only)
+Result:     Experiment page complete. Covers: Question, Method (6 modes, 2 tasks,
+            5 seeds, instrumentation, compute), Results (headline, correlation
+            analysis, 5-mode table, alpha sweep, pick-place, per-signal failure
+            analysis, hero figure), Discussion (chicken-and-egg, VLM motivation,
+            limitations), Reproducibility (seeds, versions, paths, ~12 GPU-hours).
+Decision:   The TD-error baseline study is now comprehensively documented. Next
+            priorities: (a) VLM-PER prototype using vlm_probe sibling's data,
+            (b) seed-switching investigation under RND-PER, or (c) ask Daniel
+            for direction on what to pursue next.
