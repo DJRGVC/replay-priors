@@ -19,7 +19,8 @@
 - [ ] **Re-run reach-v3 probe with gemini-2.5-flash** (thinking_budget=0 fix applied) — wait for quota reset
 - [x] **Try gemini-3-flash-preview** — DONE iter_005. MAE=54.2 (median 14), ±10=44%, ±20=56%. 2× better ±10 than Sonnet. Start-bias, bimodal. gemini-2.0-flash has 0 free RPD (dead).
 - [x] **Frame index annotation (VTimeCoT-style)** — DONE iter_007. MAE 71.9→59.5 (-17%), ±10 10%→20% on flash-lite. Needs test on stronger models.
-- [ ] **Test annotation on gemini-2.5-flash and gemini-3-flash-preview** — quota-gated, 20 RPD each
+- [x] **Test annotation on gemini-3-flash-preview** — DONE iter_028. NO effect: 8/10 predictions identical (MAE 69.9→67.3, −4%). Breaks U-shaped narrative.
+- [ ] **Test annotation on gemini-2.5-flash** — still 503 UNAVAILABLE
 - [ ] **Complete gemini-3-flash-preview CoT comparison** — need n≥9 to match direct baseline. Rate limits: run when quota resets.
 - [ ] Run remaining 10 rollouts on gemini-3-flash-preview direct for n=20
 - [ ] Run probe on push-v3 and pick-place-v3 (may have more visually distinct failure modes)

@@ -27,7 +27,7 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: paused · iter #17 · ctx 0%
+- **status**: idle · iter #17 · ctx 0%
 
 ### Recent commits on `agent/td_baseline`
 ```
@@ -83,7 +83,7 @@ git show agent/td_baseline:.c3r/RESEARCH_LOG.md
 ## lit_review2
 - **role**: generic
 - **focus**: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
-- **status**: paused · iter #1 · ctx 0%
+- **status**: idle · iter #1 · ctx 0%
 - **parent**: td_baseline (this is a sub-agent)
 
 ### Recent commits on `agent/lit_review2`
