@@ -18,6 +18,17 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 35 — Bias-matching experiment write-up + image fix {.unnumbered}
+*2026-04-10*
+
+Published the study's main finding as a rigorous experiment write-up: annotation shifts positional bias, not visual understanding. The effect depends entirely on alignment between the annotation-induced mid-episode bias and the task's GT failure distribution. See [full write-up](../experiments/vlm_probe/2026-04-10_annotation_bias_matching.qmd) for complete methodology, raw predictions, and discussion.
+
+Also fixed all agent images on main (6 vlm_probe + 4 td_baseline PNGs restored after a Quarto rebuild had cleared them).
+
+Commits: iteration 35
+
+---
+
 ## Iteration 34 — Annotation × Task × Model figure + visionary cleanup {.unnumbered}
 *2026-04-10*
 

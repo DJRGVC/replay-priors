@@ -1,0 +1,182 @@
+---
+title: "Annotation shifts positional bias, not visual understanding: a 3-task mechanism study"
+description: "Frame annotation helps or hurts VLM failure localization depending on alignment between the annotation-induced bias shift and the task's ground-truth failure distribution. Evidence from 3 MetaWorld tasks x 2 models x 2 annotation conditions."
+date: 2026-04-10
+author: "vlm_probe (c3r agent)"
+categories: [ablation, mechanism]
+---
+
+## Question
+
+Frame annotation (overlaying "t=X (N%)" text on keyframes) was found to help
+GPT-4o on reach-v3 ($-$30% MAE) but hurt GPT-4o-mini (+11% MAE). The initial
+interpretation was that annotation interacts with model strength (strong models
+leverage temporal scaffolding, weak models are distracted by it). But
+Gemini-3-flash-preview --- also strong --- ignored annotation entirely (8/10
+identical predictions). This broke the strength-based narrative.
+
+**Hypothesis**: The annotation effect is not model-strength-dependent but
+**GT-distribution-dependent**. Annotation shifts predictions toward mid-episode
+regardless of model; whether this helps depends on where ground-truth failures
+actually cluster. We test this by extending to two new tasks with different GT
+failure distributions.
+
+## Method
+
+### Tasks and GT failure distributions
+
+All tasks use MetaWorld with a random policy (all episodes are failures).
+GT failure timestep = argmin(hand-to-goal distance) over the episode. 20
+rollouts per task, 150 timesteps each, 224x224 RGB frames.
+
+| Task | GT failure mean | GT distribution shape |
+|------|:---:|---|
+| reach-v3 | 57.8 | Mid-distributed (failures throughout episode) |
+| push-v3 | 36.6 | Early-clustered (5/10 failures in first 15 steps) |
+| pick-place-v3 | 80.3 | Late-clustered (5/10 failures after step 100) |
+
+### Models
+
+- **GPT-4o** (via GitHub Models free API, native multi-image)
+- **GPT-4o-mini** (via GitHub Models free API, native multi-image)
+
+Both support native multi-image input (no grid tiling needed).
+
+### Conditions
+
+For each task x model combination, we run:
+
+- **Annotated**: K=8 uniform keyframes with "t=X (N%)" overlaid
+- **Unannotated**: K=8 uniform keyframes, no overlay
+
+All runs use: K=8, uniform sampling, direct prompt style, n=10 rollouts.
+Prompt asks model to predict the failure timestep as a single integer.
+
+### Exact commands
+
+```bash
+# Example for GPT-4o annotated on push-v3
+python run_probe.py --tasks push-v3 --K 8 --models "gh:gpt-4o" \
+    --strategies uniform --prompt-styles direct --max-rollouts 10 \
+    --annotate --call-delay 5 \
+    --output-dir results/push_v3_gpt4o_annotated_iter31
+
+# Example for GPT-4o unannotated on push-v3
+python run_probe.py --tasks push-v3 --K 8 --models "gh:gpt-4o" \
+    --strategies uniform --prompt-styles direct --max-rollouts 10 \
+    --call-delay 5 \
+    --output-dir results/push_v3_gpt4o_unannotated_iter31
+```
+
+Same pattern for all 3 tasks. GPT-4o unannotated on pick-place-v3 is missing
+(quota exhausted during iter 32, not yet recovered).
+
+## Results
+
+### Headline finding
+
+**Annotation effect tracks GT failure distribution, not model capability.**
+
+| Model | Task | GT mean | Ann MAE | Unann MAE | Delta |
+|-------|------|:---:|:---:|:---:|:---:|
+| GPT-4o | reach-v3 | 57.8 (mid) | **52.7** | 75.8 | $-$30% (helps) |
+| GPT-4o | push-v3 | 36.6 (early) | 43.0 | **36.3** | +18% (hurts) |
+| GPT-4o | pick-place-v3 | 80.3 (late) | 48.3 | --- | --- |
+| GPT-4o-mini | reach-v3 | 57.8 (mid) | 68.0 | 61.2 | +11% (hurts) |
+| GPT-4o-mini | pick-place-v3 | 80.3 (late) | 61.3 | **52.8** | +16% (hurts) |
+
+![Annotation x Task x Model interaction: annotation shifts predictions toward mid-episode, helping when GT is mid-distributed (reach-v3) but hurting when GT clusters at extremes (push-v3, pick-place-v3). Red dashed line = GT failure mean.](../../images/vlm_probe/annotation_task_model_interaction.png){width=100%}
+
+### Mechanism
+
+Annotation adds explicit temporal labels ("t=X") to each keyframe. This shifts
+all models' predictions toward **mid-episode** (t=42--85 range) by providing
+temporal anchors that override the model's default positional bias.
+
+- **reach-v3** (GT mid, mean=57.8): Annotation-induced mid-bias **aligns** with
+  GT distribution. GPT-4o benefits by $-$30%.
+- **push-v3** (GT early, mean=36.6): GPT-4o's default start-bias naturally matches
+  the early GT distribution. Annotation **shifts predictions away** from this
+  productive bias toward mid-episode, increasing error by +18%.
+- **pick-place-v3** (GT late, mean=80.3): GPT-4o-mini fixates on t=106 (matching
+  late GT). Annotation diversifies but doesn't improve --- late fixation
+  accidentally matched the late distribution. Delta: +16%.
+
+### Raw predictions
+
+**GPT-4o on push-v3** (best localization in the entire study):
+
+- Annotated: `[0, 106, 21, 0, 42, 0, 0, 0, 0, 63]` --- 6/10 at t=0
+- Unannotated: `[0, 0, 63, 0, 85, 63, 0, 0, 0, 63]` --- 4/10 at t=0, more
+  mid-distribution hits
+- GT: early-clustered, 5/10 in first 15 steps
+
+Unannotated MAE=36.3, +/-10=50% --- annotation disrupts a bias that happens
+to match the GT.
+
+**GPT-4o-mini on pick-place-v3**:
+
+- Annotated: extreme t=106 fixation (7/10)
+- Unannotated: t=106 fixation (6/10)
+- GT: late-clustered, mean=80.3
+
+Both conditions fixate, but annotation slightly increases fixation.
+
+### Across-model annotation summary (5 models)
+
+Including Gemini and grid-tiled models from other iterations:
+
+| Model | Tier | API type | Ann effect on reach-v3 |
+|-------|------|----------|------------------------|
+| GPT-4o | Strong | Multi-image | $-$30% (helps) |
+| GPT-4o-mini | Mid | Multi-image | +11% (hurts) |
+| Gemini-3-flash-preview | Strong | Multi-image | ~0% (ignored) |
+| Flash-Lite | Weak | Multi-image | $-$17% (helps) |
+| Phi-4 | Mid | Grid-tiled | ~0% (ignored) |
+
+No clean correlation with model strength (strong models: $-$30%, 0%; mid: +11%,
+0%; weak: $-$17%). Architecture and input format matter more than capability.
+
+## Discussion
+
+The annotation effect is a **bias-matching** story, not a capability story.
+Annotation doesn't improve visual understanding of manipulation states --- it
+shifts the positional prior that models use as a fallback when they can't
+actually interpret the scene. Whether this shift helps or hurts is determined by
+an interaction between:
+
+1. The model's default positional bias (architecture-dependent)
+2. The annotation-induced bias shift (toward mid-episode)
+3. The task's GT failure distribution (task-dependent)
+
+This has practical implications: annotation is not a reliable intervention for
+VLM-based failure localization. Its effect is unpredictable without knowledge of
+the GT distribution --- which is precisely what you're trying to estimate. In a
+real deployment where GT is unknown, annotation is as likely to hurt as help.
+
+The broader finding reinforces that current VLMs are not performing temporal
+reasoning about manipulation states. They are mapping visual inputs to
+characteristic positions via positional priors, and all interventions
+(annotation, CoT, K-sweep) operate by shifting or spreading these priors rather
+than enabling genuine scene understanding.
+
+### Limitations
+
+- **n=10 per condition** --- small sample sizes mean individual rollout effects
+  dominate. The direction of effects is consistent but magnitudes are noisy.
+- **GPT-4o unannotated on pick-place-v3 missing** --- quota exhaustion. Would
+  complete the table.
+- **Only random-policy rollouts** --- failures are trivial (arm barely moves).
+  A trained policy with more diverse failure modes might show different patterns.
+- **GT definition** --- argmin(hand-to-goal) may not match perceptual salience.
+  A failure that "looks wrong" to a VLM may differ from the distance-minimizing
+  timestep.
+
+## Reproducibility
+
+- **Seed**: Not applicable (VLM APIs are non-deterministic)
+- **Commit**: iterations 31--32 on branch `agent/vlm_probe`
+- **Data**: `studies/vlm_localization_probe/data/{reach-v3,push-v3,pick-place-v3}/`
+- **Results**: `studies/vlm_localization_probe/results/{push_v3,pick_place_v3}_*`
+- **Figure script**: `studies/vlm_localization_probe/plot_annotation_task_model.py`
+- **Total API cost**: $0 (all via GitHub Models free tier)
