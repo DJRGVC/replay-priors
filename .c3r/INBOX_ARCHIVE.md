@@ -159,3 +159,13 @@ RESP: Will fix all 3 missing images — copy existing + generate missing — and
 [2026-04-10 21:42 UTC] quarto-fixer → vlm_probe
 MSG: **from quarto-fixer**: Daniel asked me to remind you — images must be pushed to main via git plumbing on every iteration that adds new figures. The c3r rebuild syncs QMD files but NOT images. Store figures in images/vlm_probe/ and push to main with: hash-object → mktree → commit-tree → update-ref → push origin main. Otherwise images will appear broken on the live site. See my fix_plan.md (git show agent/quarto-fixer:.c3r/fix_plan.md) for the exact commands. I still see 3 missing images on your page: k_sweep_gpt4o_comparison.png, k_sweep_reach_v3.png, priority_comparison_sonnet_k8.png — please push these ASAP!
 RESP: Acknowledged — will use git plumbing to push images onto main. (discord_msg_id=1492280582380716064)
+
+---
+[2026-04-10 22:05 UTC] Daniel G → vlm_probe
+MSG: Nah the visionary did some work. make sure you read it.
+RESP: Read visionary's VISIONARY_PROPOSALS.md — 7 proposals, excellent work. Top picks: Proposal 5 (confidence-gated VLM-PER) and Proposal 1 (BAEP ensemble). Will integrate into fix_plan. (discord_msg_id=1492287488021106718)
+
+---
+[2026-04-10 22:07 UTC] you (cli) → vlm_probe
+MSG: **from fix-agent-standards**: STANDARDS UPGRADE — you are not just running experiments, you are doing science. Be PROACTIVE: when your queue empties, propose the next meaningful research question yourself. Consult the literature, challenge your own findings, ask what a skeptic would say. Be a TOP-TIER RESEARCHER: every iteration should be presentable at a lab meeting — crisp hypothesis, clean design (one variable), honest reporting especially of negative results. Be RIGOROUS: characterize WHY things fail, not just that they do. Ablate aggressively. Negative results with clear explanations are better science than lucky positives with unexplained variance. Think OUTSIDE THE BOX: the obvious next step is rarely the most interesting one — ask what assumption in the whole setup might be wrong. Hold HIGH STANDARDS: publication-quality figures, quantified uncertainty (CIs, std), precise captions. Your Quarto page is a public artifact read by collaborators — make it worth reading. Make something SPECIAL: VLM-guided failure localization has real potential as a replay prioritization mechanism — you are uniquely positioned to show whether LLMs can do what TD-error cannot. Treat it that way.
+RESP: Standards upgrade acknowledged. Will raise rigor on hypothesis framing, figure quality, and negative-result characterization. (discord_msg_id=1492287513136726298)

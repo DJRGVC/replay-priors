@@ -31,11 +31,11 @@ Siblings will see it in their next SIBLINGS.md refresh.
 
 ### Recent commits on `agent/td_baseline`
 ```
+42b77c1 iter_021: RND-PER baseline — novelty PER ties uniform (3/5), all 5 RL signals now tested, none beat uniform
+19dab3c iter_021: RND-PER implementation + 5-seed Modal training launched (awaiting results)
 0044f01 iter_020: Hero figure updated with RPE-PER as 4th mode in 6-panel summary
 c53c049 iter_019: Quarto page + references + INBOX catchup — full study write-up with hero figure and 7 cited papers
 2653f31 iter_018: RPE-PER baseline — reward prediction error PER also fails to beat uniform (2/5 vs 3/5), confirms problem is signal not mechanism
-23d8a3b iter_017: 6-panel hero figure with pick-place-v3 data
-79e6c77 iter_016: compaction (summarized iters 001-010)
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
@@ -69,7 +69,7 @@ images/td_baseline/multiseed_mode_comparison_reach_v3.png
 images/td_baseline/td_per_summary.png
 images/vlm_probe/.gitkeep
 index.qmd
-... and 45 more
+... and 46 more
 ```
 ### Read one with:
 ```

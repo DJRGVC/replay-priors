@@ -40,3 +40,12 @@
 - [ ] **Integrate TD-baseline results into HTML report** — td_baseline requests: uniform 3/5, TD-PER 0/5, RPE-PER 2/5, hero figure at studies/td_error_baseline/figures/td_per_summary.png on agent/td_baseline
 - [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 
+# --- Visionary Proposals (from VISIONARY_PROPOSALS.md) ---
+- [x] Proposal 1 (BAEP): Bias-Aware Ensemble — DONE iter_036. Naive 5-model ensembles DON'T beat best individual (MAE 51.2 vs 50.1), but selected 2-model pairs DO (46.9). Residual variance after debiasing too high for full ensemble.
+- [ ] Proposal 5: Confidence-Gated VLM-PER — multi-query variance as confidence, asymmetric fallback to uniform. Next priority.
+- [ ] Proposal 2: Contrastive Episode Ranking (CER) — pairwise comparison instead of absolute prediction. Strong theoretical motivation.
+- [ ] Proposal 3: Task-Adaptive Annotation — annotation format search space, task-conditioned selection. Quick win.
+- [ ] Proposal 4: Failure Mode Clustering — VLM descriptions + embeddings, diversity-weighted replay. Novel direction.
+- [ ] Proposal 6: Phase-Segmented Replay — categorical phase judgments (easier than temporal). Needs semi-trained policy.
+- [ ] Proposal 7: Retrospective Failure Narration — narration specificity as priority signal. Most speculative.
+
