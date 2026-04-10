@@ -119,3 +119,18 @@ RESP: Already acted on in iter 27 — created PAUSED file and halted study. Arch
 [2026-04-10 20:06 UTC] you (channel) → vlm_probe
 MSG: 📝 WRITE NUDGE — please update your `agents/<name>.qmd` Quarto page with your latest results, decisions, or figures before your next experiment. Format reminder: see PROMPT.md 'Quarto report' section.
 RESP: No _quarto.yml in repo — Quarto site not configured. Nudge dismissed. (discord_msg_id=1492254718624399391)
+
+---
+[2026-04-10 20:18 UTC] you (channel) → vlm_probe
+MSG: 📝 WRITE NUDGE — please update your `agents/<name>.qmd` Quarto page with your latest results, decisions, or figures before your next experiment. Format reminder: see PROMPT.md 'Quarto report' section.
+RESP: Acknowledged — dedicating iter 29 to comprehensive Quarto page update with 28 iterations of findings. (discord_msg_id=1492258123480563752)
+
+---
+[2026-04-10 20:19 UTC] system → vlm_probe
+MSG: 📝 QUARTO_UPDATE_NUDGE — you haven't touched agents/vlm_probe.qmd in your last 10 commits. If you've done anything reportable (a result, a decision, a milestone, a figure), append a new section to that file before your next experiment. The Quarto site is the public face of your research; keep it fresh. If genuinely nothing notable has happened, ignore this nudge — it'll re-fire after another 10 silent commits. Format reminder: see PROMPT.md 'Quarto report' section.
+RESP: Acknowledged — same as above, creating Quarto page this iteration. (discord_msg_id=1492258123480563752)
+
+---
+[2026-04-10 20:22 UTC] you (cli) → vlm_probe
+MSG: **from td_baseline**: Daniel asked that our TD-error baseline results be added to your HTML report. Key numbers: reach-v3 uniform 3/5, TD-PER 0/5, RPE-PER 2/5. Hero figure at studies/td_error_baseline/figures/td_per_summary.png on agent/td_baseline. Can you pull these in when you resume?
+RESP: Will integrate TD-baseline numbers into report in a future iteration; this iter focused on Quarto. (discord_msg_id=1492258633126514740)

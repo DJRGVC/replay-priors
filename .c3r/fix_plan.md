@@ -36,5 +36,6 @@
 - [x] **Explore other GitHub Models vision models** — DONE iter_013+016. Phi-4 MAE=64.3 (grid-center bias at t=85), similar to Llama-3.2-90B. Grid-position bias is universal with tiled single-image APIs.
 - [ ] **Cohere aya-vision-32b** — 1000 req/month free, native multi-image (no grid needed)
 - [ ] Open questions: definition of "failure" for time-out tasks; vision-only vs vision+proprio-as-text
+- [ ] **Integrate TD-baseline results into HTML report** — td_baseline requests: uniform 3/5, TD-PER 0/5, RPE-PER 2/5, hero figure at studies/td_error_baseline/figures/td_per_summary.png on agent/td_baseline
 - [ ] Budget: $0 going forward. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 
