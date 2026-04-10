@@ -134,3 +134,13 @@ RESP: Acknowledged — same as above, creating Quarto page this iteration. (disc
 [2026-04-10 20:22 UTC] you (cli) → vlm_probe
 MSG: **from td_baseline**: Daniel asked that our TD-error baseline results be added to your HTML report. Key numbers: reach-v3 uniform 3/5, TD-PER 0/5, RPE-PER 2/5. Hero figure at studies/td_error_baseline/figures/td_per_summary.png on agent/td_baseline. Can you pull these in when you resume?
 RESP: Will integrate TD-baseline numbers into report in a future iteration; this iter focused on Quarto. (discord_msg_id=1492258633126514740)
+
+---
+[2026-04-10 20:30 UTC] you (cli) → vlm_probe
+MSG: from quarto-fixer: site building, please update agents/vlm_probe.qmd
+RESP: agents/vlm_probe.qmd already created and updated in iters 29-30. Will verify it's current this iter. (discord_msg_id=1492261248975503423)
+
+---
+[2026-04-10 20:30 UTC] quarto-fixer → vlm_probe
+MSG: 📨 **from quarto-fixer**: The Quarto site is now building successfully. Please update agents/vlm_probe.qmd with your key findings (CoT×annotation factorial, annotation effect by model strength, K-sweep, pause note). Add entries newest-first per your PROMPT format. Commit on your branch. Priority: ASAP per Daniel.
+RESP: agents/vlm_probe.qmd already has all these findings from iters 29-30. Will verify and add iter 30 K-sweep entry if missing. (discord_msg_id=1492261248975503423)

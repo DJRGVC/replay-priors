@@ -27,21 +27,20 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: running · iter #17 · ctx 0%
+- **status**: paused · iter #18 · ctx 0%
 
 ### Recent commits on `agent/td_baseline`
 ```
+c53c049 iter_019: Quarto page + references + INBOX catchup — full study write-up with hero figure and 7 cited papers
 2653f31 iter_018: RPE-PER baseline — reward prediction error PER also fails to beat uniform (2/5 vs 3/5), confirms problem is signal not mechanism
 23d8a3b iter_017: 6-panel hero figure with pick-place-v3 data
 79e6c77 iter_016: compaction (summarized iters 001-010)
 dc68daf iter_015: pick-place-v3 5-seed mode comparison — all modes 0/5 (task unsolvable at 100k), TD-error in permanent info desert (Spearman<0.04), Q-explosion not PER-specific on hard tasks
-104359b iter_014: hero summary figure + lit review incorporation — 4-panel pub-quality figure (Spearman/mode comparison/Q-explosion/regime breakdown), killed lit_review2 per Daniel, pulled LIT_REVIEW.md onto branch
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
 .c3r/INBOX.md
 .c3r/INBOX_ARCHIVE.md
-.c3r/PAUSED
 .c3r/PROMPT.md
 .c3r/RESEARCH_LOG.md
 .c3r/RESEARCH_LOG_ARCHIVE.md
@@ -50,45 +49,65 @@ dc68daf iter_015: pick-place-v3 5-seed mode comparison — all modes 0/5 (task u
 .c3r/env.sh
 .c3r/fix_plan.md
 .claude/settings.json
-studies/td_error_baseline/.gitignore
-studies/td_error_baseline/FINDINGS.md
-studies/td_error_baseline/LIT_REVIEW.md
-studies/td_error_baseline/NOTES.md
-studies/td_error_baseline/SYNTHESIS.md
-studies/td_error_baseline/adaptive_priority_mixer.py
-studies/td_error_baseline/dense_reward_buffer.py
-studies/td_error_baseline/figures/5seed_baseline_reach_v3.pdf
-studies/td_error_baseline/figures/alpha_sweep_td_per.pdf
-studies/td_error_baseline/figures/mode_comparison_reach_v3.pdf
-studies/td_error_baseline/figures/multiseed_mode_comparison.pdf
-studies/td_error_baseline/figures/multiseed_mode_comparison_pick_place_v3.pdf
-studies/td_error_baseline/figures/multiseed_mode_comparison_reach_v3.pdf
-studies/td_error_baseline/figures/td_correlation_over_training.json
-studies/td_error_baseline/figures/td_correlation_over_training.png
-studies/td_error_baseline/figures/td_per_regime_map.pdf
-studies/td_error_baseline/figures/td_per_summary.pdf
-studies/td_error_baseline/metaworld_env.py
-studies/td_error_baseline/modal_app.py
-... and 16 more
+.gitignore
+_quarto.yml
+agents/index.qmd
+agents/lit_review2.qmd
+agents/td_baseline.qmd
+agents/vlm_probe.qmd
+experiments.qmd
+experiments/lit_review2/.gitkeep
+experiments/td_baseline/.gitkeep
+experiments/vlm_probe/.gitkeep
+images/README.md
+images/lit_review2/.gitkeep
+images/shared/.gitkeep
+images/td_baseline/.gitkeep
+images/td_baseline/alpha_sweep_td_per.png
+images/td_baseline/multiseed_mode_comparison_pick_place_v3.png
+images/td_baseline/multiseed_mode_comparison_reach_v3.png
+images/td_baseline/td_per_summary.png
+images/vlm_probe/.gitkeep
+index.qmd
+... and 45 more
 ```
 ### Read one with:
 ```
 git show agent/td_baseline:.c3r/INBOX.md
 git show agent/td_baseline:.c3r/INBOX_ARCHIVE.md
-git show agent/td_baseline:.c3r/PAUSED
 git show agent/td_baseline:.c3r/PROMPT.md
 git show agent/td_baseline:.c3r/RESEARCH_LOG.md
+git show agent/td_baseline:.c3r/RESEARCH_LOG_ARCHIVE.md
 ```
 
 ## quarto-fixer
 - **role**: quarto-fixer
 - **focus**: Fix failed Pages build (run 24261865659)
-- **status**: running · iter #0 · ctx 0%
+- **status**: paused · iter #1 · ctx 0%
 
 ### Recent commits on `agent/quarto-fixer`
 ```
+40393c0 Iteration 1: Fix ANSI ESC codes in QMD front matter + add quarto-fixer pages
 3b59ea0 scaffold replay-priors umbrella
 ```
 ### Files modified on `agent/quarto-fixer` (relative to `c3r/replay-priors`)
-_(none)_
+```
+.c3r/INBOX.md
+.c3r/INBOX_ARCHIVE.md
+.c3r/PROMPT.md
+.c3r/RESEARCH_LOG.md
+.c3r/SIBLINGS.md
+.c3r/agent.conf
+.c3r/env.sh
+.c3r/fix_plan.md
+.claude/settings.json
+```
+### Read one with:
+```
+git show agent/quarto-fixer:.c3r/INBOX.md
+git show agent/quarto-fixer:.c3r/INBOX_ARCHIVE.md
+git show agent/quarto-fixer:.c3r/PROMPT.md
+git show agent/quarto-fixer:.c3r/RESEARCH_LOG.md
+git show agent/quarto-fixer:.c3r/SIBLINGS.md
+```
 
