@@ -31,11 +31,11 @@ Siblings will see it in their next SIBLINGS.md refresh.
 
 ### Recent commits on `agent/vlm_probe`
 ```
+acd6416 Iteration 38: CER probe — primacy bias kills pairwise comparison (11/11 always A, zero signal above chance)
 5224ad8 Iteration 37: Confidence-gated VLM-PER — agreement is an anti-signal for accuracy (r=+0.53), always-VLM strictly worse than uniform
 48c1612 Iteration 36: BAEP ensemble analysis — naive ensembles don't beat best individual, but selected 2-model pairs do
 138e1b3 Iteration 35: Experiment write-up (bias-matching) + fix images on main
 c8e63c9 Iteration 32: Pick-place-v3 task generalization — GPT-4o-mini extreme fixation (9/10 at t=106), annotation +9% MAE
-7b07925 Iteration 34: Annotation × task × model figure + visionary cleanup
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
@@ -59,17 +59,17 @@ studies/vlm_localization_probe/analyze_gt_quality.py
 studies/vlm_localization_probe/build_report.py
 studies/vlm_localization_probe/collect_rollouts.py
 studies/vlm_localization_probe/confidence_gating_analysis.py
+studies/vlm_localization_probe/contrastive_ranking_probe.py
 studies/vlm_localization_probe/ensemble_analysis.py
 studies/vlm_localization_probe/figures/k_sweep_reach_v3.png
 studies/vlm_localization_probe/plot_annotation_task_model.py
 studies/vlm_localization_probe/plot_k_sweep.py
 studies/vlm_localization_probe/priority_score.py
 studies/vlm_localization_probe/regenerate_meta.py
-studies/vlm_localization_probe/results/confidence_gating/metrics.json
-studies/vlm_localization_probe/results/cot_gpt4o/results.json
-studies/vlm_localization_probe/results/cot_gpt4o_mini/results.json
-studies/vlm_localization_probe/results/cot_gpt4o_mini_noannotate/results.json
-... and 36 more
+studies/vlm_localization_probe/results/cer_iter38/cer_summary.json
+studies/vlm_localization_probe/results/cer_iter38/gpt-4o-mini_reach-v3.json
+studies/vlm_localization_probe/results/cer_iter38/run_log.txt
+... and 40 more
 ```
 ### Read one with:
 ```

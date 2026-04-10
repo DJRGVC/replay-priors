@@ -143,7 +143,22 @@ hurts when GT clusters at extremes. This is bias-matching, not capability.
 - **Always-VLM priority:** Overlap 8.7% vs uniform 21.7% (60% worse), KL 2.035 vs
   1.556 (31% worse). Strictly dominated by uniform.
 
-### 2d. Revised assessment
+### 2d. Contrastive Episode Ranking also fails (vlm_probe iter 38)
+
+The RLHF-inspired "pairwise comparison" approach — asking VLMs "which episode failed
+earlier?" instead of "at what timestep?" — was tested on GPT-4o-mini with reach-v3.
+
+**Result: 100% primacy bias.** The model picks Episode A (presented first) in 11/11
+pairs (binomial P<0.001). Accuracy = 63.6% = exactly the base rate P(GT=A earlier).
+When GT=A: 7/7 correct. When GT=B: 0/4 correct. No signal above always-A baseline,
+regardless of gap magnitude (2–139 timesteps). Confidence 0.80–0.90 regardless.
+
+This extends positional bias from *within-episode* (temporal fixation on specific
+timestep slots) to *between-episode* (first-presented preference). The RLHF pairwise
+comparison analogy fails because RLHF models are fine-tuned on comparison data; off-
+the-shelf VLMs default to position heuristics on unfamiliar visual comparison tasks.
+
+### 2e. Revised assessment
 
 The iter-006 assessment that VLMs provide a "qualitatively different kind of signal"
 was **too optimistic**. While VLM judgments are indeed critic-independent and available
@@ -152,8 +167,10 @@ from step 0, they are dominated by positional bias and produce priorities that a
 promise is top-20% overlap (+12% above uniform for Sonnet K=8), but this comes at the
 cost of catastrophic misses that create harmful priority peaks far from true failure.
 
-The path forward cannot be "better temporal localization" — it must sidestep temporal
-reasoning entirely.
+**Approaches tested and failed:** direct temporal localization (9 models), K sweeps,
+CoT prompting, frame annotation, ensemble debiasing, confidence gating, and now
+pairwise contrastive ranking. The path forward cannot be "better temporal localization"
+or "better comparison" — it must sidestep temporal reasoning entirely.
 
 ## 3. Literature Connections
 
@@ -235,11 +252,14 @@ cannot *localize temporally*.
 
 ### Remaining open questions
 
-1. **Can contrastive/pairwise VLM judgments produce actionable episode rankings?**
-   This avoids temporal precision entirely.
+1. ~~Can contrastive/pairwise VLM judgments produce actionable episode rankings?~~
+   → **Answered NO** (vlm_probe iter 38). 100% primacy bias on GPT-4o-mini, 0 signal
+   above always-A baseline. Positional bias extends from within-episode to between-
+   episode comparison.
 
 2. **Can VLM failure mode descriptions (text, not timestamps) create diversity-
-   weighted replay that outperforms uniform?**
+   weighted replay that outperforms uniform?** This is the last untested non-temporal
+   direction that leverages VLM scene understanding.
 
 3. **Is the uniform dominance result specific to MetaWorld's sparse binary reward
    structure, or does it generalize to other sparse-reward domains?**
@@ -270,19 +290,24 @@ cannot *localize temporally*.
 
 ### Active directions
 
-1. **Non-temporal VLM approaches:** Contrastive episode ranking, failure mode
-   clustering, phase segmentation. These leverage VLM categorization strengths.
+1. ~~Contrastive episode ranking~~ → **Closed** (vlm_probe iter 38, primacy bias).
 
-2. **Negative result write-up:** The convergent finding (7 approaches, 0 beat
+2. **Failure mode clustering / phase segmentation:** The only untested non-temporal
+   VLM direction. Use VLM *descriptions* of failure (text, not timestamps) to cluster
+   episodes by failure mode and prioritize under-represented modes for diversity.
+
+3. **Negative result write-up:** The convergent finding (8 approaches tested, 0 beat
    uniform) is itself publishable as a cautionary benchmark paper.
 
-3. **Dense reward shaping investigation:** State-visitation analysis suggests
+4. **Dense reward shaping investigation:** State-visitation analysis suggests
    the problem may be better attacked through reward design than replay design.
 
 ---
 
-*This synthesis was last updated by `agent/td_baseline` (iter_025) combining:*
+*This synthesis was last updated by `agent/td_baseline` (iter_026) combining:*
 - *TD-error baseline: 40 runs (5 seeds × {uniform, TD-PER×3α, RPE-PER, RND-PER, Adaptive} × 2 tasks)*
-- *VLM probe: 9 models × 3 tasks × 10+ interventions (37 iterations)*
-- *Additional analyses: seed-switching (iter_023), state-space visitation (iter_024)*
+- *VLM probe: 9 models × 3 tasks × 10+ interventions (38 iterations)*
+- *Additional analyses: seed-switching (iter_023), state-space visitation (iter_024),*
+  *CER primacy bias (vlm_probe iter_038)*
 - *Cross-study synthesis figure: `figures/cross_study_synthesis.png` (iter_025)*
+- *Approach count: 8 tested (5 RL signals + VLM temporal + ensemble/gating + CER), 0 beat uniform*

@@ -13,6 +13,24 @@ Decision:   The baseline study is now comprehensively finished. Five independent
             change WHICH seeds learn?) as this could reveal something about exploration
             diversity under different priority regimes.
 
+## Iteration 26 — Synthesis update: CER failure closes contrastive ranking  (2026-04-11T01:15:00Z)
+Hypothesis: Integrating vlm_probe iter 38 CER findings will close the contrastive
+            ranking open question and strengthen the "8 approaches, 0 beat uniform"
+            narrative in SYNTHESIS.md.
+Change:     Updated SYNTHESIS.md §2d (new subsection on CER primacy bias), §5
+            (closed question #1), §7 (closed contrastive ranking direction, updated
+            approach count to 8). Updated fix_plan.md. Updated Quarto page with
+            new entry.
+Command:    N/A (synthesis/writing only, no training or API calls)
+Result:     SYNTHESIS.md now reflects all vlm_probe findings through iter 38.
+            Approach count: 8 tested (5 RL signals: TD-PER×3α, RPE-PER, RND-PER,
+            Adaptive; plus VLM temporal, ensemble/gating, CER). Zero beat uniform.
+            Only untested direction: failure mode clustering via VLM descriptions.
+Decision:   Two viable next steps: (a) outline the negative result paper — the
+            convergent "nothing beats uniform" finding across 8 approaches is itself
+            publishable, (b) prototype failure mode clustering to test the last
+            non-temporal direction. Will ask Daniel for direction.
+
 ## Iteration 25 — Cross-study synthesis: unified priority signal landscape  (2026-04-11T00:30:00Z)
 Hypothesis: A unified figure combining td_baseline (5 RL signals) and vlm_probe
             (VLM priority quality) will make the "nothing beats uniform" finding
