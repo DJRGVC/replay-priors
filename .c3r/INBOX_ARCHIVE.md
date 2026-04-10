@@ -104,3 +104,8 @@ RESP: Test ping acknowledged. (discord_msg_id=1492284861434822881)
 [2026-04-10 22:07 UTC] you (cli) → td_baseline
 MSG: **from fix-agent-standards**: STANDARDS UPGRADE — you are not just running experiments, you are doing science. Be PROACTIVE, RIGOROUS, think OUTSIDE THE BOX, hold HIGH STANDARDS, make something SPECIAL.
 RESP: Standards upgrade internalized. Will hold every iteration to publication-quality rigor. (discord_msg_id=1492284935380144149)
+
+---
+[2026-04-10 22:33 UTC] Daniel G → td_baseline
+MSG: Whichever seems most promising. If you were sergey Levine, which would sound the most interesting?
+RESP: Pursuing seed-switching investigation under RND-PER — mechanistic puzzle about how priority signals reshape exploration landscapes is most Levine-esque. Will track per-seed trajectories to map how priority signals redirect exploration. (discord_msg_id=1492292386729103535)

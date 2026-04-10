@@ -27,15 +27,15 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #31 · ctx 100%
+- **status**: running · iter #33 · ctx 100%
 
 ### Recent commits on `agent/vlm_probe`
 ```
+5224ad8 Iteration 37: Confidence-gated VLM-PER — agreement is an anti-signal for accuracy (r=+0.53), always-VLM strictly worse than uniform
+48c1612 Iteration 36: BAEP ensemble analysis — naive ensembles don't beat best individual, but selected 2-model pairs do
 138e1b3 Iteration 35: Experiment write-up (bias-matching) + fix images on main
 c8e63c9 Iteration 32: Pick-place-v3 task generalization — GPT-4o-mini extreme fixation (9/10 at t=106), annotation +9% MAE
 7b07925 Iteration 34: Annotation × task × model figure + visionary cleanup
-2a94b60 Iteration 33: Spawn visionary opus sub-agent + fix Quarto images on main
-9b609ca Iteration 32: Pick-place-v3 task generalization — annotation effect is GT-distribution-dependent (bias-matching mechanism)
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
@@ -58,18 +58,18 @@ studies/vlm_localization_probe/RESULTS_SUMMARY.md
 studies/vlm_localization_probe/analyze_gt_quality.py
 studies/vlm_localization_probe/build_report.py
 studies/vlm_localization_probe/collect_rollouts.py
+studies/vlm_localization_probe/confidence_gating_analysis.py
+studies/vlm_localization_probe/ensemble_analysis.py
 studies/vlm_localization_probe/figures/k_sweep_reach_v3.png
 studies/vlm_localization_probe/plot_annotation_task_model.py
 studies/vlm_localization_probe/plot_k_sweep.py
 studies/vlm_localization_probe/priority_score.py
 studies/vlm_localization_probe/regenerate_meta.py
+studies/vlm_localization_probe/results/confidence_gating/metrics.json
 studies/vlm_localization_probe/results/cot_gpt4o/results.json
 studies/vlm_localization_probe/results/cot_gpt4o_mini/results.json
 studies/vlm_localization_probe/results/cot_gpt4o_mini_noannotate/results.json
-studies/vlm_localization_probe/results/cot_gpt4o_noannotate/results.json
-studies/vlm_localization_probe/results/cot_llama90b/results.json
-studies/vlm_localization_probe/results/cot_phi4/results.json
-... and 32 more
+... and 36 more
 ```
 ### Read one with:
 ```

@@ -13,7 +13,28 @@ Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on
 
 ## Current focus
 
-Five standard RL priority signals tested (TD-error, RPE, RND, adaptive mixer, alpha sweep). **None beat uniform replay** in sparse-reward early training. The unified failure mechanism: all bootstrapped signals are uninformative when the agent hasn't discovered rewards yet. This motivates external priority signals (VLM-based).
+Five standard RL priority signals tested (TD-error, RPE, RND, adaptive mixer, alpha sweep). **None beat uniform replay** in sparse-reward early training. New finding: priority signals don't just change *how many* seeds learn — they change *which* seeds learn, with mean Jaccard similarity of 0.51 between learned sets. This "exploration bifurcation" reveals that RL-internal signals merely reshuffle the exploration landscape rather than improving it. VLM-PER must provide *external* information independent of Q-function biases.
+
+---
+
+## Iteration 23 — Exploration Bifurcation: Seed-Switching Under Priority Regimes {.unnumbered}
+*2026-04-10*
+
+A mechanistic investigation into **why** different priority signals change *which* seeds learn rather than *how many*. This is the most scientifically interesting finding from the baseline study — priority signals don't uniformly help or hurt, they redirect the exploration landscape.
+
+![Seed-switching analysis — 6-panel figure showing exploration bifurcation](../images/td_baseline/seed_switching_analysis.png){width=100%}
+
+**The seed-switching phenomenon:** Under uniform replay, seeds {7, 123, 256} learn. Under RND-PER, seeds {42, 7, 123} learn — same 3/5 count, but seed 42 switches ON and seed 256 switches OFF. Under Adaptive, seeds {7, 256} learn with seed 123 switching OFF. Mean pairwise Jaccard similarity between "learned" sets is 0.51 (vs 1.0 if signals were irrelevant).
+
+**Diagnostic case — seed 42:** Never discovers reward under uniform (sr=0.000 at 100k steps), but learns *fastest* of all seeds under RND-PER (sr=0.056 at 30k, 0.369 at 90k). Novelty-seeking literally redirected this seed's exploration into a reward-bearing region of state space.
+
+**Pathological Q-divergence:** Seed 99 under RND-PER reaches Q=162 with sr=0.000 — pure exploration noise driving Q-values up without any reward signal. Seed 123 under Adaptive reaches Q=225 with sr≈0. Priority regimes can create self-reinforcing replay loops.
+
+**Seed 7: the robust learner.** Learns under all 4 modes — its initial random exploration trajectory naturally encounters reward regardless of replay priority.
+
+**Implication for VLM-PER:** If RL-internal signals merely reshuffle which seeds succeed, a useful external signal must provide information that is *independent* of the current Q-function's biases. This is exactly what a VLM can do — judge transition quality from visual semantics, not bootstrapped value estimates.
+
+Commits: `iter_023`
 
 ---
 
