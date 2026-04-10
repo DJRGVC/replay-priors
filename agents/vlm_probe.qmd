@@ -18,6 +18,47 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 31 — Push-v3 generalization: annotation effect reverses across tasks {.unnumbered}
+*2026-04-10*
+
+First test beyond reach-v3. Ran GPT-4o (annotated + unannotated) and GPT-4o-mini on push-v3 (K=8, uniform, direct, n=10 each).
+
+| Model | Task | Annotated MAE | Unannotated MAE | Ann effect |
+|-------|------|:---:|:---:|:---:|
+| GPT-4o | reach-v3 | **52.7** | 75.8 | −30% (helps) |
+| GPT-4o | push-v3 | 43.0 | **36.3** | +18% (hurts!) |
+| GPT-4o-mini | reach-v3 | 68.0 | 61.2 | +11% (hurts) |
+| GPT-4o-mini | push-v3 | — | 44.4 | — |
+
+**Result**: GPT-4o unannotated achieves MAE=36.3 on push-v3 — the **best localization accuracy in the entire study** (beating Claude Sonnet's 41.9 on reach-v3). Push-v3 failures cluster early (5/10 GT in first 15 timesteps), and the model's start-bias naturally matches this distribution. Annotation adds temporal labels that shift predictions *away* from this productive bias, increasing error by 18%.
+
+**Key insight**: Annotation effect is not just model-specific or architecture-specific — it's **task-specific**, interacting with the ground-truth failure distribution. When model bias aligns with GT distribution, annotation disrupts the alignment. Finding #10 revised from "push-v3 unsuitable" to "push-v3 easier than reach-v3".
+
+Commits: iteration 31
+
+---
+
+## Iteration 30 — GPT-4o K sweep reveals bias-variance tradeoff {.unnumbered}
+*2026-04-10*
+
+Ran K=4/8/16 sweep on GPT-4o (annotated, direct prompt, reach-v3, n=10) to complement the GPT-4o-mini K sweep from iter 25.
+
+| K | MAE | ±5 | ±10 | ±20 | Unique preds | Dominant position |
+|---|-----|-----|------|------|-------------|-------------------|
+| 4 | **49.0** | 0% | 0% | 10% | 3 | t=49 (7/10) |
+| 8 | 52.7 | 10% | 10% | 10% | 3 | t=42 (6/10) |
+| 16 | 53.7 | **10%** | **20%** | **40%** | **6** | t=0,29 (3/10 each) |
+
+![K sweep comparison: GPT-4o vs GPT-4o-mini vs Sonnet](../images/vlm_probe/k_sweep_gpt4o_comparison.png){width=100%}
+
+**Result**: Fewer frames produce extreme positional fixation (low variance, high bias) — K=4 has best MAE but 0% ±10. More frames diversify predictions, improving tolerance accuracy (K=16: 40% ±20) but introducing new failure modes (start-bias at t=0). This **bias-variance tradeoff** is model-dependent: mid-tier GPT-4o-mini benefits unambiguously from K=16 (best on all metrics), strong Sonnet is flat, and GPT-4o shows the tradeoff most clearly.
+
+**Decision**: Finding #3 updated to reflect the K-as-bias-variance-tradeoff interpretation. Next: Gemini CoT completion (quota-gated).
+
+Commits: iteration 30
+
+---
+
 ## Iteration 29 — Quarto page bootstrap {.unnumbered}
 *2026-04-10*
 
@@ -137,10 +178,11 @@ Commits: `first 3 iterations on agent/vlm_probe`
 
 ## Study-wide model comparison {.unnumbered}
 
-| Model | API | MAE | ±10 | ±20 | Bias | Cost |
-|-------|-----|-----|-----|-----|------|------|
-| Claude Sonnet 4.6 | Anthropic | **41.9** | 20% | 35% | center | $0.004/call |
-| GPT-4o (ann) | GitHub | 52.7 | 10% | 10% | early-mid | $0 |
+| Model | API | Task | MAE | ±10 | ±20 | Bias | Cost |
+|-------|-----|------|-----|-----|-----|------|------|
+| GPT-4o (no ann) | GitHub | push-v3 | **36.3** | **50%** | **50%** | start | $0 |
+| Claude Sonnet 4.6 | Anthropic | reach-v3 | 41.9 | 20% | 35% | center | $0.004/call |
+| GPT-4o (ann) | GitHub | reach-v3 | 52.7 | 10% | 10% | early-mid | $0 |
 | Gemini 3 Flash Preview | Google | 54.2 | **44%** | **56%** | start | $0 |
 | GPT-4o-mini (CoT, no ann) | GitHub | 53.2 | 10% | 20% | early | $0 |
 | GPT-4o-mini (no ann) | GitHub | 61.2 | 10% | 20% | late | $0 |
