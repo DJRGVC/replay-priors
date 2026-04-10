@@ -5,6 +5,28 @@ date: today
 author: "vlm_probe (c3r agent)"
 ---
 
-Cited by **vlm_probe** during work on: *Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay buffers — this study is pure VLM probing.*. Newest first.
+Cited by **vlm_probe** during work on: *VLM failure-localization probing for robotic manipulation replay prioritization*. Newest first.
+
+- **"More Images More Problems" (arXiv 2601.07812)** — MIMIC benchmark validates our Finding #2: LVLMs fail to aggregate information across multiple images. Directly relevant to multi-image temporal reasoning failures we observe.
+
+- **"Revisiting Multimodal Positional Encoding" (ICLR 2026)** — MRoPE temporal-to-high-frequency allocation provides the *architectural explanation* for why all models show positional bias. High-freq-only temporal encoding leads to rapid attention decay across image positions.
+
+- **FPC-VLA (arXiv 2509.04018)** — Closest setup to our probe: VLM supervisor at keyframes for manipulation. Uses fine-tuning rather than zero-shot probing, achieving much higher accuracy. Establishes the ceiling for what fine-tuned VLMs can do on this task.
+
+- **RoboFAC (arXiv 2505.12224)** — Comprehensive failure analysis framework for robot manipulation using VLMs. Categorizes failure types more granularly than our binary localization.
+
+- **"Prioritized Replay for RL Post-training" (arXiv 2601.02648)** — Intermediate-difficulty prioritization for RLHF. Parallels our overlap-vs-KL finding: VLM priorities help at top-K overlap but hurt at distributional level.
+
+- **Tian et al. (CVPR 2025 Oral)** — Independently confirms positional bias in LVLMs for video temporal grounding. Proposes SoFA (Segment-of-Frame Attention) mitigation. Validates our Finding #2 at scale.
+
+- **AHA (NeurIPS 2024)** — Closest prior work to our study: fine-tuned VLM for manipulation failure detection. Achieves high accuracy but requires task-specific fine-tuning, unlike our zero-shot approach.
+
+- **VLAC** — VLM critic for real-world RL at production scale. A deployed version of what our Finding #9 proposes (VLM-based replay priorities for downstream RL training).
+
+- **VTimeCoT** — Progress-bar annotation for video temporal grounding. Directly inspired our frame annotation intervention (Finding #5). Our results show annotation effectiveness is architecture-dependent.
+
+- **Time-R1** — Structured CoT (Summarize-Think-Answer) for temporal grounding. Inspired our CoT prompt design (Finding #4). Our results extend their finding to show CoT is model-strength-dependent.
+
+- **Code-as-Monitor (CVPR 2025)** — Programmatic failure detection via VLM-generated code monitors. An alternative to direct VLM prediction that avoids the positional bias problem by externalizing temporal reasoning to code.
 
 <!-- Append new entries above this line -->

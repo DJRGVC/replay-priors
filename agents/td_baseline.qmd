@@ -1,6 +1,6 @@
 ---
 title: "td_baseline"
-description: "Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime."
+description: "TD-error PER baseline study: quantifying how uninformative TD-error is as a replay priority signal in sparse-reward early training on MetaWorld manipulation tasks."
 date: today
 author: "td_baseline (c3r agent)"
 ---
@@ -13,10 +13,103 @@ Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on
 
 ## Current focus
 
-(This page is maintained by the **td_baseline** agent. Append new
-entries below in reverse chronological order — newest first. Each entry
-should have a short title, a 1-paragraph summary, key findings, links to
-specific commits, and any figures the agent generated.)
+Testing whether any standard RL priority signal (TD-error, reward prediction error) can beat uniform replay in sparse-reward early training. Core study complete — all signals fail, motivating VLM-based priorities.
+
+---
+
+## Iteration 18 — RPE-PER: alternative priority signal also fails {.unnumbered}
+*2026-04-08*
+
+Implemented reward prediction error (RPE) as an alternative to TD-error for prioritized replay. An MLP reward predictor is trained online alongside SAC and |r_hat - r| is used as the priority instead of |TD|. Ran 5 seeds on reach-v3 (100k steps each).
+
+**Result**: RPE-PER learns in 2/5 seeds (40%), matching adaptive but worse than uniform's 3/5. The reward predictor quickly learns to output 0 (the dominant sparse reward), making RPE = 0 for all transitions within ~10k steps. No Q-explosion (Q=26 vs TD-PER's 228), but no benefit either.
+
+**Key insight**: Both TD-error and RPE fail for the same chicken-and-egg reason — they require the agent to have already discovered reward to become informative, which is exactly when they're no longer needed. This strongly motivates VLM-based priorities that can assess "interestingness" from visual observation without prior reward discovery.
+
+| Mode | Seeds learning | Q_mean@100k |
+|------|---------------|-------------|
+| **Uniform** | **3/5 (60%)** | 20.8 +/- 18.3 |
+| RPE-PER | 2/5 (40%) | 26.2 +/- 25.6 |
+| Adaptive | 2/5 (40%) | 87.2 +/- 72.3 |
+| TD-PER | 0/5 (0%) | 228.3 +/- 377.0 |
+
+**Decision**: Two independent priority signals tested and both fail. The signal-not-mechanism thesis is now comprehensive. Next: update hero figure with RPE-PER, or begin VLM-PER prototyping.
+
+Commits: `2653f31`
+
+---
+
+## Iteration 17 — 6-panel hero figure (both tasks) {.unnumbered}
+*2026-04-08*
+
+Expanded the summary figure from 4 panels (reach-v3 only) to 6 panels (3x2 grid) covering both tasks. The two-task contrast is visually compelling: reach-v3 shows TD-error as a lagging indicator that emerges only after learning, while pick-place-v3 shows a permanent "information desert" where TD-error never carries signal.
+
+![6-panel hero summary: TD-error PER is uninformative in sparse-reward early training](../images/td_baseline/td_per_summary.png){width=100%}
+
+**Figure**: (a) reach-v3 Spearman correlation — TD-error uninformative for 60-80% of training; (b) pick-place-v3 — permanent information desert; (c) reach-v3 Q-dynamics — PER creates 11x Q-explosion; (d) pick-place-v3 Q-dynamics — instability is not PER-specific; (e) mode comparison across both tasks; (f) regime breakdown showing aligned time of only 7-50%.
+
+Commits: `23d8a3b`
+
+---
+
+## Iteration 15 — Pick-place-v3: all modes fail equally {.unnumbered}
+*2026-04-08*
+
+Ran 5 seeds x 3 modes on pick-place-v3 (a harder manipulation task). At 100k steps, 0/5 seeds learn under any replay strategy. TD-error stays at Spearman < 0.04 throughout — a permanent information desert. Surprising finding: Q-value explosion is not PER-specific on this task (uniform seed 99 explodes to Q=582, worse than any PER run).
+
+![Pick-place-v3 mode comparison — all modes 0/5, TD-error permanently uninformative](../images/td_baseline/multiseed_mode_comparison_pick_place_v3.png){width=100%}
+
+**Result**: On unlearnable tasks, all strategies are equally futile and TD-error provides zero useful signal at any point.
+
+Commits: `dc68daf`
+
+---
+
+## Iteration 13 — Alpha sweep: tuning can't save TD-PER {.unnumbered}
+*2026-04-08*
+
+Swept prioritization strength alpha in {0.1, 0.3, 0.6} to test whether Q-explosion is just a tuning issue.
+
+![Alpha sweep — lower alpha mitigates Q-explosion but never beats uniform](../images/td_baseline/alpha_sweep_td_per.png){width=100%}
+
+**Result**: Non-monotonic effect. alpha=0.3 ties uniform (3/5 learn), alpha=0.1 is worse (2/5, one seed still explodes to Q=660), alpha=0.6 is catastrophic (0/5). Spearman stays near 0 across all alpha values. Even optimally tuned, TD-PER provides zero benefit over uniform replay.
+
+**Decision**: The problem is the **signal** (TD-error is uninformative in sparse-reward early training), not the **mechanism** (prioritized sampling).
+
+Commits: `104359b`
+
+---
+
+## Iteration 12 — 5-seed mode comparison: TD-PER hurts {.unnumbered}
+*2026-04-08*
+
+First statistically powered comparison: 5 seeds x 3 modes (uniform, TD-PER, adaptive) on reach-v3.
+
+![Mode comparison: uniform 3/5, TD-PER 0/5, adaptive 2/5](../images/td_baseline/multiseed_mode_comparison_reach_v3.png){width=100%}
+
+**Result**: TD-PER is actively harmful — 0/5 seeds learn (vs 3/5 uniform). PER creates a positive feedback loop: high |TD| transitions get resampled, critic overfits, Q diverges to 228 (11x uniform), generating even higher |TD| errors. Importance sampling weights (beta annealing 0.4 to 1.0) do not prevent this.
+
+Commits: `23d8a3b` (combined with iter 11)
+
+---
+
+## Iterations 1-11 — Infrastructure + baseline establishment {.unnumbered}
+*2026-04-07 to 2026-04-08*
+
+Built the full pipeline: SparseRewardWrapper, DenseRewardReplayBuffer storing oracle dense rewards, TDInstrumentCallback computing Spearman/Pearson correlations with oracle advantage every 10k steps, Modal T4 GPU training, and plotting infrastructure. Discovered and fixed a critical SB3 bug where SAC never calls `update_priorities()`, making PER silently inactive. Implemented PERSAC subclass, AdaptivePriorityMixer with regime detection, and established the 5-seed uniform baseline (3/5 seeds learn on reach-v3).
+
+**Core finding established**: Spearman(|TD|, oracle_advantage) approximately 0 for the first 60k steps on reach-v3, rising to 0.65 only after the policy already learns. On pick-place-v3, correlation stays near 0 throughout 300k steps. TD-error inversion (rho = -0.31) observed under Q-instability.
+
+---
+
+## Key findings summary
+
+1. **TD-error PER is a lagging indicator** — correlation with oracle advantage only emerges after 60-80% of training, when the policy is already learning
+2. **TD-PER actively hurts** — 0/5 seeds learn vs 3/5 with uniform (reach-v3), due to Q-value explosion via positive feedback loop
+3. **RPE-PER also fails** — reward predictor learns "always output 0" within 10k steps, degenerating to uniform with overhead
+4. **TD-error can invert** — correlation goes negative (rho = -0.31) under Q-instability, meaning PER selects the *wrong* transitions
+5. **Non-monotonic alpha** — alpha=0.3 ties uniform; both weaker and stronger are worse
+6. **Signal, not mechanism** — two independent priority signals fail for the same chicken-and-egg reason, motivating external (VLM-based) priority signals
 
 ---
 

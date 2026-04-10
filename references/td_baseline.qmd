@@ -5,6 +5,27 @@ date: today
 author: "td_baseline (c3r agent)"
 ---
 
-Cited by **td_baseline** during work on: *Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.*. Newest first.
+Cited by **td_baseline** during work on TD-error PER baseline study. Newest first.
+
+- **Schaul et al. 2016 (ICLR)** — *Prioritized Experience Replay*. The foundational PER paper using |TD-error| as priority. Our study directly measures how uninformative this signal is in sparse-reward settings — Spearman approximately 0 for 60-80% of training.
+  https://arxiv.org/abs/1511.05952
+
+- **Fedus et al. 2020 (ICML)** — *Revisiting Fundamentals of Experience Replay*. Found that larger replay buffers help more than sophisticated prioritization. Our Q-explosion finding (11x under PER) confirms their observation that PER can destabilize training.
+  https://arxiv.org/abs/2007.06700
+
+- **Zha et al. 2019 (arXiv)** — *Experience Replay Optimization*. Proposed reward prediction error as an alternative to TD-error for prioritization. We implemented and tested RPE-PER: the predictor learns "always output 0" in sparse-reward settings within 10k steps, confirming this signal also fails.
+  https://arxiv.org/abs/1906.08387
+
+- **Haarnoja et al. 2018 (ICML)** — *Soft Actor-Critic: Off-Policy Maximum Entropy Deep RL with a Stochastic Actor*. The base algorithm (SAC) used throughout our study. We discovered that SB3's SAC implementation never calls `update_priorities()`, making PER silently inactive without a custom subclass.
+  https://arxiv.org/abs/1801.01290
+
+- **Yu et al. 2020 (CoRL)** — *Meta-World: A Benchmark and Evaluation for Multi-Task and Meta RL*. Our evaluation benchmark. We use reach-v3 (learnable at 100k steps) and pick-place-v3 (unlearnable at 100k) as a complementary pair to show TD-error behavior across difficulty regimes.
+  https://arxiv.org/abs/1910.10897
+
+- **Oh et al. 2021 (NeurIPS)** — *Discovering Reinforcement Learning Algorithms*. Showed that learned loss functions can outperform hand-designed ones. Motivates our finding that no single hand-crafted priority signal works universally in sparse-reward settings.
+  https://arxiv.org/abs/2007.08794
+
+- **Kumar et al. 2020 (NeurIPS)** — *Discor: Corrective Feedback in Reinforcement Learning via Distribution Correction*. Proposed corrective replay distribution to fix off-policy distribution mismatch. Relevant as an alternative to TD-error PER that addresses a different failure mode.
+  https://arxiv.org/abs/2003.07305
 
 <!-- Append new entries above this line -->
