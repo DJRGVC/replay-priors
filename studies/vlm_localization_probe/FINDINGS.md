@@ -439,8 +439,16 @@ at 224×224 resolution with ~30-pixel arm regions. VLM-based replay priorities s
 promising overlap signal (+12% above uniform) but harmful KL divergence. Ensemble
 approaches (BAEP, confidence gating) cannot extract value from fundamentally biased
 predictions — inter-model agreement reflects shared positional bias, not accuracy
-(r=+0.53). The path forward requires sidestepping temporal localization entirely:
-pairwise contrastive ranking (Proposal 2), failure mode clustering (Proposal 4), or
-phase-segmented replay (Proposal 6) — approaches that leverage VLM strengths (scene
-understanding, categorical judgment) rather than fighting their weaknesses (temporal
-precision, positional bias).
+(r=+0.53). **Contrastive Episode Ranking (CER, Proposal 2) fails due to primacy bias.** The RLHF
+analogy ("pairwise comparison is easier than absolute scoring") does not transfer:
+GPT-4o-mini picks Episode A (presented first) in 11/11 pairs (P<0.001), regardless of
+GT failure timing or gap magnitude. Accuracy = P(GT=A) = base rate (63.6%). When GT=A:
+100% correct; when GT=B: 0% correct — performance is entirely explained by always-A
+primacy bias. This extends the positional bias finding from within-episode (early/mid/late
+fixation) to between-episode (first-presented preference). Confidence scores are
+uninformative (0.80-0.90 for both correct and incorrect predictions).
+
+The path forward requires sidestepping both temporal localization AND relative temporal
+comparison: failure mode clustering (Proposal 4) or phase-segmented replay (Proposal 6)
+— approaches that leverage VLM strengths (scene understanding, categorical judgment)
+rather than fighting their weaknesses (temporal precision, positional bias in any form).

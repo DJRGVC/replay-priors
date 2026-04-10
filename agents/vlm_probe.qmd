@@ -18,6 +18,23 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 38 — Contrastive Episode Ranking: primacy bias kills pairwise comparison {.unnumbered}
+*2026-04-10*
+
+Implemented and tested Proposal 2 (Contrastive Episode Ranking): instead of absolute temporal localization, present pairs of episodes and ask "which failed earlier?" — the RLHF pairwise comparison analogy. Tested GPT-4o-mini with K=4 on reach-v3, 11 pairs (partial sweep of 45, halted early due to overwhelming signal).
+
+![CER primacy bias — model picks Episode A 100% of the time](../images/vlm_probe/cer_primacy_bias.png){width=100%}
+
+**Key finding: VLMs exhibit 100% primacy bias in pairwise comparison.** GPT-4o-mini picks Episode A (presented first) in 11/11 pairs (binomial P<0.001), regardless of GT failure timing or gap magnitude (2-139 timesteps). Overall accuracy of 63.6% is exactly explained by the base rate P(GT=A earlier) — zero signal above chance.
+
+This extends our positional bias finding to a new dimension: not just within-episode (early/mid/late fixation from §1-2) or between-models (shared bias from §11-12), but now **between-episodes** (first-presented preference). The RLHF analogy fails because RLHF works with strong models trained for comparison tasks — off-the-shelf VLMs default to positional heuristics when faced with unfamiliar visual comparison tasks.
+
+**Implication:** Both absolute and relative temporal approaches are now ruled out. Remaining viable directions: failure mode clustering (Proposal 4 — semantic descriptions, no temporal reasoning) and phase-segmented replay (Proposal 6 — categorical phase labels, not temporal precision).
+
+Commits: `iter38`
+
+---
+
 ## Iteration 37 — Confidence-gated VLM-PER: agreement is an anti-signal {.unnumbered}
 *2026-04-10*
 

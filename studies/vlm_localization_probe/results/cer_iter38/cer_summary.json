@@ -1,0 +1,129 @@
+{
+  "gpt-4o-mini": {
+    "model": "gh:gpt-4o-mini",
+    "task": "reach-v3",
+    "K": 4,
+    "n_rollouts": 10,
+    "n_pairs_completed": 11,
+    "n_pairs_total": 45,
+    "correct": 7,
+    "accuracy": 0.6363636363636364,
+    "pred_distribution": {
+      "A": 11,
+      "B": 0
+    },
+    "primacy_bias": 1.0,
+    "when_gt_A": {
+      "correct": 7,
+      "total": 7,
+      "accuracy": 1.0
+    },
+    "when_gt_B": {
+      "correct": 0,
+      "total": 4,
+      "accuracy": 0.0
+    },
+    "note": "Model picks A 100% of time. Accuracy = P(GT=A) = base rate. No signal above primacy bias.",
+    "pairs": [
+      {
+        "a": "rollout_000",
+        "b": "rollout_001",
+        "gt_a": 10,
+        "gt_b": 69,
+        "pred": "A",
+        "correct": true,
+        "conf": 0.85
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_002",
+        "gt_a": 10,
+        "gt_b": 8,
+        "pred": "A",
+        "correct": false,
+        "conf": 0.9
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_003",
+        "gt_a": 10,
+        "gt_b": 1,
+        "pred": "A",
+        "correct": false,
+        "conf": 0.9
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_004",
+        "gt_a": 10,
+        "gt_b": 109,
+        "pred": "A",
+        "correct": true,
+        "conf": 0.8
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_005",
+        "gt_a": 10,
+        "gt_b": 14,
+        "pred": "A",
+        "correct": true,
+        "conf": 0.8
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_006",
+        "gt_a": 10,
+        "gt_b": 16,
+        "pred": "A",
+        "correct": true,
+        "conf": 0.9
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_007",
+        "gt_a": 10,
+        "gt_b": 149,
+        "pred": "A",
+        "correct": true,
+        "conf": 0.9
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_008",
+        "gt_a": 10,
+        "gt_b": 61,
+        "pred": "A",
+        "correct": true,
+        "conf": 0.8
+      },
+      {
+        "a": "rollout_000",
+        "b": "rollout_009",
+        "gt_a": 10,
+        "gt_b": 141,
+        "pred": "A",
+        "correct": true,
+        "conf": 0.9
+      },
+      {
+        "a": "rollout_001",
+        "b": "rollout_002",
+        "gt_a": 69,
+        "gt_b": 8,
+        "pred": "A",
+        "correct": false,
+        "conf": 0.85
+      },
+      {
+        "a": "rollout_001",
+        "b": "rollout_003",
+        "gt_a": 69,
+        "gt_b": 1,
+        "pred": "A",
+        "correct": false,
+        "conf": 0.8
+      }
+    ]
+  }
+}

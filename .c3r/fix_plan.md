@@ -43,7 +43,7 @@
 # --- Visionary Proposals (from VISIONARY_PROPOSALS.md) ---
 - [x] Proposal 1 (BAEP): Bias-Aware Ensemble — DONE iter_036. Naive 5-model ensembles DON'T beat best individual (MAE 51.2 vs 50.1), but selected 2-model pairs DO (46.9). Residual variance after debiasing too high for full ensemble.
 - [x] Proposal 5: Confidence-Gated VLM-PER — DONE iter_037. NEGATIVE: agreement anti-correlates with accuracy (r=+0.53). Optimal gate = "never use VLM." Shared positional bias makes consensus an anti-signal.
-- [ ] Proposal 2: Contrastive Episode Ranking (CER) — pairwise comparison instead of absolute prediction. Strong theoretical motivation.
+- [x] Proposal 2: Contrastive Episode Ranking (CER) — DONE iter_038. NEGATIVE: 100% primacy bias (11/11 always picks Episode A). Accuracy = base rate. Zero signal above chance.
 - [ ] Proposal 3: Task-Adaptive Annotation — annotation format search space, task-conditioned selection. Quick win.
 - [ ] Proposal 4: Failure Mode Clustering — VLM descriptions + embeddings, diversity-weighted replay. Novel direction.
 - [ ] Proposal 6: Phase-Segmented Replay — categorical phase judgments (easier than temporal). Needs semi-trained policy.

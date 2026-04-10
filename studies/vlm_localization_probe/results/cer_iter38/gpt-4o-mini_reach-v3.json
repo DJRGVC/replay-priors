@@ -1,0 +1,69 @@
+{
+  "model": "gh:gpt-4o-mini",
+  "task": "reach-v3",
+  "K": 4,
+  "n_rollouts": 3,
+  "n_pairs": 3,
+  "n_valid": 3,
+  "correct": 1,
+  "accuracy": 0.3333333333333333,
+  "results": [
+    {
+      "earlier_failure": "A",
+      "confidence": 0.8,
+      "rationale": "Episode A shows the arm still not moving towards the target significantly by timestep 99, indicating earlier divergence from the task goal.",
+      "_latency_s": 2.46,
+      "_input_tokens": 23017,
+      "_output_tokens": 43,
+      "_model": "gpt-4o-mini",
+      "_raw_text": "{\"earlier_failure\":\"A\",\"confidence\":0.8,\"rationale\":\"Episode A shows the arm still not moving towards the target significantly by timestep 99, indicating earlier divergence from the task goal.\"}",
+      "pair": [
+        "rollout_000",
+        "rollout_001"
+      ],
+      "gt_a": 10,
+      "gt_b": 69,
+      "gt_earlier": "A",
+      "gt_gap": 59,
+      "is_correct": true
+    },
+    {
+      "earlier_failure": "A",
+      "confidence": 0.8,
+      "rationale": "Episode A shows signs of diverging from the task goal earlier in the timeline compared to Episode B.",
+      "_latency_s": 3.76,
+      "_input_tokens": 23017,
+      "_output_tokens": 38,
+      "_model": "gpt-4o-mini",
+      "_raw_text": "{\"earlier_failure\":\"A\",\"confidence\":0.8,\"rationale\":\"Episode A shows signs of diverging from the task goal earlier in the timeline compared to Episode B.\"}",
+      "pair": [
+        "rollout_000",
+        "rollout_002"
+      ],
+      "gt_a": 10,
+      "gt_b": 8,
+      "gt_earlier": "B",
+      "gt_gap": 2,
+      "is_correct": false
+    },
+    {
+      "earlier_failure": "A",
+      "confidence": 0.8,
+      "rationale": "The robot's end-effector in Episode A is positioned less effectively towards the target by timestep 49 compared to Episode B.",
+      "_latency_s": 2.39,
+      "_input_tokens": 23017,
+      "_output_tokens": 48,
+      "_model": "gpt-4o-mini",
+      "_raw_text": "{\"earlier_failure\": \"A\", \"confidence\": 0.8, \"rationale\": \"The robot's end-effector in Episode A is positioned less effectively towards the target by timestep 49 compared to Episode B.\"}",
+      "pair": [
+        "rollout_001",
+        "rollout_002"
+      ],
+      "gt_a": 69,
+      "gt_b": 8,
+      "gt_earlier": "B",
+      "gt_gap": 61,
+      "is_correct": false
+    }
+  ]
+}

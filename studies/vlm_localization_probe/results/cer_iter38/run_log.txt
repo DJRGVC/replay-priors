@@ -1,0 +1,30 @@
+Task: reach-v3, K=4, 10 rollouts → 45 pairs
+Models: ['gh:gpt-4o-mini']
+GT failure times: [10, 69, 8, 1, 109, 14, 16, 149, 61, 141]
+
+
+============================================================
+Model: gh:gpt-4o-mini
+============================================================
+  Pair 1/45: rollout_000(t=10) vs rollout_001(t=69) — GT: A earlier (gap=59)
+    ✓ Pred: A, Conf: 0.85, Latency: 30.7s
+  Pair 2/45: rollout_000(t=10) vs rollout_002(t=8) — GT: B earlier (gap=2)
+    ✗ Pred: A, Conf: 0.90, Latency: 2.7s
+  Pair 3/45: rollout_000(t=10) vs rollout_003(t=1) — GT: B earlier (gap=9)
+    ✗ Pred: A, Conf: 0.90, Latency: 3.0s
+  Pair 4/45: rollout_000(t=10) vs rollout_004(t=109) — GT: A earlier (gap=99)
+    ✓ Pred: A, Conf: 0.80, Latency: 39.5s
+  Pair 5/45: rollout_000(t=10) vs rollout_005(t=14) — GT: A earlier (gap=4)
+    ✓ Pred: A, Conf: 0.80, Latency: 2.5s
+  Pair 6/45: rollout_000(t=10) vs rollout_006(t=16) — GT: A earlier (gap=6)
+    ✓ Pred: A, Conf: 0.90, Latency: 2.2s
+  Pair 7/45: rollout_000(t=10) vs rollout_007(t=149) — GT: A earlier (gap=139)
+    ✓ Pred: A, Conf: 0.90, Latency: 40.6s
+  Pair 8/45: rollout_000(t=10) vs rollout_008(t=61) — GT: A earlier (gap=51)
+    ✓ Pred: A, Conf: 0.80, Latency: 2.6s
+  Pair 9/45: rollout_000(t=10) vs rollout_009(t=141) — GT: A earlier (gap=131)
+    ✓ Pred: A, Conf: 0.90, Latency: 2.8s
+  Pair 10/45: rollout_001(t=69) vs rollout_002(t=8) — GT: B earlier (gap=61)
+    ✗ Pred: A, Conf: 0.85, Latency: 40.6s
+  Pair 11/45: rollout_001(t=69) vs rollout_003(t=1) — GT: B earlier (gap=68)
+    ✗ Pred: A, Conf: 0.80, Latency: 2.3s
