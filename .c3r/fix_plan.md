@@ -6,8 +6,9 @@ All core deliverables done through iter_015: pipeline built, 2 tasks × 5 seeds 
 ## Open tasks
 - [x] **Seed-switching analysis**: exploration bifurcation under priority regimes (iter_023)
 - [x] **State-space visitation analysis**: dense reward distribution proxy shows exploration divergence per seed×mode (iter_024)
-- [ ] Head-to-head: uniform vs TD-PER vs VLM-PER vs Adaptive-Mix on reach-v3 + pick-place-v3
-- [ ] Prototype VLM-PER integration using vlm_probe sibling's data/models
+- [x] Cross-study synthesis figure: unified priority signal landscape (iter_025)
+- [ ] Update SYNTHESIS.md with comprehensive cross-study findings (vlm_probe iters 32-37)
+- [ ] Investigate non-temporal VLM approaches: contrastive episode ranking, failure mode clustering
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
 
 ## Done

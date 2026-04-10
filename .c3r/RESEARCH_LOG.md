@@ -13,6 +13,29 @@ Decision:   The baseline study is now comprehensively finished. Five independent
             change WHICH seeds learn?) as this could reveal something about exploration
             diversity under different priority regimes.
 
+## Iteration 25 — Cross-study synthesis: unified priority signal landscape  (2026-04-11T00:30:00Z)
+Hypothesis: A unified figure combining td_baseline (5 RL signals) and vlm_probe
+            (VLM priority quality) will make the "nothing beats uniform" finding
+            visually compelling and cross-study.
+Change:     Created plot_cross_study_synthesis.py — 4-panel figure: (a) RL signal
+            success rates bar chart, (b) VLM overlap vs KL scatter plot, (c) signal
+            informativeness timeline, (d) unified failure mechanism diagram. Integrated
+            vlm_probe findings from iters 32-37 (confidence gating, ensemble analysis,
+            3-task bias matching). Updated Quarto page with new entry.
+Command:    python3 plot_cross_study_synthesis.py
+Result:     Figure generated. Key synthesis:
+            • RL signals: 0/5 beat uniform (3/5) on reach-v3. TD-PER α=0.6 worst (0/5).
+            • VLM priorities: Always-VLM overlap 8.7% vs uniform 21.7% (60% worse).
+              Sonnet K=8 gets +12% overlap but +24% worse KL — tradeoff, not improvement.
+            • Confidence gating: optimal threshold = 100% uniform (agreement anti-signal).
+            • Three independent failure modes: chicken-and-egg (RL), positional bias
+              (VLM), exploration redirection (novelty). All converge on uniform dominance.
+Decision:   Cross-study synthesis done. Next: (a) update SYNTHESIS.md with vlm_probe's
+            latest findings (bias-matching, ensemble failure, confidence gating), (b) ask
+            Daniel for direction — temporal approaches exhausted, non-temporal VLM
+            approaches (contrastive ranking, failure clustering) are the remaining viable
+            directions but represent a scope pivot.
+
 ## Iteration 24 — State-space visitation via dense reward proxy  (2026-04-10T23:55:00Z)
 Hypothesis: Dense reward distributions (distance-to-goal proxy) can reveal the
             spatial mechanism behind seed-switching — priority signals redirect

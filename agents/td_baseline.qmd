@@ -13,7 +13,25 @@ Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on
 
 ## Current focus
 
-Five standard RL priority signals tested (TD-error, RPE, RND, adaptive mixer, alpha sweep). **None beat uniform replay** in sparse-reward early training. New finding: priority signals don't just change *how many* seeds learn — they change *which* seeds learn, with mean Jaccard similarity of 0.51 between learned sets. This "exploration bifurcation" reveals that RL-internal signals merely reshuffle the exploration landscape rather than improving it. VLM-PER must provide *external* information independent of Q-function biases.
+**Cross-study synthesis complete.** Combined td_baseline (5 RL signals × 2 tasks × 5 seeds = 40 runs) with vlm_probe (9 VLMs × 3 tasks × 10+ interventions) into a unified figure. The convergent finding: **no priority signal beats uniform replay in sparse-reward early training** — 7 distinct approaches tested, zero improvements. RL signals suffer from chicken-and-egg (need reward to learn priorities, but reward is sparse), VLM signals suffer from positional bias (MAE ≈ 42, 28% of episode), and novelty signals redirect exploration without improving it.
+
+---
+
+## Iteration 25 — Cross-Study Synthesis: The Complete Priority Signal Landscape {.unnumbered}
+*2026-04-10*
+
+Created a unified 4-panel figure combining all results from both td_baseline and vlm_probe studies. Panel (a): all 5 RL priority signals on reach-v3 — none exceed uniform's 3/5 success rate. Panel (b): VLM priority quality analysis — Sonnet K=8 improves overlap (+12% above uniform) but worsens KL divergence, and confidence gating/ensembles can't fix it. Panel (c): signal informativeness timeline showing the "information desert" from 0–60k steps. Panel (d): unified failure mechanism diagram showing three independent failure modes converging on the same conclusion.
+
+![Cross-study synthesis — the priority signal landscape](../images/td_baseline/cross_study_synthesis.png){width=100%}
+
+**Key numbers:**
+- RL signals: Uniform 3/5, TD-PER α=0.6 0/5, TD-PER α=0.3 3/5, TD-PER α=0.1 2/5, RPE-PER 2/5, RND-PER 3/5, Adaptive 2/5
+- VLM priorities: Always-VLM overlap 8.7% vs uniform 21.7% (60% worse), KL 2.035 vs 1.556 (31% worse)
+- Confidence gating optimal threshold → 100% uniform usage (agreement is anti-correlated with accuracy, r=+0.53)
+
+**Implication:** The path forward cannot be "better temporal localization" — it must sidestep the temporal reasoning bottleneck entirely. Contrastive episode ranking, failure mode clustering, or phase-segmented replay are the remaining viable directions.
+
+Commits: `iter_025`
 
 ---
 
