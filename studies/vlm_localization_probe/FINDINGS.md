@@ -235,15 +235,16 @@ tracks GT failure distribution**, not model capability:
 | GPT-4o | pick-place-v3 | 80.3 (late) | 48.3 | — | — |
 | GPT-4o-mini | reach-v3 | 57.8 (mid) | 68.0 | 61.2 | +11% (hurts) |
 | GPT-4o-mini | push-v3 | 36.6 (early) | — | 44.4 | — |
-| GPT-4o-mini | pick-place-v3 | 80.3 (late) | 61.3 | **52.8** | +16% (hurts) |
+| GPT-4o-mini | pick-place-v3 | 80.3 (late) | 55.2 | **50.6** | +9% (hurts) |
 
 **Mechanistic explanation:** Annotation shifts all models' predictions toward mid-episode
 (t=42-85 range) by providing explicit temporal anchors. This helps when GT failures are
 mid-distributed (reach-v3, mean=57.8) but hurts when GT clusters at extremes:
 - **push-v3**: GT early (mean=36.6, 5/10 in first 15 steps). Unannotated start-bias
   naturally matches → annotation shifts away from productive bias.
-- **pick-place-v3**: GT late (mean=80.3, 7/10 > 40). Both models fixate on t=106
-  (GPT-4o-mini: 7/10 annotated, 6/10 unannotated). Annotation worsens fixation.
+- **pick-place-v3**: GT late (mean=80.3, 5/10 > 100). GPT-4o-mini fixates on t=106
+  (9/10 unannotated, 5/10 annotated). Annotation slightly diversifies predictions but
+  doesn't improve accuracy — late fixation accidentally matches late GT distribution.
 - **reach-v3**: GT mid-distributed (mean=57.8). Annotation anchors match GT → helps.
 
 This is a **bias-matching** story: annotation doesn't improve visual understanding, it
@@ -378,7 +379,7 @@ a reliable priority signal when it would be most needed (early training).
 | 029 | Quarto page bootstrap | agents/vlm_probe.qmd + references/vlm_probe.qmd + figures | ✓ |
 | 030 | GPT-4o K sweep (K=4/8/16) | K=4 best MAE (49.0), K=16 best ±20 (40%): bias-variance tradeoff. Mid-tier benefits most from more frames. | ✓ |
 | 031 | push-v3 task generalization (GPT-4o ±ann, GPT-4o-mini) | GPT-4o unannotated MAE=36.3 (best ever!), annotation HURTS (+18%). GPT-4o-mini MAE=44.4. Finding #10 revised: push-v3 easier, annotation effect task-dependent. | ✓ |
-| 032 | pick-place-v3 task generalization (GPT-4o ann, GPT-4o-mini ±ann) | GPT-4o-mini annotation hurts +16% (52.8→61.3). GPT-4o annotated MAE=48.3. 3-task comparison reveals annotation effect tracks GT distribution (mid→helps, extreme→hurts). | ✓ |
+| 032 | pick-place-v3 task generalization (GPT-4o ann, GPT-4o-mini ±ann) | GPT-4o ann MAE=48.3 (4 unique preds). GPT-4o-mini: unannotated MAE=50.6 (9/10 fixated t=106!), annotated MAE=55.2 (+9%, hurts). GPT-4o unannotated rate-limited (50/day quota). | ✓ |
 
 ## Bottom Line
 
@@ -387,9 +388,12 @@ dominated by positional biases rather than visual understanding. The central fin
 across 32 iterations, 9 models, 3 tasks, and 10+ interventions is that **annotation
 effect is GT-distribution-dependent**: annotation shifts predictions toward mid-episode,
 helping when GT failures cluster mid-episode (reach-v3, −30% for GPT-4o) but hurting
-when GT failures cluster at extremes (push-v3 early: +18%, pick-place-v3 late: +16%).
+when GT failures cluster at extremes (push-v3 early: +18%, pick-place-v3 late: +9%).
 This is architecture-modulated (Gemini-3-flash-preview ignores annotation entirely, 8/10
 identical predictions) but the primary driver is bias-matching, not capability.
+GPT-4o-mini shows extreme positional fixation on pick-place-v3 (9/10 at t=106), the
+most severe case in the study — annotation partially breaks fixation (5 unique preds
+vs 2) but increases MAE.
 
 More keyframes reveal a **bias-variance tradeoff**: K=4 produces extreme positional
 fixation with low MAE but 0% tolerance accuracy; K=16 diversifies predictions with best

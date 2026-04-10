@@ -1,0 +1,27 @@
+[
+  {
+    "task": "pick-place-v3",
+    "model": "gh:gpt-4o",
+    "K": 8,
+    "strategy": "uniform",
+    "prompt_style": "direct",
+    "annotate": false,
+    "proprio": false,
+    "rollout": "rollout_000",
+    "gt_failure_t": 136,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "gt_ambiguous": true,
+    "pred_failure_t": null,
+    "pred_confidence": 0.0,
+    "pred_rationale": "api_error: Rate limited after 5 retries",
+    "abs_error": 150,
+    "within_5": false,
+    "within_10": false,
+    "within_20": false,
+    "normalized_error": 1.0,
+    "latency_s": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0
+  }
+]
