@@ -18,6 +18,21 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 37 — Confidence-gated VLM-PER: agreement is an anti-signal {.unnumbered}
+*2026-04-10*
+
+Tested Proposal 5 (Confidence-Gated VLM-PER): use inter-model agreement as a confidence signal to gate between VLM priority and uniform fallback. Swept agreement threshold τ∈[0,1] over existing 5-model predictions on reach-v3.
+
+![Confidence gating analysis — agreement anti-correlates with accuracy](../images/vlm_probe/confidence_gating_annotated.png){width=100%}
+
+**Key finding: Agreement is an ANTI-signal for accuracy** (r=+0.53 annotated). When models agree, they converge on shared positional biases — not the true failure timestep. Optimal gating threshold τ*=0.75 means "never use VLM" — pure uniform dominates on both KL divergence (1.556 vs 2.035) and oracle overlap (21.7% vs 8.7%).
+
+**Implication:** This definitively closes temporal-localization-based approaches for VLM-PER. Ensemble consensus reflects bias correlation, not prediction quality. The path forward requires sidestepping temporal prediction entirely: contrastive episode ranking (pairwise comparison) or failure mode clustering (semantic descriptions).
+
+Commits: see `agent/vlm_probe` branch
+
+---
+
 ## Iteration 36 — BAEP ensemble analysis: debiased multi-model ensembles {.unnumbered}
 *2026-04-10*
 

@@ -27,15 +27,15 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: running · iter #19 · ctx 0%
+- **status**: running · iter #20 · ctx 0%
 
 ### Recent commits on `agent/td_baseline`
 ```
+e31d1c1 iter_022: Rigorous experiment write-up — 35-run study documented with full methodology, results, and figures
 42b77c1 iter_021: RND-PER baseline — novelty PER ties uniform (3/5), all 5 RL signals now tested, none beat uniform
 19dab3c iter_021: RND-PER implementation + 5-seed Modal training launched (awaiting results)
 0044f01 iter_020: Hero figure updated with RPE-PER as 4th mode in 6-panel summary
 c53c049 iter_019: Quarto page + references + INBOX catchup — full study write-up with hero figure and 7 cited papers
-2653f31 iter_018: RPE-PER baseline — reward prediction error PER also fails to beat uniform (2/5 vs 3/5), confirms problem is signal not mechanism
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
@@ -58,6 +58,7 @@ agents/vlm_probe.qmd
 experiments.qmd
 experiments/lit_review2/.gitkeep
 experiments/td_baseline/.gitkeep
+experiments/td_baseline/2026-04-10_td_error_per_baseline.qmd
 experiments/vlm_probe/.gitkeep
 images/README.md
 images/lit_review2/.gitkeep
@@ -68,8 +69,7 @@ images/td_baseline/multiseed_mode_comparison_pick_place_v3.png
 images/td_baseline/multiseed_mode_comparison_reach_v3.png
 images/td_baseline/td_per_summary.png
 images/vlm_probe/.gitkeep
-index.qmd
-... and 46 more
+... and 47 more
 ```
 ### Read one with:
 ```

@@ -253,6 +253,35 @@ aligns with the task's GT distribution.
 
 GPT-4o achieves best-ever localization on push-v3 unannotated: MAE=36.3, ±10=50%.
 
+### 11. Ensemble analysis: naive ensembles fail, selected pairs marginally help (BAEP)
+
+Debiased multi-model ensembles (5 VLMs, 3 debiasing × 3 aggregation methods):
+- **Naive 5-model ensembles do NOT beat best individual**: annotated MAE=51.2 vs
+  Llama-90B MAE=50.1 (Δ=+1.1); unannotated MAE=44.3 vs Sonnet MAE=43.4 (Δ=+0.9).
+- **Selected 2-model pairs DO outperform**: annotated Llama-90B+GPT-4o-mini MAE=46.9
+  (−6.4%); unannotated Sonnet+Phi-4 MAE=39.0 (−10.1%).
+- Linear debiasing raises inter-model agreement from 0.51→0.71, confirming bias
+  correction works structurally, but residual variance is too high for full-ensemble
+  averaging — weak models dilute the signal.
+
+### 12. Confidence-gated VLM-PER fails: agreement ≠ accuracy (Proposal 5)
+
+Inter-model agreement (1 − σ_predictions/75) tested as confidence signal for gating
+between VLM priority and uniform fallback:
+- **Agreement-error correlation is POSITIVE** (r=+0.53 annotated, r=+0.32 unannotated):
+  when models agree, they agree on the WRONG answer (shared positional bias).
+- **Optimal gating threshold is "never use VLM"**: τ*=0.75 → 0% VLM usage → pure
+  uniform (KL=1.556 vs always-VLM KL=2.035, overlap=21.7% vs 8.7%).
+- **Always-VLM is strictly worse than uniform** on both KL and overlap metrics,
+  confirming §9's finding at the ensemble level.
+- **Root cause**: models agree because they share positional biases (all gravitate toward
+  mid-episode), not because they've identified the true failure. Agreement measures bias
+  correlation, not prediction quality.
+
+This definitively closes the confidence-gating approach for VLM temporal localization.
+The fundamental problem isn't confidence calibration — it's that ensemble consensus
+reflects shared bias structure, making it an anti-signal for accuracy.
+
 ## Related Work
 
 Recent literature directly connects to our findings:
@@ -380,6 +409,8 @@ a reliable priority signal when it would be most needed (early training).
 | 030 | GPT-4o K sweep (K=4/8/16) | K=4 best MAE (49.0), K=16 best ±20 (40%): bias-variance tradeoff. Mid-tier benefits most from more frames. | ✓ |
 | 031 | push-v3 task generalization (GPT-4o ±ann, GPT-4o-mini) | GPT-4o unannotated MAE=36.3 (best ever!), annotation HURTS (+18%). GPT-4o-mini MAE=44.4. Finding #10 revised: push-v3 easier, annotation effect task-dependent. | ✓ |
 | 032 | pick-place-v3 task generalization (GPT-4o ann, GPT-4o-mini ±ann) | GPT-4o ann MAE=48.3 (4 unique preds). GPT-4o-mini: unannotated MAE=50.6 (9/10 fixated t=106!), annotated MAE=55.2 (+9%, hurts). GPT-4o unannotated rate-limited (50/day quota). | ✓ |
+| 036 | BAEP ensemble analysis | Naive 5-model ensembles don't beat best individual (MAE 51.2 vs 50.1); selected 2-model pairs do (46.9, −6.4%). | ✓ |
+| 037 | Confidence-gated VLM-PER (Proposal 5) | Agreement anti-correlates with accuracy (r=+0.53). Optimal gate = "never use VLM." Always-VLM strictly worse than uniform. | ✓ |
 
 ## Bottom Line
 
@@ -405,5 +436,11 @@ AND model strength.
 
 The fundamental bottleneck is visual acuity: distinguishing subtle arm position changes
 at 224×224 resolution with ~30-pixel arm regions. VLM-based replay priorities show a
-promising overlap signal (+12% above uniform) but harmful KL divergence, suggesting a
-confidence-gated hybrid approach as the path forward.
+promising overlap signal (+12% above uniform) but harmful KL divergence. Ensemble
+approaches (BAEP, confidence gating) cannot extract value from fundamentally biased
+predictions — inter-model agreement reflects shared positional bias, not accuracy
+(r=+0.53). The path forward requires sidestepping temporal localization entirely:
+pairwise contrastive ranking (Proposal 2), failure mode clustering (Proposal 4), or
+phase-segmented replay (Proposal 6) — approaches that leverage VLM strengths (scene
+understanding, categorical judgment) rather than fighting their weaknesses (temporal
+precision, positional bias).
