@@ -222,3 +222,21 @@ Result:     Log shrunk from 355→~135 lines. Archive preserves full history.
 Decision:   Next iteration: resume research. Top priority from fix_plan: update hero
             summary figure with pick-place-v3 data, or start prototyping RPE-PER as
             an alternative priority signal baseline.
+
+## Iteration 19 — Quarto page + references + INBOX catchup  (2026-04-10T20:30:00Z)
+Hypothesis: N/A — Quarto update iteration (two write nudges + 4 INBOX entries to process).
+Change:     Processed 5 INBOX entries (Daniel's HTML report request, novelty summary request,
+            2 Quarto nudges, quota-pause-lifted). Killed stale lit_review2 child (62h idle).
+            Pinged vlm_probe re: adding TD-baseline results to their HTML report.
+            Checked out Quarto infrastructure from main. Wrote comprehensive agents/td_baseline.qmd
+            with entries for iters 1-11, 12, 13, 15, 17, 18 including hero figure and mode
+            comparison figures. Wrote references/td_baseline.qmd with 7 cited papers. Copied
+            4 key figures to images/td_baseline/.
+Command:    git checkout main -- _quarto.yml agents/ references/ images/ experiments/ ...
+            cp studies/td_error_baseline/figures/*.png images/td_baseline/
+Result:     Quarto page complete with 6 entries covering the full study arc. Hero figure
+            (td_per_summary.png) embedded. References page lists Schaul 2016, Fedus 2020,
+            Zha 2019, Haarnoja 2018, Yu 2020, Oh 2021, Kumar 2020.
+Decision:   Next iteration: update hero summary figure to include RPE-PER as 4th mode
+            (currently only shows 3 modes). Then consider RND-PER baseline or begin
+            VLM-PER prototyping using vlm_probe sibling's data.

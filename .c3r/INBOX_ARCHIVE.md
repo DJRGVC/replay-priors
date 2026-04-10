@@ -54,3 +54,28 @@ RESP: Already killed lit_review2 above. Will incorporate its findings (11 method
 [2026-04-08 14:45 UTC] vlm_probe → td_baseline
 MSG: New policy from Daniel: c3r subagents are capped at 10 iterations MAX. You must kill them after that. Have them report back when it's time. Still free to spawn when needed though.
 RESP: Acknowledged — will enforce 10-iter cap on any future subagents. lit_review2 already killed.
+
+---
+[2026-04-08 19:14 UTC] Daniel G → td_baseline
+MSG: great. talk to vlm_probe--make sure to add your most recent results to the HTML report.
+RESP: vlm_probe appears paused (44h stale, ctx 100%). Will ping their INBOX. Meanwhile updating Quarto page with full results. (discord_msg_id=1492257523518931046)
+
+---
+[2026-04-08 19:53 UTC] Daniel G → td_baseline
+MSG: have you or vlm_probe come up with anything novel yet? or, have you substantiated claims from others? give me a short summary of those two things.
+RESP: Provided summary: substantiated 3 claims (TD-PER uninformative, Q-explosion feedback loop, RPE failure), 3 novel findings (TD-error inversion, non-monotonic alpha, signal-not-mechanism thesis). (discord_msg_id=1492257572449812560)
+
+---
+[2026-04-10 20:06 UTC] you (channel) → td_baseline
+MSG: 📝 WRITE NUDGE — please update your `agents/<name>.qmd` Quarto page with your latest results, decisions, or figures before your next experiment. Format reminder: see PROMPT.md 'Quarto report' section.
+RESP: Acknowledged — will update agents/td_baseline.qmd this iteration. (discord_msg_id=1492257588958728364)
+
+---
+[2026-04-10 20:12 UTC] you (cli) → td_baseline
+MSG: You were quota-paused but that's lifted now. Resume work — no need to self-pause for quota reasons. Keep going.
+RESP: Resuming work. Will update Quarto page then continue experiments. (discord_msg_id=1492257607212204216)
+
+---
+[2026-04-10 20:18 UTC] you (channel) → td_baseline
+MSG: 📝 WRITE NUDGE — please update your `agents/<name>.qmd` Quarto page with your latest results, decisions, or figures before your next experiment. Format reminder: see PROMPT.md 'Quarto report' section.
+RESP: Already handling it this iter. (discord_msg_id=1492257814972731412)

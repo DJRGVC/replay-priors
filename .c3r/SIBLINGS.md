@@ -30,7 +30,7 @@ they get stuck, or they exceed their useful budget.** Each child
 also has a hard iteration cap and will self-kill at MAX_ITERATIONS,
 but that's a safety net — proactive management is your job.
 
-- **lit_review2** (generic, parent=td_baseline) — status=stopped, iter=#1, last=13h ago  ⚠ STALE — consider killing  (already stopped)
+- **lit_review2** (generic, parent=td_baseline) — status=running, iter=#1, last=62h ago  ⚠ STALE — consider killing
   Focus: Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.
 
 **Decision rules** (apply at the top of every iteration):
@@ -46,21 +46,22 @@ but that's a safety net — proactive management is your job.
 ## vlm_probe
 - **role**: generic
 - **focus**: Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM E  client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a E  sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay E  buffers — this study is pure VLM probing.
-- **status**: running · iter #17 · ctx 0%
-- **last iter**: 2m ago
+- **status**: running · iter #24 · ctx 100%
+- **last iter**: 44h ago
 
 ### Recent commits on `agent/vlm_probe`
 ```
-25d6106 iter_019: GPT-4o-mini annotation ± comparison (annotation HURTS: MAE 68.0→61.2 without, overturns universal-annotation finding)
-aa14bd3 iter_018: GPT-4o-mini native multi-image probe (MAE=68.0, late-bias confirms positional bias is intrinsic not grid-artifact)
-efcd098 iter_017: FINDINGS.md synthesis — 10 key findings across 7 models and 6 interventions, Gemini image quotas still blocked
-5f8bb2e iter_016: CoT on Phi-4 NEGATIVE (MAE 64.3→90.2), Gemini quotas reset, vlm_litreview removed
-85acc68 iter_015: two-pass adaptive probing on Llama-3.2-90B (NEGATIVE: MAE 69.8→71.3, refinement worsens 6/10 — coarse pass too inaccurate to center refinement window)
+96f8b23 Iteration 27: Literature update (5 papers) + study pause per Daniel
+4186349 Iteration 26: GPT-4o-mini CoT×annotation 2×2 factorial — mirror-image interaction across model strength
+314b67f Iteration 26: GPT-4o-mini CoT×annotation 2×2 (CoT+unannotated best at 53.2, annotation interferes with CoT on mid-tier, substitutability replicates)
+9a4d6dd Iteration 25: Phi-4 annotation ± (no effect, too weak) + GPT-4o-mini K sweep (K=16 best, more frames help mid-tier)
+3586bc1 Iteration 24: HTML report update with GPT-4o results + CoT×annotation substitutability
 ```
 ### Files modified on `agent/vlm_probe` (relative to `c3r/replay-priors`)
 ```
 .c3r/INBOX.md
 .c3r/INBOX_ARCHIVE.md
+.c3r/PAUSED
 .c3r/PROMPT.md
 .c3r/RESEARCH_LOG.md
 .c3r/SIBLINGS.md
@@ -68,35 +69,46 @@ efcd098 iter_017: FINDINGS.md synthesis — 10 key findings across 7 models and 
 .c3r/fix_plan.md
 .claude/settings.json
 .gitignore
+studies/vlm_localization_probe/.gitignore
 studies/vlm_localization_probe/FINDINGS.md
 studies/vlm_localization_probe/FREE_VLM_OPTIONS.md
 studies/vlm_localization_probe/RESULTS_SUMMARY.md
 studies/vlm_localization_probe/analyze_gt_quality.py
+studies/vlm_localization_probe/build_report.py
 studies/vlm_localization_probe/collect_rollouts.py
 studies/vlm_localization_probe/figures/k_sweep_reach_v3.png
 studies/vlm_localization_probe/plot_k_sweep.py
 studies/vlm_localization_probe/priority_score.py
 studies/vlm_localization_probe/regenerate_meta.py
+studies/vlm_localization_probe/results/cot_gpt4o/results.json
+studies/vlm_localization_probe/results/cot_gpt4o_mini/results.json
+studies/vlm_localization_probe/results/cot_gpt4o_mini_noannotate/results.json
+studies/vlm_localization_probe/results/cot_gpt4o_noannotate/results.json
 studies/vlm_localization_probe/results/cot_llama90b/results.json
 studies/vlm_localization_probe/results/cot_phi4/results.json
+studies/vlm_localization_probe/results/gpt4o/results.json
 studies/vlm_localization_probe/results/gpt4o_mini/results.json
 studies/vlm_localization_probe/results/gpt4o_mini_noannotate/results.json
-studies/vlm_localization_probe/results/gpt4o_mini_test/results.json
-studies/vlm_localization_probe/results/k_sweep_consolidated.json
-studies/vlm_localization_probe/results/k_sweep_k32/results.json
-studies/vlm_localization_probe/results/k_sweep_reach/results.json
-studies/vlm_localization_probe/results/phi4_probe/results.json
-studies/vlm_localization_probe/results/random_sampling/results.json
-studies/vlm_localization_probe/results/random_sampling_control/results.json
-studies/vlm_localization_probe/results/results.json
-... and 4 more
+... and 18 more
 ```
 ### Read one with:
 ```
 git show agent/vlm_probe:.c3r/INBOX.md
 git show agent/vlm_probe:.c3r/INBOX_ARCHIVE.md
+git show agent/vlm_probe:.c3r/PAUSED
 git show agent/vlm_probe:.c3r/PROMPT.md
 git show agent/vlm_probe:.c3r/RESEARCH_LOG.md
-git show agent/vlm_probe:.c3r/SIBLINGS.md
 ```
+
+## quarto-fixer
+- **role**: quarto-fixer
+- **focus**: Fix failed Pages build (run 24261865659)
+- **status**: running · iter #0 · ctx 0%
+
+### Recent commits on `agent/quarto-fixer`
+```
+3b59ea0 scaffold replay-priors umbrella
+```
+### Files modified on `agent/quarto-fixer` (relative to `c3r/replay-priors`)
+_(none)_
 

@@ -1,0 +1,10 @@
+---
+title: "References — lit_review2"
+description: "Papers and prior work cited by the lit_review2 agent"
+date: today
+author: "lit_review2 (c3r agent)"
+---
+
+Cited by **lit_review2** during work on: *Literature review agent. Use WebSearch to find and summarize recent papers (NeurIPS, ICLR, ICML 2023-2026, DeepMind, Google) on: (1) alternatives to TD-error prioritized experience replay in sparse-reward RL, (2) VLM/LLM-guided exploration, reward shaping, or hindsight relabeling, (3) foundation-model-based replay prioritization. Write findings to studies/td_error_baseline/LIT_REVIEW.md. Focus on web search and writing — no code, no training.*. Newest first.
+
+<!-- Append new entries above this line -->
