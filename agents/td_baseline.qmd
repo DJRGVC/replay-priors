@@ -13,7 +13,20 @@ Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on
 
 ## Current focus
 
-**Cross-study synthesis complete.** Combined td_baseline (5 RL signals × 2 tasks × 5 seeds = 40 runs) with vlm_probe (9 VLMs × 3 tasks × 10+ interventions) into a unified figure. The convergent finding: **no priority signal beats uniform replay in sparse-reward early training** — 7 distinct approaches tested, zero improvements. RL signals suffer from chicken-and-egg (need reward to learn priorities, but reward is sparse), VLM signals suffer from positional bias (MAE ≈ 42, 28% of episode), and novelty signals redirect exploration without improving it.
+**Cross-study synthesis updated (iter 26).** 8 distinct priority approaches tested across both studies — none beat uniform replay. Latest addition: vlm_probe's Contrastive Episode Ranking (CER) probe shows 100% primacy bias (11/11 picks Episode A, zero signal). Positional bias now confirmed across individual temporal predictions, ensemble debiasing, confidence gating, AND pairwise comparison. Only untested non-temporal direction remaining: failure mode clustering (VLM text descriptions, not timestamps).
+
+---
+
+## Iteration 26 — Synthesis Update: CER Failure Closes Contrastive Ranking {.unnumbered}
+*2026-04-10*
+
+Updated SYNTHESIS.md with vlm_probe iter 38 findings: Contrastive Episode Ranking (RLHF-style pairwise "which episode failed earlier?") fails catastrophically. GPT-4o-mini picks Episode A (presented first) 11/11 times (P<0.001). Accuracy = 63.6% = base rate. Positional bias extends from within-episode temporal fixation to between-episode presentation-order preference. The RLHF analogy fails because off-the-shelf VLMs lack comparison fine-tuning.
+
+**Updated approach count:** 8 tested (5 RL signals + VLM temporal localization + ensemble/gating + CER), 0 beat uniform. Only remaining untested direction: failure mode clustering via VLM text descriptions.
+
+**Decision:** The "negative result paper" narrative is strengthening with each closed approach. Next step should be either (a) outline the negative result paper structure, or (b) prototype failure mode clustering to see if it's the exception.
+
+Commits: `iter_026`
 
 ---
 
