@@ -22,20 +22,40 @@ Siblings will see it in their next SIBLINGS.md refresh.
 
 ---
 
+## YOUR CHILDREN — agents YOU spawned and YOU must manage
+
+These are sub-agents you spawned (directly or transitively).
+**YOU are responsible for killing them when their task is done,
+they get stuck, or they exceed their useful budget.** Each child
+also has a hard iteration cap and will self-kill at MAX_ITERATIONS,
+but that's a safety net — proactive management is your job.
+
+- **visionary** (generic, parent=vlm_probe) — status=idle, iter=#0, last=never
+  Focus: Survey frontier literature (2024-2026) on VLM-guided robotic learning, temporal reasoning in VLMs, and intelligent experience replay. Synthesize VISIONARY proposals for novel techniques combining VLM failure localization with replay buffer prioritization. Parent vlm_probe ran 32 iterations probing 9 VLMs on MetaWorld failure timestep localization. Read git show agent/vlm_probe:.c3r/RESEARCH_LOG.md and git show agent/vlm_probe:studies/vlm_localization_probe/FINDINGS.md for full context. Write proposals to studies/vlm_localization_probe/VISIONARY_PROPOSALS.md.
+
+**Decision rules** (apply at the top of every iteration):
+1. If a child's last RESEARCH_LOG entry says its task is done, kill it: `$C3R_BIN/c3r kill <name>`
+2. If a child has been stale (no iter for >2 hours), kill it.
+3. If a child's fail_streak ≥ 3 in state.json, investigate or kill it.
+4. Otherwise, leave it running and check again next iteration.
+
+---
+
 ## SIBLINGS — peers you do NOT manage (other agents' work)
 
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: idle · iter #18 · ctx 0%
+- **status**: running · iter #19 · ctx 0%
+- **last iter**: 17m ago
 
 ### Recent commits on `agent/td_baseline`
 ```
+0044f01 iter_020: Hero figure updated with RPE-PER as 4th mode in 6-panel summary
 c53c049 iter_019: Quarto page + references + INBOX catchup — full study write-up with hero figure and 7 cited papers
 2653f31 iter_018: RPE-PER baseline — reward prediction error PER also fails to beat uniform (2/5 vs 3/5), confirms problem is signal not mechanism
 23d8a3b iter_017: 6-panel hero figure with pick-place-v3 data
 79e6c77 iter_016: compaction (summarized iters 001-010)
-dc68daf iter_015: pick-place-v3 5-seed mode comparison — all modes 0/5 (task unsolvable at 100k), TD-error in permanent info desert (Spearman<0.04), Q-explosion not PER-specific on hard tasks
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
@@ -78,36 +98,5 @@ git show agent/td_baseline:.c3r/INBOX_ARCHIVE.md
 git show agent/td_baseline:.c3r/PROMPT.md
 git show agent/td_baseline:.c3r/RESEARCH_LOG.md
 git show agent/td_baseline:.c3r/RESEARCH_LOG_ARCHIVE.md
-```
-
-## quarto-fixer
-- **role**: quarto-fixer
-- **focus**: Fix failed Pages build (run 24261865659)
-- **status**: paused · iter #1 · ctx 0%
-
-### Recent commits on `agent/quarto-fixer`
-```
-40393c0 Iteration 1: Fix ANSI ESC codes in QMD front matter + add quarto-fixer pages
-3b59ea0 scaffold replay-priors umbrella
-```
-### Files modified on `agent/quarto-fixer` (relative to `c3r/replay-priors`)
-```
-.c3r/INBOX.md
-.c3r/INBOX_ARCHIVE.md
-.c3r/PROMPT.md
-.c3r/RESEARCH_LOG.md
-.c3r/SIBLINGS.md
-.c3r/agent.conf
-.c3r/env.sh
-.c3r/fix_plan.md
-.claude/settings.json
-```
-### Read one with:
-```
-git show agent/quarto-fixer:.c3r/INBOX.md
-git show agent/quarto-fixer:.c3r/INBOX_ARCHIVE.md
-git show agent/quarto-fixer:.c3r/PROMPT.md
-git show agent/quarto-fixer:.c3r/RESEARCH_LOG.md
-git show agent/quarto-fixer:.c3r/SIBLINGS.md
 ```
 
