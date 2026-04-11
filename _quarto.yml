@@ -34,8 +34,6 @@ website:
             text: td_baseline
           - href: agents/vlm_probe.qmd
             text: vlm_probe
-          - href: agents/fix-image-issues.qmd
-            text: fix-image-issues
       # AGENT_MENU_END
       - href: experiments.qmd
         text: Experiments
