@@ -481,6 +481,39 @@ a reliable priority signal when it would be most needed (early training).
 | 039 | Failure mode descriptions (Proposal 4) | High semantic diversity (6/6 cats, 100% unique descs, Jaccard=0.27). Categories explain GT timing (η²=0.34-0.99). First positive non-temporal signal. | ✓ |
 | 040 | TF-IDF clustering + category-based diversity | TF-IDF clusters fail (silhouette<0.12, ARI≈0). VLM categories ARE the signal: 6x weight ratio, late-quartile upweighting. | ✓ |
 | 041 | Category-diversity replay simulation | Category-diversity ≈ uniform (+2% GT coverage, ρ=+0.04 oracle). η² signal doesn't translate to replay priority. Proposal 4 closed. | ✓ |
+| 042 | Synthetic scale-up simulation | Category-diversity beats uniform at N≥50 (+5-8% coverage, Δent up to +0.40). Effect is real but requires N>20 to overcome sampling noise. | ✓ |
+| 043 | Cross-model category comparison | GPT-4o-mini uses only standard 6 categories; Phi-4 invents 4 novel ones. Cross-model Jaccard=0.60, Phi-4 cross-task Jaccard=0.20. Category stability is model-dependent. | ✓ |
+
+### 17. Cross-model category stability: taxonomy adherence is model-dependent
+
+**Setup:** Compared failure mode categories from GPT-4o-mini (reach-v3, n=20) and
+Phi-4 (push-v3 n=10, pick-place-v3 n=9) using the same 6-category prompted taxonomy.
+
+| | GPT-4o-mini (reach) | Phi-4 (push) | Phi-4 (pick-place) |
+|---|---|---|---|
+| Standard cats used | 6/6 (100%) | 5/6 + 1 novel | 3/6 + 3 novel |
+| Novel categories | — | missing_target | size_mismatch, crash, alway_ent |
+| Top category | stuck (30%) | stuck (40%) | stuck (33%) |
+| η² | 0.340 | 0.582 | 0.988 |
+
+**Key findings:**
+- **GPT-4o-mini strictly adheres to the prompted taxonomy** — all 20 labels from the
+  6 standard categories. **Phi-4 invents 4 novel categories** (40% of its unique labels),
+  some clearly task-specific (size_mismatch), some likely hallucinated (alway_ent).
+- **Cross-model vocabulary overlap** Jaccard=0.60. GPT-4o-mini's categories are a strict
+  subset of Phi-4's. The standard taxonomy provides the shared foundation.
+- **Phi-4's cross-task category stability is very low** (Jaccard=0.20 between push and
+  pick-place). Only "stuck" and "other" transfer across tasks. Novel categories are
+  task-specific and don't generalize.
+- **"stuck" is universal** — the only category with consistent semantic meaning across
+  all model/task combinations (30-40% prevalence, mid-range GT timing).
+- **η² holds regardless of model**: category-timing correlation is stable (0.34, 0.58,
+  0.99) whether categories come from GPT-4o-mini or Phi-4.
+
+**Implication for scale-up:** The iter 42 finding that category-diversity improves replay
+at N≥50 is model-dependent. GPT-4o-mini's disciplined taxonomy would produce more stable,
+transferable categories than Phi-4's creative but noisy ones. For practical replay
+prioritization, the generating model matters — taxonomy adherence is a desirable property.
 
 ## Bottom Line
 

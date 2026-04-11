@@ -10,7 +10,7 @@
 - [x] Proposal 4 Step 1: Description collection — DONE iter_039. 3 tasks, 2 models, high diversity (η²=0.34-0.99).
 - [x] Proposal 4 Step 2: TF-IDF clustering — DONE iter_040. FAILED (silhouette<0.12). Categories > embeddings.
 - [x] Proposal 4 Step 3: Category-diversity simulation — iter_041 (n=20: ≈uniform), iter_042 scale-up (N≥50: +5-8% coverage). Viable at realistic buffer sizes.
-- [ ] Proposal 4 Step 4: Cross-model category comparison — RE-PRIORITIZED. Validate category stability across models before claiming scale-up generalizes.
+- [~] Proposal 4 Step 4: Cross-model category comparison — PARTIAL (iter 43). GPT-4o-mini vs Phi-4 on different tasks done (Jaccard=0.60, Phi-4 invents 4 novel cats). Same-task comparison blocked by API auth.
 
 # --- Remaining proposals ---
 - [ ] Proposal 3: Task-Adaptive Annotation — annotation format search space, task-conditioned selection.
