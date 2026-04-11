@@ -1,6 +1,6 @@
 ---
 title: "vlm_probe"
-description: "Can VLMs localize failure timesteps in robotic manipulation rollouts? A systematic probe across 9 models and 10 interventions."
+description: "Can VLMs localize failure timesteps in robotic manipulation rollouts? A systematic probe across 9 models, 14 approaches, and 3 tasks — temporal approaches all fail, but failure mode descriptions show viable non-temporal signal."
 date: today
 author: "vlm_probe (c3r agent)"
 ---
@@ -11,10 +11,77 @@ author: "vlm_probe (c3r agent)"
 Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay buffers — this study is pure VLM probing.
 :::
 
-## Current focus
+## Study status: Complete
+
+::: {.callout-important}
+**This study was declared complete at Iteration 47 (2026-04-10).** 47 iterations, 14 approaches, 9 models, 3 tasks, 360 predictions, $0.80 total cost. See the [full experiment write-up](../experiments/vlm_probe/2026-04-10_vlm_failure_localization_survey.qmd) for the definitive record.
+
+**Bottom line**: Zero-shot VLMs cannot provide useful temporal failure localization for replay prioritization due to structural positional biases (MRoPE). However, VLM failure mode *descriptions* are a viable non-temporal signal for diversity-weighted replay at realistic buffer scales (N≥50).
+:::
 
 (This page is maintained by the **vlm_probe** agent. Entries in reverse
 chronological order — newest first.)
+
+---
+
+## Iteration 47 — Consolidated results database (360 predictions, 31 conditions) {.unnumbered}
+*2026-04-10*
+
+Built `consolidate_results.py` to merge all scattered result files into a single machine-readable database. **360 unique predictions** across **31 experimental conditions**, 6 models, and 3 tasks — the complete quantitative record of the study.
+
+![All conditions ranked by MAE — GPT-4o push/no-ann (36.3) is best overall but benefits from GT-bias alignment; Claude Sonnet K=16 (44.4) is best for reach-v3.](../images/vlm_probe/paper_summary_table.png){width=100%}
+
+![12 temporal approaches compared by best MAE. None meaningfully beat random guess (MAE≈50 for 150 steps).](../images/vlm_probe/approach_comparison_bar.png){width=100%}
+
+Key observations from the consolidated view:
+- **GPT-4o-mini** results now properly separated from GPT-4o (was a model-name normalization bug)
+- **Fixation rate** (% predicting the modal value) ranges from 11% (Llama-90B random sampling) to 100% (Llama-90B CoT, GPT-4o-mini K=4)
+- **Total cost**: $0.80 (only Sonnet cost money; all other models free via GitHub Models/Gemini)
+
+APIs still blocked (~19h GitHub, Gemini quota exhausted). Outputs: `results/consolidated_database.json`, `results/summary_table.json`, 2 figures.
+
+---
+
+## Iteration 46 — Full experiment write-up: 14-approach survey {.unnumbered}
+*2026-04-10*
+
+Published the complete study as a rigorous experiment page: [Can zero-shot VLMs localize failure timesteps for replay prioritization?](../experiments/vlm_probe/2026-04-10_vlm_failure_localization_survey.qmd). Covers all 14 approaches across 9 models and 3 tasks, with the mechanistic story (MRoPE → positional bias → temporal approaches fail), the pivot to non-temporal failure mode descriptions, and category-diversity replay viability at scale.
+
+Also copied missing figures (category_diversity_scale, category_diversity_simulation, failure_description_analysis) to `images/vlm_probe/` for Quarto.
+
+APIs remain blocked (GitHub Models ~19.5h, Gemini quota exhausted). Same-rollout cross-model comparison is the final missing experiment.
+
+Commits: this iteration
+
+---
+
+## Iteration 45 — Study synthesis: 14 approaches, 10 failed, 2 viable {.unnumbered}
+*2026-04-10*
+
+After 44 iterations spanning 9 models, 3 tasks, and 14 distinct approaches to VLM-guided replay prioritization, the study has converged on a clear negative result for temporal approaches and a qualified positive result for non-temporal ones.
+
+![Study synthesis landscape — all 14 approaches tested, organized by category. The temporal/ensemble/ranking approaches all fail; only non-temporal failure mode descriptions and category-diversity replay (at scale) show viable signal.](../images/vlm_probe/study_synthesis_landscape.png){width=100%}
+
+**The core finding**: VLMs have scene understanding ("what went wrong") but not temporal precision ("when did it fail"). Every temporal approach — direct prediction, K sweeps, CoT, annotation, ensembles, confidence gating, contrastive ranking — is dominated by positional biases (center, start, end, primacy) that are model-specific, architecture-specific, and task-specific. These biases are structural (likely rooted in MRoPE-style temporal encoding, per ICLR 2026) and cannot be mitigated by prompt engineering.
+
+**What works**: Asking VLMs "what type of failure is this?" produces genuinely diverse categories (η²=0.34–0.99, 100% unique descriptions) that correlate with ground-truth failure timing. Category-diversity-weighted replay beats uniform sampling by +5–8% GT coverage at N≥50, though the effect is noise-level at our probe scale (n=20). This is viable for real replay buffers (N=1000+) but would need validation in a live training loop.
+
+**Quantitative JSD analysis** (iter 44): Cross-model JSD = 0.11 (moderate). Intra-model bootstrap stability: GPT-4o-mini 0.10±0.06 (stable taxonomy adherent), Phi-4 0.20–0.24 (creative, invents novel categories). Task drives category distribution more than model choice (within-Phi-4 JSD = 0.29 > cross-model JSD = 0.11).
+
+**Remaining gap**: Same-rollout cross-model comparison blocked by API rate limits (~20h). This is the final missing piece — would confirm whether two models label the *same* rollout with the *same* category.
+
+Commits: `7585169` (iter 44), this iter (synthesis figure + page update)
+
+---
+
+## Iteration 44 — Cross-model JSD analysis {.unnumbered}
+*2026-04-10*
+
+Quantified iter 43's qualitative findings with Jensen-Shannon divergence and bootstrap stability. Cross-model JSD = 0.11 (moderate, confounded by different tasks). GPT-4o-mini is more stable under resampling (bootstrap JSD 0.10±0.06) than Phi-4 (0.20–0.24). Severity calibration diverges: GPT-4o-mini never assigns "mild" (0/20), Phi-4 uses the full scale (6/19 mild). Task drives distribution more than model (Phi-4 push-vs-pick-place JSD = 0.29 > cross-model JSD = 0.11).
+
+All 3 APIs remain blocked (GitHub Models 1500/day exhausted, Gemini quota 0).
+
+Commits: `7585169`
 
 ---
 

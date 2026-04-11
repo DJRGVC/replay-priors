@@ -13,7 +13,22 @@ Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on
 
 ## Current focus
 
-**Paper outline drafted (iter 27).** 10 distinct priority approaches tested across both studies — none reliably beat uniform replay in early training. Paper outline for negative result publication now in `PAPER_OUTLINE.md`. vlm_probe iters 39-42 closed the last non-temporal direction: failure-mode category-diversity only helps at N≥50 episodes, too late for the critical early-training regime. The study is at a natural conclusion point — all reasonable approaches exhausted.
+**Final synthesis complete (iter 28).** 14 distinct priority approaches tested across both studies — none reliably beat uniform replay in early training. Paper outline updated to reflect complete vlm_probe findings (45 iters, $0.80 total cost). Cross-model category stability analysis (iters 43-45) confirms taxonomy-adherent models produce more stable labels but the effect still requires N≥50 episodes. The study is at a natural conclusion point — all reasonable approaches exhausted.
+
+---
+
+## Iteration 28 — Final Cross-Study Synthesis (14 approaches) {.unnumbered}
+*2026-04-10*
+
+Integrated vlm_probe's final findings (iters 43-45) into SYNTHESIS.md and PAPER_OUTLINE.md. Updated the approach inventory from 10 to **14** — vlm_probe's complete accounting reveals 6 temporal VLM variants (direct, CoT, annotation, adaptive probing, random sampling, multi-format), 3 ensemble/meta approaches, 1 contrastive ranking, and 4 non-temporal approaches (failure descriptions, TF-IDF clustering, category-diversity at small n, category-diversity at scale).
+
+Key new finding from vlm_probe iters 43-44: **cross-model category stability is model-dependent.** GPT-4o-mini (bootstrap JSD=0.10±0.06) produces strict 6-category taxonomy; Phi-4 (JSD=0.20-0.24) invents novel categories. Task drives distribution more than model (cross-task JSD=0.29 > cross-model JSD=0.11).
+
+Updated hero figure to 14 approaches:
+
+![14-approach priority quality comparison — all at or below uniform](../images/td_baseline/paper_hero_14approach.png){width=100%}
+
+**Approach count: 14 tested, 0 reliably beat uniform in early-training regime.**
 
 ---
 
@@ -28,7 +43,11 @@ Updated SYNTHESIS.md with vlm_probe iters 39-42 findings: failure-mode descripti
 
 **Approach count: 10 tested, 0 reliably beat uniform in early-training regime.**
 
-**Next:** Ask Daniel for direction — is this a natural stopping point, or should we pursue (a) the hero figure for the paper, (b) real training loop validation of category-diversity at scale, or (c) cross-domain generalization?
+Created the paper's hero figure — a 2-panel chart showing (a) success rates for all 7 RL configurations and (b) priority quality scores for all 10 approaches including VLM-based signals. Notable data correction: TD-PER α=0.3 actually achieves 3/5 (ties uniform), not 2/5 as previously reported. The core finding is unchanged — no approach *exceeds* uniform.
+
+![Paper hero figure — 10-approach comparison](../images/td_baseline/paper_hero_10approach.png){width=100%}
+
+**Next:** Ask Daniel for direction — is this a natural stopping point, or should we pursue real training loop validation of category-diversity at scale, or cross-domain generalization?
 
 Commits: `iter_027`
 
