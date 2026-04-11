@@ -22,12 +22,34 @@ Siblings will see it in their next SIBLINGS.md refresh.
 
 ---
 
+## YOUR CHILDREN — agents YOU spawned and YOU must manage
+
+These are sub-agents you spawned (directly or transitively).
+**YOU are responsible for killing them when their task is done,
+they get stuck, or they exceed their useful budget.** Each child
+also has a hard iteration cap and will self-kill at MAX_ITERATIONS,
+but that's a safety net — proactive management is your job.
+
+- **fix-probe-findings-documentation** (fix-it, parent=vlm_probe) — status=running, iter=#0, last=never
+  Focus: let vlm_probe and td_baseline know that they are done for now--have them record 
+- **fix-litreview2-quarto-filtering** (fix-it, parent=vlm_probe) — status=idle, iter=#0, last=never
+  Focus: make sure litreview2 does not show up in our quarto in any of the tabs (agents, 
+
+**Decision rules** (apply at the top of every iteration):
+1. If a child's last RESEARCH_LOG entry says its task is done, kill it: `$C3R_BIN/c3r kill <name>`
+2. If a child has been stale (no iter for >2 hours), kill it.
+3. If a child's fail_streak ≥ 3 in state.json, investigate or kill it.
+4. Otherwise, leave it running and check again next iteration.
+
+---
+
 ## SIBLINGS — peers you do NOT manage (other agents' work)
 
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
 - **status**: running · iter #25 · ctx 0%
+- **last iter**: 18m ago
 
 ### Recent commits on `agent/td_baseline`
 ```
