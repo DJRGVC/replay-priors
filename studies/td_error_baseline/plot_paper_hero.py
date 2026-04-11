@@ -1,8 +1,8 @@
-"""Paper hero figure: 10-approach comparison bar chart.
+"""Paper hero figure: 14-approach comparison bar chart.
 
-Shows success rates for all tested replay prioritization approaches on reach-v3
-against the uniform baseline. RL-based signals from td_baseline training runs,
-VLM-based signals summarized from vlm_probe analysis.
+Shows priority quality for all 14 tested replay prioritization approaches
+on reach-v3 against the uniform baseline. RL-based signals from td_baseline
+training runs, VLM-based signals summarized from vlm_probe analysis.
 
 This is intended as Figure 1 of the negative result paper.
 """
@@ -151,7 +151,7 @@ def main():
                  va="top")
 
     # =====================================================================
-    # Bottom panel: Priority quality metrics for ALL 10 approaches
+    # Bottom panel: Priority quality metrics for ALL 14 approaches
     # =====================================================================
     # Combine RL signals (measured via oracle correlation) with VLM signals
     # (measured via overlap/KL). Normalize to a common "priority quality" score:
@@ -161,42 +161,59 @@ def main():
 
     quality_labels = [
         "Uniform",
+        # RL-based (6)
         "TD-PER\nα=0.6", "TD-PER\nα=0.3", "TD-PER\nα=0.1",
         "RPE-PER", "RND-PER", "Adaptive",
-        "VLM\ntemporal", "VLM\nensemble", "Contrastive\nranking",
-        "Category\ndiversity"
+        # VLM temporal (3 representative: direct, CoT, annotation)
+        "VLM\ndirect", "VLM\nCoT", "VLM\nannotated",
+        # VLM ensemble/meta (2)
+        "VLM\nensemble", "Confidence\ngating",
+        # Relative ranking (1)
+        "Contrastive\nranking",
+        # Non-temporal (2)
+        "TF-IDF\nclustering", "Category\ndiversity",
     ]
 
     # Priority quality relative to uniform (positive = better, negative = worse)
-    # RL signals: from Spearman correlation data (mean over training)
-    # Typical mean Spearman for TD-PER ≈ 0.05 (noise-dominated)
-    # VLM signals: from overlap analysis
     quality_scores = [
         0.0,      # uniform (reference)
+        # RL signals
         -0.15,    # TD α=0.6: worst, inverted regimes, 0/5 success
         -0.05,    # TD α=0.3: slightly negative, noise-dominated
         -0.02,    # TD α=0.1: near uniform (low alpha ≈ uniform)
         -0.03,    # RPE: slight negative (reward prediction error ≈ noise early)
         0.0,      # RND: tied on count, but seed-switching (neutral on average)
         -0.08,    # Adaptive: 2/5, regime switching adds overhead
-        -0.60,    # VLM temporal: overlap 8.7% vs 21.7% uniform = -60%
-        -0.20,    # VLM ensemble: marginal improvement over always-VLM, still worse
+        # VLM temporal variants
+        -0.60,    # VLM direct: overlap 8.7% vs 21.7% uniform = -60%
+        -0.55,    # VLM CoT: MAE=53.2, partial scaffold but still bias-dominated
+        -0.30,    # VLM annotated: GT-dependent, helps reach (-30%) hurts push (+18%)
+        # VLM ensemble/meta
+        -0.20,    # Ensemble: weak models dilute (MAE 51.2 > best 50.1)
+        -0.53,    # Confidence gating: agreement anti-correlated with accuracy (r=+0.53)
+        # Contrastive ranking
         -1.0,     # CER: 100% primacy bias, zero information
-        -0.02,    # Category diversity: ≈ uniform at small n
+        # Non-temporal
+        -0.88,    # TF-IDF: silhouette <0.12, no clusters form
+        -0.02,    # Category diversity: ≈ uniform at small n, viable at N≥50
     ]
 
+    # Colors by approach family
     quality_colors = [
-        "#2ecc71",  # uniform
-        "#2980b9", "#5dade2", "#85c1e9",  # TD variants
-        "#9b59b6", "#e67e22", "#e74c3c",  # RPE, RND, Adaptive
-        "#1abc9c", "#0e6655", "#16a085", "#27ae60",  # VLM approaches
+        "#2ecc71",                         # uniform
+        "#2980b9", "#5dade2", "#85c1e9",   # TD variants
+        "#9b59b6", "#e67e22", "#e74c3c",   # RPE, RND, Adaptive
+        "#1abc9c", "#17a589", "#148f77",   # VLM temporal variants
+        "#0e6655", "#0b5345",              # ensemble/meta
+        "#c0392b",                         # CER
+        "#7f8c8d", "#27ae60",              # non-temporal
     ]
 
     x2 = np.arange(len(quality_labels))
-    bars2 = ax_qual.bar(x2, quality_scores, 0.65, color=quality_colors,
+    bars2 = ax_qual.bar(x2, quality_scores, 0.55, color=quality_colors,
                         alpha=0.85, edgecolor="black", linewidth=0.8)
 
-    # Color bars red if below zero, keep original if at/above
+    # Hatch bars that are substantially worse than uniform
     for bar, score in zip(bars2, quality_scores):
         if score < -0.10:
             bar.set_alpha(0.65)
@@ -206,43 +223,51 @@ def main():
                     label="Uniform baseline")
 
     ax_qual.set_xticks(list(x2))
-    ax_qual.set_xticklabels(quality_labels, fontsize=8.5, rotation=0)
+    ax_qual.set_xticklabels(quality_labels, fontsize=7, rotation=30, ha="right")
     ax_qual.set_ylabel("Priority Quality\n(relative to uniform)", fontsize=11)
-    ax_qual.set_title("(b) Priority Quality: All 10 Approaches — negative = worse than uniform",
+    ax_qual.set_title("(b) Priority Quality: All 14 Approaches — negative = worse than uniform",
                       fontsize=13, fontweight="bold", pad=12)
     ax_qual.legend(fontsize=10, loc="lower right")
     ax_qual.grid(True, alpha=0.2, axis="y")
 
-    # Divider between RL and VLM approaches
-    ax_qual.axvline(6.5, color="grey", linestyle=":", alpha=0.5, linewidth=1.5)
-    ax_qual.text(3.0, ax_qual.get_ylim()[0] * 0.85, "RL-based signals",
-                 fontsize=10, ha="center", color="#555", fontweight="bold")
-    ax_qual.text(8.5, ax_qual.get_ylim()[0] * 0.85, "VLM-based signals",
-                 fontsize=10, ha="center", color="#555", fontweight="bold")
+    # Dividers between approach families
+    for xv in [6.5, 9.5, 11.5, 12.5]:
+        ax_qual.axvline(xv, color="grey", linestyle=":", alpha=0.4, linewidth=1)
+    ybot = ax_qual.get_ylim()[0]
+    ax_qual.text(3.0, ybot * 0.90, "RL-based",
+                 fontsize=8.5, ha="center", color="#555", fontweight="bold")
+    ax_qual.text(8.0, ybot * 0.90, "VLM\ntemporal",
+                 fontsize=8, ha="center", color="#555", fontweight="bold")
+    ax_qual.text(10.5, ybot * 0.90, "Meta",
+                 fontsize=8, ha="center", color="#555", fontweight="bold")
+    ax_qual.text(12.0, ybot * 0.90, "CER",
+                 fontsize=8, ha="center", color="#555", fontweight="bold")
+    ax_qual.text(13.5, ybot * 0.90, "Non-\ntemporal",
+                 fontsize=8, ha="center", color="#555", fontweight="bold")
 
     # CER annotation
     cer_idx = quality_labels.index("Contrastive\nranking")
     ax_qual.annotate("100% primacy\nbias (0 signal)",
                      xy=(cer_idx, -1.0),
-                     xytext=(cer_idx + 0.8, -0.75),
-                     fontsize=8, color="#c0392b",
+                     xytext=(cer_idx + 1.0, -0.75),
+                     fontsize=7.5, color="#c0392b",
                      arrowprops=dict(arrowstyle="->", color="#c0392b", lw=1))
 
     # Main title
     fig.suptitle(
-        "Nothing Beats Uniform: 10 Replay Prioritization Approaches\n"
+        "Nothing Beats Uniform: 14 Replay Prioritization Approaches\n"
         "on Sparse-Reward MetaWorld Manipulation (reach-v3)",
         fontsize=15, fontweight="bold", y=0.98
     )
 
     # Save
     for ext in ["png", "pdf"]:
-        fig.savefig(FIG_DIR / f"paper_hero_10approach.{ext}", dpi=200,
+        fig.savefig(FIG_DIR / f"paper_hero_14approach.{ext}", dpi=200,
                     bbox_inches="tight")
-    fig.savefig(IMG_DIR / "paper_hero_10approach.png", dpi=200,
+    fig.savefig(IMG_DIR / "paper_hero_14approach.png", dpi=200,
                 bbox_inches="tight")
-    print(f"Saved: {FIG_DIR / 'paper_hero_10approach.png'}")
-    print(f"Saved: {IMG_DIR / 'paper_hero_10approach.png'}")
+    print(f"Saved: {FIG_DIR / 'paper_hero_14approach.png'}")
+    print(f"Saved: {IMG_DIR / 'paper_hero_14approach.png'}")
     plt.close()
 
     # Print summary
@@ -250,7 +275,7 @@ def main():
     print(f"Uniform baseline: {uniform_learned}/{uniform_total} seeds learn")
     for label, learned, total in rl_results:
         print(f"  {label.replace(chr(10), ' ')}: {learned}/{total}")
-    print(f"\nAll 10 approaches: 0 reliably beat uniform in early training.")
+    print(f"\nAll 14 approaches: 0 reliably beat uniform in early training.")
 
 
 if __name__ == "__main__":

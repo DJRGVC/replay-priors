@@ -179,6 +179,23 @@ but not for the early-training regime where prioritization matters most. By the
 time the buffer has 50+ episodes, the agent has already passed the critical
 exploration bottleneck.
 
+### 2g. Cross-model category stability (vlm_probe iters 43-45)
+
+Category taxonomy adherence is **model-dependent, not task-dependent:**
+- GPT-4o-mini uses only the standard 6 failure categories (100% adherence),
+  with stable bootstrap JSD = 0.10 ± 0.06.
+- Phi-4 invents 4 novel categories (missing_target, size_mismatch, crash,
+  alway_ent) — 40% of unique labels are off-taxonomy. Bootstrap JSD = 0.20–0.24.
+- Cross-model Jaccard = 0.60 (moderate). Only "stuck" is universal (30-40%
+  prevalence across all models/tasks).
+- **Task drives category distribution more than model choice:** within-Phi-4
+  cross-task JSD = 0.29 > cross-model JSD = 0.11.
+
+Implication for deployment: taxonomy-adherent models (GPT-4o-mini) produce more
+stable and predictable categories for diversity-weighted replay. Creative models
+(Phi-4) may discover task-specific failure modes but at the cost of cross-task
+transfer and reproducibility.
+
 ### 2f. Revised assessment
 
 The iter-006 assessment that VLMs provide a "qualitatively different kind of signal"
@@ -188,12 +205,19 @@ from step 0, they are dominated by positional bias and produce priorities that a
 promise is top-20% overlap (+12% above uniform for Sonnet K=8), but this comes at the
 cost of catastrophic misses that create harmful priority peaks far from true failure.
 
-**Approaches tested and failed/limited:** direct temporal localization (9 models),
-K sweeps, CoT prompting, frame annotation, ensemble debiasing, confidence gating,
-pairwise contrastive ranking, and category-diversity replay. The only positive VLM
-signal (failure-mode descriptions, η²=0.34-0.99) requires N≥50 episodes to translate
-into replay benefit — too late for the critical early-training regime. **10 approaches
-tested, 0 reliably beat uniform in the regime that matters.**
+**Approaches tested and failed/limited (14 total across both studies):**
+
+*Temporal (6):* direct localization (K sweep K=4→32), CoT prompting, frame annotation,
+two-pass adaptive probing, random sampling, multi-format (grid vs native multi-image).
+*Ensemble/meta (3):* 5-model BAEP ensemble, selective 2-model pairing, confidence gating.
+*Relative ranking (1):* contrastive episode ranking (100% primacy bias).
+*Non-temporal (4):* failure-mode descriptions (✓ viable at N≥50), TF-IDF clustering
+(failed), category-diversity replay at small n (≈ uniform), category-diversity at
+N≥50 (✓ viable in simulation).
+
+The only positive VLM signal (failure-mode descriptions, η²=0.34-0.99) requires N≥50
+episodes to translate into replay benefit — too late for the critical early-training
+regime. **14 approaches tested, 0 reliably beat uniform in the regime that matters.**
 
 ## 3. Literature Connections
 
@@ -316,25 +340,30 @@ cannot *localize temporally*.
 
 1. ~~Contrastive episode ranking~~ → **Closed** (vlm_probe iter 38, primacy bias).
 
-2. **Failure mode clustering at scale:** Category-diversity replay shows promise at
-   N≥50 in simulation (vlm_probe iter 42) but fails at small n. Needs real training
-   loop validation to determine if the effect survives online learning dynamics.
+2. ~~Failure mode clustering at scale~~ → **Partially closed.** Category-diversity
+   replay viable at N≥50 in simulation (vlm_probe iter 42) but requires real
+   training loop validation. Cross-model analysis (iters 43-44) shows taxonomy-
+   adherent models (GPT-4o-mini) produce more stable categories. Not practical
+   for early-training regime where the buffer has <50 episodes.
 
-3. **Negative result write-up:** The convergent finding (8 approaches tested, 0 beat
-   uniform) is itself publishable as a cautionary benchmark paper.
+3. **Negative result write-up:** The convergent finding (14 approaches tested, 0 beat
+   uniform in early training) is itself publishable as a cautionary benchmark paper.
+   Paper outline drafted (iter_027, `PAPER_OUTLINE.md`).
 
 4. **Dense reward shaping investigation:** State-visitation analysis suggests
    the problem may be better attacked through reward design than replay design.
 
 ---
 
-*This synthesis was last updated by `agent/td_baseline` (iter_027) combining:*
+*This synthesis was last updated by `agent/td_baseline` (iter_028) combining:*
 - *TD-error baseline: 40 runs (5 seeds × {uniform, TD-PER×3α, RPE-PER, RND-PER, Adaptive} × 2 tasks)*
-- *VLM probe: 9 models × 3 tasks × 10+ interventions (42 iterations)*
+- *VLM probe: 9 models × 3 tasks × 14 approaches (45 iterations, $0.80 total cost)*
 - *Additional analyses: seed-switching (iter_023), state-space visitation (iter_024),*
   *CER primacy bias (vlm_probe iter_038), failure descriptions (vlm_probe iter_039),*
-  *category-diversity simulation (vlm_probe iters 041-042)*
+  *category-diversity simulation (vlm_probe iters 041-042), cross-model category*
+  *stability (vlm_probe iters 043-044), final study synthesis (vlm_probe iter_045)*
 - *Cross-study synthesis figure: `figures/cross_study_synthesis.png` (iter_025)*
-- *Approach count: 10 tested (5 RL signals + VLM temporal + ensemble/gating + CER +*
-  *category-diversity), 0 reliably beat uniform in early-training regime*
+- *Approach count: 14 tested across both studies (5 RL signals + 6 temporal VLM +*
+  *3 ensemble/meta + 1 contrastive ranking + 4 non-temporal VLM),*
+  *0 reliably beat uniform in early-training regime*
 - *Paper outline: `PAPER_OUTLINE.md` (iter_027)*

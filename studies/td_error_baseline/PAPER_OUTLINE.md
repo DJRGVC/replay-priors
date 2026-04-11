@@ -3,7 +3,7 @@
 **Working title alternatives:**
 - "The Replay Prioritization Mirage: Why No Signal Beats Uniform Sampling in Sparse-Reward RL"
 - "Uninformative by Design: TD-Error and VLM Signals for Experience Replay in Sparse-Reward Tasks"
-- "Nine Approaches, Zero Winners: A Negative Result on Replay Prioritization for Sparse Manipulation"
+- "Fourteen Approaches, Zero Winners: A Negative Result on Replay Prioritization for Sparse Manipulation"
 
 **Target venues:** NeurIPS Datasets & Benchmarks, ICML (negative results are valued), CoRL, or workshop paper
 
@@ -13,10 +13,12 @@
 
 Prioritized Experience Replay (PER) is a default component of deep RL systems, yet its
 effectiveness in sparse-reward settings is rarely questioned. We present a systematic
-evaluation of **10 replay prioritization approaches** — spanning TD-error variants, reward
-prediction error, novelty-based signals, adaptive mixing, VLM temporal localization,
+evaluation of **14 replay prioritization approaches** — spanning TD-error variants, reward
+prediction error, novelty-based signals, adaptive mixing, VLM temporal localization (6
+approaches: K sweep, CoT, annotation, adaptive probing, random sampling, multi-format),
 ensemble debiasing, confidence gating, contrastive episode ranking, and failure-mode
-clustering — on MetaWorld manipulation tasks with binary sparse rewards.
+clustering (TF-IDF and category-diversity) — on MetaWorld manipulation tasks with binary
+sparse rewards.
 
 **None reliably outperform uniform sampling.** We identify three independent failure
 mechanisms: (1) the chicken-and-egg problem (bootstrapped RL signals require the learning
@@ -39,8 +41,8 @@ catastrophically.
 prioritization signals in sparse-reward manipulation to date:
 - 5 RL-based signals (TD-PER at α∈{0.1, 0.3, 0.6}, RPE-PER, RND-PER)
 - 1 adaptive mixer (regime-switching between signals)
-- 4 VLM-based approaches (temporal localization, ensemble/gating, contrastive ranking,
-  failure-mode clustering)
+- 8 VLM-based approaches (6 temporal localization variants, ensemble/gating,
+  contrastive ranking, 2 failure-mode clustering variants)
 - 2 tasks × 5 seeds × 10 configurations = 40+ fully instrumented training runs
 - Dense-reward oracle advantage as ground truth for priority quality measurement
 
@@ -160,8 +162,12 @@ prioritization *hurts*.
 
 ### 5.4 Failure-Mode Clustering
 - First positive signal: η²=0.34-0.99 for VLM category × GT failure time
-- BUT: category-diversity ≈ uniform at small n (n=10-20)
+- TF-IDF clustering fails (silhouette <0.12) — descriptions syntactically template-like
+- Category-diversity ≈ uniform at small n (n=10-20)
 - Simulation shows effect only emerges at N≥50 episodes
+- Cross-model stability: taxonomy-adherent models (GPT-4o-mini, JSD=0.10±0.06) more
+  reliable than creative models (Phi-4, JSD=0.20-0.24). Task drives distribution more
+  than model (within-model cross-task JSD=0.29 > cross-model JSD=0.11)
 - Not practical for online RL where buffer grows incrementally
 
 ## 6. Analysis: Three Independent Failure Mechanisms (1.5 pages)
@@ -222,7 +228,7 @@ prioritization *hurts*.
 
 ## 8. Conclusion (~0.5 page)
 
-We systematically evaluated 10 replay prioritization approaches in sparse-reward
+We systematically evaluated 14 replay prioritization approaches in sparse-reward
 manipulation and found that none reliably outperform uniform sampling. The failure
 stems from three independent mechanisms that make the sparse-reward setting fundamentally
 hostile to prioritized replay. Our findings suggest that the sparse-reward bottleneck
@@ -262,9 +268,11 @@ is better addressed through reward design than replay mechanics.
 7. K-sweep reach figure
 8. Annotation bias-matching figure
 9. Category-diversity simulation figures (iters 41-42)
+10. Cross-model category comparison (iter 43)
+11. Study synthesis landscape — 14 approaches (iter 45)
 
 ### Needed (new figures for paper)
-10. **Hero figure (Fig. 1):** 10-approach comparison bar chart — success rate vs uniform baseline
+12. **Hero figure (Fig. 1):** 14-approach comparison bar chart — success rate vs uniform baseline
 11. **Failure mechanism diagram (Fig. 6):** visual summary of 3 independent mechanisms
 12. **Timeline figure:** when each approach was tested and how it failed
 
@@ -284,4 +292,5 @@ is better addressed through reward design than replay mechanics.
 ---
 
 *Outline drafted by agent/td_baseline, iter_027. Last updated: 2026-04-10.*
-*Incorporates findings through td_baseline iter_026 and vlm_probe iter_042.*
+*Updated iter_028 to incorporate vlm_probe iters 043-045 (cross-model stability, final synthesis).*
+*Now reflects 14 approaches across both studies.*

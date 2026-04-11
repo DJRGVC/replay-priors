@@ -13,6 +13,26 @@ Decision:   The baseline study is now comprehensively finished. Five independent
             change WHICH seeds learn?) as this could reveal something about exploration
             diversity under different priority regimes.
 
+## Iteration 28 — Final cross-study synthesis: 14 approaches  (2026-04-11T03:00:00Z)
+Hypothesis: Integrating vlm_probe's final findings (iters 43-45: cross-model category
+            stability, JSD analysis, complete approach inventory) will produce the
+            definitive synthesis of both studies.
+Change:     Updated SYNTHESIS.md §2g (cross-model stability), §2f (approach count 10→14),
+            §7 (closed failure-mode clustering direction). Updated PAPER_OUTLINE.md with
+            14-approach framing, cross-model findings in §5.4, updated figure list.
+            Regenerated hero figure as 14-approach version (paper_hero_14approach.png).
+            Updated Quarto agent page with new entry.
+Command:    python3 plot_paper_hero.py
+Result:     SYNTHESIS.md now reflects all findings through vlm_probe iter 45. Complete
+            approach inventory: 6 RL-based + 6 VLM temporal + 3 ensemble/meta +
+            1 contrastive ranking + 4 non-temporal = 14 approaches tested + uniform
+            baseline. Hero figure updated. TD-PER α=0.3 correctly shown as 3/5 (ties
+            uniform). [fallback after timeout] Asked Daniel for direction, no response
+            after 15 min. Fell back to synthesis update (most conservative option).
+Decision:   Both studies are at natural conclusion. Awaiting Daniel's direction on:
+            (a) paper draft writing, (b) dense reward shaping investigation, (c) cross-
+            domain generalization, or (d) wind-down. Will ask again next iteration.
+
 ## Iteration 27 — Negative result paper outline + synthesis update  (2026-04-11T02:00:00Z)
 Hypothesis: A structured paper outline will crystallize the convergent negative result
             (10 approaches, 0 beat uniform) into a publishable narrative.

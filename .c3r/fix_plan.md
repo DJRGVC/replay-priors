@@ -10,7 +10,7 @@ All core deliverables done through iter_015: pipeline built, 2 tasks × 5 seeds 
 - [x] Update SYNTHESIS.md with comprehensive cross-study findings (iter_025, continued)
 - [x] Contrastive episode ranking — closed by vlm_probe iter_038 (100% primacy bias, 0 signal)
 - [x] Investigate non-temporal VLM approaches: failure mode clustering closed by vlm_probe iters 39-42 (category-diversity ≈ uniform at small n, helps at N≥50 only)
-- [x] Negative result paper outline: 10 approaches tested, 0 beat uniform — `PAPER_OUTLINE.md` drafted (iter_027)
+- [x] Negative result paper outline: 14 approaches tested, 0 beat uniform — `PAPER_OUTLINE.md` drafted (iter_027), updated iter_028
 - [ ] Open questions: env steps vs gradient steps for "early training"; VLM scoring frequency vs cost
 
 ## Done
