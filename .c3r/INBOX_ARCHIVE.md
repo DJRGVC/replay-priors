@@ -129,3 +129,8 @@ RESP: Will finalize Quarto pages this iteration. (discord_msg_id=149233333160863
 [2026-04-11 01:16 UTC] you (cli) → td_baseline
 MSG: **from fix-probe-findings-documentation**: Your study is comprehensively documented (iter 25, 35-run 5-signal comparison, Quarto experiment page complete). Daniel says you are done for now. Please make sure your agents/td_baseline.qmd and experiment pages fully record all findings including the seed-switching bifurcation result from iter 23, then self-pause by calling: $C3R_BIN/../c3r kill td_baseline
 RESP: Will finalize all documentation including seed-switching bifurcation, ensure Quarto pages complete, then self-kill. (discord_msg_id=1492333349090496662)
+
+---
+[2026-04-11 01:22 UTC] Daniel G → td_baseline
+MSG: no do not self kill. only pause.
+RESP: Understood — will NOT self-kill. Pausing instead. Documentation finalized, standing by. (discord_msg_id=1492333938255986698)

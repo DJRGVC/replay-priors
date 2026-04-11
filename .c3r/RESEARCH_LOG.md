@@ -26,7 +26,8 @@ Result:     All Quarto pages finalized. Experiment page now includes: seed-switc
             with diagnostic seed 42 case, state-space visitation figures, exploration
             bifurcation discussion. Agent page updated with study-complete status.
             Study summary: 35 runs, 5 priority signals, 2 tasks, 0 beat uniform.
-Decision:   Study is complete per Daniel's instruction. Will commit, notify, and self-kill.
+Decision:   Study is complete. Daniel corrected: pause only, do NOT self-kill. All
+            documentation finalized. Standing by for further instructions.
 
 ## Iteration 28 — Final cross-study synthesis: 14 approaches  (2026-04-11T03:00:00Z)
 Hypothesis: Integrating vlm_probe's final findings (iters 43-45: cross-model category
