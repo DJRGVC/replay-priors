@@ -112,6 +112,20 @@ On a task where no seeds learn at 100k steps, all modes produce 0/5 learning. TD
 
 4. **Adaptive mixer**: Regime detection (switching to uniform when Spearman < 0.1) partially rescues performance (2/5 vs TD-PER's 0/5), but the PER overhead during detected-aligned periods still causes Q-instability for non-learning seeds.
 
+### Exploration bifurcation: priority signals change *which* seeds learn
+
+A striking finding: priority signals don't uniformly help or hurt — they redirect exploration, changing *which* seeds discover reward while leaving the aggregate success rate unchanged. Under uniform replay, seeds {7, 123, 256} learn. Under RND-PER, seeds {42, 7, 123} learn — same 3/5 count, but seed 42 switches ON and seed 256 switches OFF. Mean pairwise Jaccard similarity between "learned" seed sets across modes is 0.51, well below 1.0 (which would indicate the same seeds always learn).
+
+**Diagnostic case — seed 42:** Never discovers reward under uniform (sr=0.000 at 100k steps), but learns *fastest* of all seeds under RND-PER (sr=0.369 at 90k). Dense-reward proxy analysis confirms the mechanism: at 50k steps, seed 42 under uniform has mean dense reward = 1.16 (far from goal), vs 3.19 under RND-PER (near goal). The novelty signal physically redirected this seed's exploration into reward-bearing state regions.
+
+**Pathological Q-divergence:** Seed 99 under RND-PER reaches Q=162 with sr=0 — pure exploration noise trapped in a novelty loop, sampling "interesting but useless" states. Seed 123 under Adaptive reaches Q=225 with sr≈0. Priority regimes create self-reinforcing replay loops for some seeds while rescuing others.
+
+**Seed 7: the robust learner.** Learns under all 4 modes tested — its initial random exploration trajectory naturally encounters reward regardless of replay strategy, suggesting seed-specific sensitivity is driven by the initial exploration trajectory's proximity to reward-bearing regions.
+
+![Seed-switching analysis — per-seed outcomes differ across priority regimes despite identical aggregate success rates](../images/td_baseline/seed_switching_analysis.png){width=100%}
+
+![State-space visitation under priority regimes — dense reward as exploration proxy](../images/td_baseline/state_visitation_analysis.png){width=100%}
+
 ### Hero summary figure
 
 ![6-panel hero summary: (a-b) Spearman correlation traces for both tasks; (c-d) Q-value dynamics showing PER feedback loop; (e) 5-mode bar chart; (f) regime breakdown](../images/td_baseline/td_per_summary.png){width=100%}
@@ -123,6 +137,10 @@ On a task where no seeds learn at 100k steps, all modes produce 0/5 learning. TD
 ### The chicken-and-egg problem
 
 All five priority signals fail for a unified reason: they are bootstrapped from the agent's own experience, which is uninformative in sparse-reward early training. TD-error needs a reasonable critic; RPE needs reward observations; even RND novelty becomes uniform as the predictor sees more of the (randomly explored) state space. Each signal requires the agent to have already made progress to become informative — but progress is exactly what the priority signal is supposed to accelerate.
+
+### Exploration bifurcation as a diagnostic
+
+The seed-switching phenomenon (same aggregate success rate, different individual seeds learning) reveals that priority signals act as *exploration redirectors*, not uniform accelerators or decelerators. This has practical implications: reporting only aggregate metrics (e.g., "3/5 seeds learn") can mask that a priority signal is fundamentally changing the exploration landscape. Per-seed tracking is essential for understanding priority signal effects.
 
 ### Implications for VLM-based replay prioritisation
 

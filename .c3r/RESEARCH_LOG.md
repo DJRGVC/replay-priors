@@ -13,6 +13,21 @@ Decision:   The baseline study is now comprehensively finished. Five independent
             change WHICH seeds learn?) as this could reveal something about exploration
             diversity under different priority regimes.
 
+## Iteration 29 — Final documentation + study closure  (2026-04-11T04:00:00Z)
+Hypothesis: Finalizing all documentation (experiment page + agent page) with seed-switching
+            findings will make the study complete and ready for closure.
+Change:     Added seed-switching bifurcation analysis (iter 23) and state-space visitation
+            (iter 24) to experiment page. Added exploration bifurcation discussion section.
+            Updated agent page with final status. Responded to Daniel's INBOX questions
+            about why PER doesn't beat uniform. Processed self-kill instruction from
+            fix-probe-findings-documentation.
+Command:    N/A (documentation/writing only)
+Result:     All Quarto pages finalized. Experiment page now includes: seed-switching analysis
+            with diagnostic seed 42 case, state-space visitation figures, exploration
+            bifurcation discussion. Agent page updated with study-complete status.
+            Study summary: 35 runs, 5 priority signals, 2 tasks, 0 beat uniform.
+Decision:   Study is complete per Daniel's instruction. Will commit, notify, and self-kill.
+
 ## Iteration 28 — Final cross-study synthesis: 14 approaches  (2026-04-11T03:00:00Z)
 Hypothesis: Integrating vlm_probe's final findings (iters 43-45: cross-model category
             stability, JSD analysis, complete approach inventory) will produce the
