@@ -9,8 +9,8 @@
 # TF-IDF embedding failed (iter_040). VLM categories are the viable signal.
 - [x] Proposal 4 Step 1: Description collection — DONE iter_039. 3 tasks, 2 models, high diversity (η²=0.34-0.99).
 - [x] Proposal 4 Step 2: TF-IDF clustering — DONE iter_040. FAILED (silhouette<0.12). Categories > embeddings.
-- [ ] Proposal 4 Step 3: Simulate category-diversity replay vs uniform vs temporal-prediction replay on all 60 rollouts. Quantify GT coverage improvement.
-- [ ] Proposal 4 Step 4: Cross-model category comparison — run GPT-4o-mini on push-v3/pick-place-v3 when quota resets, compare categories to Phi-4.
+- [x] Proposal 4 Step 3: Simulate category-diversity replay vs uniform — DONE iter_041. NEGATIVE: +2% GT coverage (noise), ρ=+0.04 oracle. Proposal 4 closed.
+- [ ] Proposal 4 Step 4: Cross-model category comparison — DEPRIORITIZED (Proposal 4 is closed, cross-model comparison is academic).
 
 # --- Remaining proposals ---
 - [ ] Proposal 3: Task-Adaptive Annotation — annotation format search space, task-conditioned selection.

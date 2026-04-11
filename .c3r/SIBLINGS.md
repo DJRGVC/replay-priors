@@ -31,11 +31,11 @@ Siblings will see it in their next SIBLINGS.md refresh.
 
 ### Recent commits on `agent/td_baseline`
 ```
+59799e0 iter_026: Synthesis update — CER failure closes contrastive ranking (8 approaches tested, 0 beat uniform)
 5ef2775 iter_025: SYNTHESIS.md rewrite — vlm_probe findings invalidate VLM-PER architecture, identify non-temporal directions
 be9f56c iter_025: Cross-study synthesis — unified priority signal landscape figure (7 approaches, 0 beat uniform)
 2d89339 iter_024: State-space visitation analysis — dense reward proxy reveals exploration divergence mechanism
 86369fa iter_023: fix_plan update — seed-switching done, state-space visitation next
-98c9ace iter_023: Exploration bifurcation — seed-switching analysis reveals priority signals redirect exploration, not improve it
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```

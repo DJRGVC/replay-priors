@@ -18,6 +18,21 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 41 — Category-diversity replay ≈ uniform: Proposal 4 closed {.unnumbered}
+*2026-04-10*
+
+Simulated category-diversity-weighted replay (inverse category frequency) vs uniform on all 20 reach-v3 rollouts. 10,000-trial Monte Carlo sampling at B=5/8/10 episodes.
+
+![Replay simulation: category-diversity provides only +2% GT coverage over uniform.](../images/vlm_probe/replay_simulation_iter41.png){width=100%}
+
+**Result**: Category-diversity is NOT better than uniform. GT coverage improvement is noise-level (+2.8% at B=5, p>0.8). Oracle correlation ρ=+0.04 — category rarity does not predict episode informativeness. The η²=0.34 signal (categories explain GT timing variance) doesn't translate to priorities because: (a) rare categories aren't inherently more useful, and (b) the correlation is distributional (group means differ) not ordinal (rarity doesn't rank episodes).
+
+**Proposal 4 is now closed.** Together with temporal approaches (§1-12) and contrastive ranking (§13), this exhausts the study's most promising directions. Remaining proposals (3, 6, 7) are increasingly speculative.
+
+Commits: iteration 41
+
+---
+
 ## Iteration 40 — TF-IDF clustering fails, but VLM categories are the signal {.unnumbered}
 *2026-04-10*
 

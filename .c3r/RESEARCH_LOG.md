@@ -144,3 +144,10 @@ Hypothesis: TF-IDF embeddings form clusters aligned with VLM categories.
 Change:     scikit-learn TF-IDF (100 features) + K-Means + PCA analysis.
 Result:     **TF-IDF fails** (silhouette <0.12, ARI ≈ 0). Descriptions syntactically template-like despite semantic diversity. **VLM categories ARE the signal**: category-diversity weighting produces 6x max weight ratio, KL(div||unif)=0.14.
 Decision:   Category labels are the viable path. Next: cross-model category comparison, simulate category-diversity replay vs uniform.
+
+## Iteration 41 — Category-diversity replay simulation: ≈ uniform  (2026-04-10T18:15Z)
+Hypothesis: Category-diversity-weighted replay (inverse category frequency) will improve GT temporal coverage compared to uniform sampling.
+Change:     Monte Carlo simulation: sampled B={3..10} episodes under uniform, inverse-frequency, and balanced-category schemes, 10,000 trials each, computed GT bin coverage. Compared to oracle (GT-deviation-proportional). Both GPT-4o and GPT-4o-mini still rate-limited.
+Command:    Pure analysis on existing data (no API calls)
+Result:     **Category-diversity ≈ uniform.** GT coverage improvement is +2.8% at B=5, +1.7% at B=10 — noise-level. Oracle correlation ρ=+0.04 (p=0.88) — effectively zero. The η²=0.34 signal from §14 does NOT translate to replay priority because: (a) rare categories aren't inherently more useful, (b) correlation is distributional (group means differ) not ordinal (rarity doesn't rank episodes within categories). Updated FINDINGS.md §16. **Proposal 4 closed.** Figure: replay_simulation_iter41.png.
+Decision:   Proposal 4 joins the graveyard of approaches that don't beat uniform: temporal prediction (§1-9), ensemble (§11), confidence gating (§12), CER (§13), and now category-diversity (§16). The study has systematically explored and ruled out the most promising VLM-guided replay prioritization directions. Remaining proposals (3, 6, 7) are increasingly speculative. Should ask Daniel about study direction — this may be a natural conclusion point.

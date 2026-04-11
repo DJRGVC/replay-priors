@@ -1,0 +1,210 @@
+{
+  "reach-v3": {
+    "n": 20,
+    "categories": {
+      "stuck": 6,
+      "wrong_direction": 2,
+      "never_reached": 4,
+      "overshot": 3,
+      "oscillated": 1,
+      "other": 4
+    },
+    "gt_stats": {
+      "min": 1,
+      "max": 150,
+      "mean": 58.3,
+      "std": 48.4
+    },
+    "weight_ratios": {
+      "category_max_min": 6.0,
+      "temporal_max_min": 76.0
+    },
+    "sweeps": {
+      "frac_0.5": {
+        "uniform": {
+          "coverage_mean": 0.727,
+          "coverage_std": 0.0971,
+          "entropy_mean": 2.5702,
+          "entropy_std": 0.2157,
+          "unique_mean": 10.0
+        },
+        "category_diversity": {
+          "coverage_mean": 0.6864,
+          "coverage_std": 0.0961,
+          "entropy_mean": 2.4948,
+          "entropy_std": 0.2098,
+          "unique_mean": 10.0
+        },
+        "temporal_prediction": {
+          "coverage_mean": 0.5569,
+          "coverage_std": 0.0586,
+          "entropy_mean": 2.2411,
+          "entropy_std": 0.1417,
+          "unique_mean": 10.0
+        }
+      },
+      "frac_0.3": {
+        "uniform": {
+          "coverage_mean": 0.5264,
+          "coverage_std": 0.0869,
+          "entropy_mean": 2.1477,
+          "entropy_std": 0.2868,
+          "unique_mean": 6.0
+        },
+        "category_diversity": {
+          "coverage_mean": 0.5061,
+          "coverage_std": 0.0868,
+          "entropy_mean": 2.0856,
+          "entropy_std": 0.2852,
+          "unique_mean": 6.0
+        },
+        "temporal_prediction": {
+          "coverage_mean": 0.4424,
+          "coverage_std": 0.0628,
+          "entropy_mean": 1.8965,
+          "entropy_std": 0.2067,
+          "unique_mean": 6.0
+        }
+      }
+    }
+  },
+  "push-v3": {
+    "n": 10,
+    "categories": {
+      "oscillated": 1,
+      "stuck": 4,
+      "other": 2,
+      "wrong_direction": 1,
+      "never_reached": 1,
+      "missing_target": 1
+    },
+    "gt_stats": {
+      "min": 1,
+      "max": 82,
+      "mean": 36.6,
+      "std": 30.4
+    },
+    "weight_ratios": {
+      "category_max_min": 4.0,
+      "temporal_max_min": 44.0
+    },
+    "sweeps": {
+      "frac_0.5": {
+        "uniform": {
+          "coverage_mean": 0.7186,
+          "coverage_std": 0.1344,
+          "entropy_mean": 1.735,
+          "entropy_std": 0.3014,
+          "unique_mean": 5.0
+        },
+        "category_diversity": {
+          "coverage_mean": 0.6664,
+          "coverage_std": 0.1239,
+          "entropy_mean": 1.6185,
+          "entropy_std": 0.2883,
+          "unique_mean": 5.0
+        },
+        "temporal_prediction": {
+          "coverage_mean": 0.8306,
+          "coverage_std": 0.0794,
+          "entropy_mean": 1.9826,
+          "entropy_std": 0.1603,
+          "unique_mean": 5.0
+        }
+      },
+      "frac_0.3": {
+        "uniform": {
+          "coverage_mean": 0.5078,
+          "coverage_std": 0.1044,
+          "entropy_mean": 1.2746,
+          "entropy_std": 0.3579,
+          "unique_mean": 3.0
+        },
+        "category_diversity": {
+          "coverage_mean": 0.4858,
+          "coverage_std": 0.1104,
+          "entropy_mean": 1.1968,
+          "entropy_std": 0.3896,
+          "unique_mean": 3.0
+        },
+        "temporal_prediction": {
+          "coverage_mean": 0.588,
+          "coverage_std": 0.0475,
+          "entropy_mean": 1.545,
+          "entropy_std": 0.1583,
+          "unique_mean": 3.0
+        }
+      }
+    }
+  },
+  "pick-place-v3": {
+    "n": 10,
+    "categories": {
+      "parse_error": 1,
+      "other": 2,
+      "stuck": 3,
+      "overshot": 1,
+      "size_mismatch": 1,
+      "crash": 1,
+      "alway_ent": 1
+    },
+    "gt_stats": {
+      "min": 2,
+      "max": 149,
+      "mean": 80.3,
+      "std": 57.0
+    },
+    "weight_ratios": {
+      "category_max_min": 3.0,
+      "temporal_max_min": 44.0
+    },
+    "sweeps": {
+      "frac_0.5": {
+        "uniform": {
+          "coverage_mean": 0.6176,
+          "coverage_std": 0.0867,
+          "entropy_mean": 2.0511,
+          "entropy_std": 0.2429,
+          "unique_mean": 5.0
+        },
+        "category_diversity": {
+          "coverage_mean": 0.661,
+          "coverage_std": 0.0745,
+          "entropy_mean": 2.1727,
+          "entropy_std": 0.2086,
+          "unique_mean": 5.0
+        },
+        "temporal_prediction": {
+          "coverage_mean": 0.6021,
+          "coverage_std": 0.0886,
+          "entropy_mean": 2.0079,
+          "entropy_std": 0.2481,
+          "unique_mean": 5.0
+        }
+      },
+      "frac_0.3": {
+        "uniform": {
+          "coverage_mean": 0.4023,
+          "coverage_std": 0.0554,
+          "entropy_mean": 1.4623,
+          "entropy_std": 0.2583,
+          "unique_mean": 3.0
+        },
+        "category_diversity": {
+          "coverage_mean": 0.4166,
+          "coverage_std": 0.0396,
+          "entropy_mean": 1.529,
+          "entropy_std": 0.1849,
+          "unique_mean": 3.0
+        },
+        "temporal_prediction": {
+          "coverage_mean": 0.3894,
+          "coverage_std": 0.0637,
+          "entropy_mean": 1.4023,
+          "entropy_std": 0.2974,
+          "unique_mean": 3.0
+        }
+      }
+    }
+  }
+}
