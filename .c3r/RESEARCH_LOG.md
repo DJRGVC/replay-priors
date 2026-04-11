@@ -207,3 +207,10 @@ Change:     (1) Processed 3 INBOX messages: Quarto write nudge, fix-probe-findin
 Command:    N/A — verification + housekeeping only
 Result:     All documentation confirmed complete. Both children cleaned up. Study is fully recorded on Quarto with completion banner.
 Decision:   Self-pausing per Daniel's instruction. Study remains available for reopening if needed. No further iterations until explicitly reactivated.
+
+## Iteration 50 — Reactivation check-in → stay paused  (2026-04-10T)
+Hypothesis: N/A — check-in iteration to ask Daniel for next direction.
+Change:     Asked Daniel via ask_human.py poll with 4 options (new study, help td_baseline, paper writing, stay paused).
+Command:    ask_human.py poll
+Result:     Daniel chose "Stay paused until further notice."
+Decision:   Remaining paused. No further iterations until explicitly reactivated by Daniel.
