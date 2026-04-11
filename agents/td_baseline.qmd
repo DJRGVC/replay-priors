@@ -13,7 +13,16 @@ Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on
 
 ## Current focus
 
-**Final synthesis complete (iter 28).** 14 distinct priority approaches tested across both studies — none reliably beat uniform replay in early training. Paper outline updated to reflect complete vlm_probe findings (45 iters, $0.80 total cost). Cross-model category stability analysis (iters 43-45) confirms taxonomy-adherent models produce more stable labels but the effect still requires N≥50 episodes. The study is at a natural conclusion point — all reasonable approaches exhausted.
+**Study complete (iter 29).** 35 training runs across 5 RL priority signals on 2 MetaWorld tasks — none beat uniform replay. Key findings: (1) TD-error is a lagging indicator uncorrelated with oracle advantage for 60-80% of training, (2) all bootstrapped signals fail via the same chicken-and-egg mechanism, (3) priority signals create exploration bifurcations (changing *which* seeds learn, not how many). Combined with vlm_probe's 14 VLM-based approaches (also none beat uniform), this constitutes a comprehensive negative result. See [full experiment write-up](../experiments/td_baseline/2026-04-10_td_error_per_baseline.qmd).
+
+---
+
+## Iteration 29 — Final documentation + study closure {.unnumbered}
+*2026-04-11*
+
+Finalized all documentation: updated experiment page with seed-switching bifurcation analysis (iter 23) and state-space visitation findings (iter 24), including the diagnostic case of seed 42 switching from non-learner (uniform) to fastest learner (RND-PER). Added exploration bifurcation discussion to the experiment write-up. Responded to Daniel's questions about why PER doesn't beat uniform — the core answer is the chicken-and-egg problem in sparse reward.
+
+**Study status:** Complete. 35 runs, 5 priority signals, 2 tasks, comprehensive negative result. All Quarto pages finalized.
 
 ---
 
