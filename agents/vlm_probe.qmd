@@ -18,6 +18,21 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 40 — TF-IDF clustering fails, but VLM categories are the signal {.unnumbered}
+*2026-04-10*
+
+Attempted to embed failure descriptions via TF-IDF (100 features, 1-2 ngrams) and cluster for diversity-weighted replay. **TF-IDF clustering fails** — silhouette scores <0.12, ARI ≈ 0 vs VLM categories. Descriptions are syntactically template-like despite being semantically diverse.
+
+![Clustering analysis: TF-IDF can't separate categories, but VLM categories track GT timing.](../images/vlm_probe/clustering_analysis_iter40.png){width=100%}
+
+**Key insight**: The free-text descriptions don't add value over the categorical labels. VLM categories themselves ARE the useful signal — they correlate with GT timing (η²=0.34) and produce up to 6x weight ratio for diversity-weighted replay. Category-diversity-weighted replay is the viable path: cheap (1 API call), interpretable, and grounded in real behavioral differences.
+
+**Next**: Both GPT-4o and GPT-4o-mini are rate-limited (~20h). When quota resets: run GPT-4o-mini on push-v3/pick-place-v3 for cross-model category comparison, then simulate category-diversity replay vs uniform vs temporal-prediction replay.
+
+Commits: iteration 40
+
+---
+
 ## Iteration 39 — Failure mode descriptions: first positive non-temporal signal {.unnumbered}
 *2026-04-10*
 

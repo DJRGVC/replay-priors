@@ -308,6 +308,28 @@ task (VLM strength) not a temporal precision task (VLM weakness). The η² value
 suggest that clustering descriptions could yield behaviorally meaningful episode
 groups for diversity-weighted replay — the exact use case Proposal 4 targets.
 
+### §15. TF-IDF clustering fails but category-based diversity works (iter 40)
+
+Attempted to embed failure descriptions via TF-IDF (100 features, 1-2 ngrams) and
+cluster for diversity-weighted replay. Key findings:
+
+- **TF-IDF clustering fails**: silhouette scores 0.09-0.12 across K=2..6, ARI ≈ 0
+  vs VLM categories. Descriptions are syntactically template-like ("The robot arm
+  failed to [verb] the [object]") despite being semantically diverse.
+- **VLM categories ARE the useful signal**: categories correlate with GT timing
+  (η²=0.34, shown in iter 39) and produce 6.0x max weight ratio when used for
+  diversity-weighted replay. The free-text descriptions don't add value over the
+  categorical labels.
+- **Task separation works in embedding space**: PCA shows clear task clusters
+  (different object vocabulary), confirming descriptions are task-aware.
+- **Diversity weighting upweights late quartiles**: Q2-Q3 get 31%/29% vs 25%
+  uniform, shifting weight toward underrepresented failure timings.
+
+**Implication**: Proposal 4 is viable but should use VLM category labels directly
+(cheap, fast, 1 API call) rather than embedding free-text descriptions (expensive,
+noisy, clusters poorly). The path forward is category-diversity-weighted replay
+with VLM-assigned failure mode categories as the priority signal.
+
 ## Related Work
 
 Recent literature directly connects to our findings:
@@ -439,6 +461,7 @@ a reliable priority signal when it would be most needed (early training).
 | 037 | Confidence-gated VLM-PER (Proposal 5) | Agreement anti-correlates with accuracy (r=+0.53). Optimal gate = "never use VLM." Always-VLM strictly worse than uniform. | ✓ |
 | 038 | Contrastive Episode Ranking (Proposal 2) | 100% primacy bias (11/11 always A). Accuracy = base rate. Zero signal above chance. | ✓ |
 | 039 | Failure mode descriptions (Proposal 4) | High semantic diversity (6/6 cats, 100% unique descs, Jaccard=0.27). Categories explain GT timing (η²=0.34-0.99). First positive non-temporal signal. | ✓ |
+| 040 | TF-IDF clustering + category-based diversity | TF-IDF clusters fail (silhouette<0.12, ARI≈0). VLM categories ARE the signal: 6x weight ratio, late-quartile upweighting. Category-diversity replay is viable path. | ✓ |
 
 ## Bottom Line
 
