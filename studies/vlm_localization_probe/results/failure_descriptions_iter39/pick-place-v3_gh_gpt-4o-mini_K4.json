@@ -1,0 +1,102 @@
+[
+  {
+    "rollout": "rollout_000",
+    "gt_failure_t": 136,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_001",
+    "gt_failure_t": 14,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_002",
+    "gt_failure_t": 125,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_003",
+    "gt_failure_t": 17,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_004",
+    "gt_failure_t": 149,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_005",
+    "gt_failure_t": 2,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_006",
+    "gt_failure_t": 52,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_007",
+    "gt_failure_t": 121,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_008",
+    "gt_failure_t": 42,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_009",
+    "gt_failure_t": 145,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_010",
+    "gt_failure_t": 12,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_011",
+    "gt_failure_t": 38,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_012",
+    "gt_failure_t": 33,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_013",
+    "gt_failure_t": 0,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_014",
+    "gt_failure_t": 80,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_015",
+    "gt_failure_t": 48,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_016",
+    "gt_failure_t": 6,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_017",
+    "gt_failure_t": 21,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_018",
+    "gt_failure_t": 6,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  },
+  {
+    "rollout": "rollout_019",
+    "gt_failure_t": 117,
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
+  }
+]

@@ -9,8 +9,8 @@
 # TF-IDF embedding failed (iter_040). VLM categories are the viable signal.
 - [x] Proposal 4 Step 1: Description collection — DONE iter_039. 3 tasks, 2 models, high diversity (η²=0.34-0.99).
 - [x] Proposal 4 Step 2: TF-IDF clustering — DONE iter_040. FAILED (silhouette<0.12). Categories > embeddings.
-- [x] Proposal 4 Step 3: Simulate category-diversity replay vs uniform — DONE iter_041. NEGATIVE: +2% GT coverage (noise), ρ=+0.04 oracle. Proposal 4 closed.
-- [ ] Proposal 4 Step 4: Cross-model category comparison — DEPRIORITIZED (Proposal 4 is closed, cross-model comparison is academic).
+- [x] Proposal 4 Step 3: Category-diversity simulation — iter_041 (n=20: ≈uniform), iter_042 scale-up (N≥50: +5-8% coverage). Viable at realistic buffer sizes.
+- [ ] Proposal 4 Step 4: Cross-model category comparison — RE-PRIORITIZED. Validate category stability across models before claiming scale-up generalizes.
 
 # --- Remaining proposals ---
 - [ ] Proposal 3: Task-Adaptive Annotation — annotation format search space, task-conditioned selection.
