@@ -1,0 +1,12 @@
+[
+  {
+    "rollout": "rollout_000",
+    "gt_failure_t": 1,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_001",
+    "gt_failure_t": 14,
+    "error": "Rate limited after 5 retries"
+  }
+]

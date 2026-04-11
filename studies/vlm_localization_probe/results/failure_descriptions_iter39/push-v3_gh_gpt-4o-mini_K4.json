@@ -1,0 +1,63 @@
+[
+  {
+    "rollout": "rollout_000",
+    "gt_failure_t": 1,
+    "gt_failure_type": "never_contacted_object_closest_approach",
+    "failure_mode": "The robot arm did not make sufficient contact with the puck to push it towards the target position.",
+    "failure_category": "stuck",
+    "severity": "moderate",
+    "visual_cues": [
+      "robot arm is positioned above the puck but not in contact",
+      "lack of movement in puck during keyframes",
+      "arm posture suggests it is not pushing forward",
+      "target position is still unachieved as puck remains stationary"
+    ],
+    "_latency_s": 3.52,
+    "_raw_response": "{\"failure_mode\":\"The robot arm did not make sufficient contact with the puck to push it towards the target position.\",\"failure_category\":\"stuck\",\"severity\":\"moderate\",\"visual_cues\":[\"robot arm is positioned above the puck but not in contact\",\"lack of movement in puck during keyframes\",\"arm posture suggests it is not pushing forward\",\"target position is still unachieved as puck remains stationary\"]}"
+  },
+  {
+    "rollout": "rollout_001",
+    "gt_failure_t": 14,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_002",
+    "gt_failure_t": 67,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_003",
+    "gt_failure_t": 82,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_004",
+    "gt_failure_t": 60,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_005",
+    "gt_failure_t": 58,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_006",
+    "gt_failure_t": 64,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_007",
+    "gt_failure_t": 10,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_008",
+    "gt_failure_t": 3,
+    "error": "Rate limited after 5 retries"
+  },
+  {
+    "rollout": "rollout_009",
+    "gt_failure_t": 7,
+    "error": "Rate limited after 5 retries"
+  }
+]
