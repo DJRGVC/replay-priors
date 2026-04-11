@@ -186,3 +186,10 @@ Change:     (1) Created experiments/vlm_probe/2026-04-10_vlm_failure_localizatio
 Command:    No API calls — pure writing. Verified GitHub Models still 429 (70201s wait) and Gemini still 429.
 Result:     Publication-quality experiment page live on Quarto. Covers: baseline model comparison, K sweep, CoT×annotation factorial, bias-matching mechanism, ensemble/gating/CER failures, failure mode descriptions, category-diversity viability, cross-model stability. Includes connection to td_baseline, limitations, and what-would-change-the-conclusion section.
 Decision:   When APIs reset, run same-rollout cross-model comparison (final missing experiment). Then ask Daniel re: study direction — declare complete or pursue proposals 3/6/7.
+
+## Iteration 47 — Consolidated results database + summary figures  (2026-04-10T22:00Z)
+Hypothesis: Scattered result files across 30+ directories need consolidation into a single machine-readable database for reproducibility and a paper-ready summary.
+Change:     Created consolidate_results.py. Merges all results/*.json files, deduplicates, normalizes model names (fixed gh:gpt-4o matching gh:gpt-4o-mini substring bug), computes per-condition aggregates, generates 2 figures.
+Command:    python3 consolidate_results.py (pure analysis, no API calls)
+Result:     **360 unique predictions across 31 conditions.** GPT-4o push/no-ann best overall (MAE=36.3, GT-bias-aligned), Claude Sonnet K=16 best reach-v3 (MAE=44.4). GPT-4o-mini now properly separated — 90 predictions visible. Fixation rate spans 11-100%. Two figures: paper_summary_table.png, approach_comparison_bar.png. Updated Quarto page with iter 47 entry.
+Decision:   APIs blocked ~19h. Study is comprehensive. Should ask Daniel whether to declare study complete or pursue remaining proposals (3/6/7) when APIs reset.

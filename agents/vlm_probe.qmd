@@ -18,6 +18,24 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 47 — Consolidated results database (360 predictions, 31 conditions) {.unnumbered}
+*2026-04-10*
+
+Built `consolidate_results.py` to merge all scattered result files into a single machine-readable database. **360 unique predictions** across **31 experimental conditions**, 6 models, and 3 tasks — the complete quantitative record of the study.
+
+![All conditions ranked by MAE — GPT-4o push/no-ann (36.3) is best overall but benefits from GT-bias alignment; Claude Sonnet K=16 (44.4) is best for reach-v3.](../images/vlm_probe/paper_summary_table.png){width=100%}
+
+![12 temporal approaches compared by best MAE. None meaningfully beat random guess (MAE≈50 for 150 steps).](../images/vlm_probe/approach_comparison_bar.png){width=100%}
+
+Key observations from the consolidated view:
+- **GPT-4o-mini** results now properly separated from GPT-4o (was a model-name normalization bug)
+- **Fixation rate** (% predicting the modal value) ranges from 11% (Llama-90B random sampling) to 100% (Llama-90B CoT, GPT-4o-mini K=4)
+- **Total cost**: $0.80 (only Sonnet cost money; all other models free via GitHub Models/Gemini)
+
+APIs still blocked (~19h GitHub, Gemini quota exhausted). Outputs: `results/consolidated_database.json`, `results/summary_table.json`, 2 figures.
+
+---
+
 ## Iteration 46 — Full experiment write-up: 14-approach survey {.unnumbered}
 *2026-04-10*
 

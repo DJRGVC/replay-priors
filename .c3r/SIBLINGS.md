@@ -27,15 +27,15 @@ Siblings will see it in their next SIBLINGS.md refresh.
 ## td_baseline
 - **role**: generic
 - **focus**: Bootstrap studies/td_error_baseline: set up MetaWorld + SAC with TD-error PER on 2 sparse-reward tasks using Modal for       E  training, instrument the critic to log TD-error distributions and their correlation with a dense-reward oracle advantage over  E  training, and produce a single figure quantifying how (un)informative TD-error PER is in the early training regime.
-- **status**: running · iter #24 · ctx 0%
+- **status**: running · iter #25 · ctx 0%
 
 ### Recent commits on `agent/td_baseline`
 ```
+b2756ab iter_027: Paper outline + hero figure (10 approaches, 0 beat uniform)
 be42531 iter_027: Negative result paper outline + synthesis update (10 approaches, 0 beat uniform)
 59799e0 iter_026: Synthesis update — CER failure closes contrastive ranking (8 approaches tested, 0 beat uniform)
 5ef2775 iter_025: SYNTHESIS.md rewrite — vlm_probe findings invalidate VLM-PER architecture, identify non-temporal directions
 be9f56c iter_025: Cross-study synthesis — unified priority signal landscape figure (7 approaches, 0 beat uniform)
-2d89339 iter_024: State-space visitation analysis — dense reward proxy reveals exploration divergence mechanism
 ```
 ### Files modified on `agent/td_baseline` (relative to `c3r/replay-priors`)
 ```
@@ -68,8 +68,8 @@ images/td_baseline/alpha_sweep_td_per.png
 images/td_baseline/cross_study_synthesis.png
 images/td_baseline/multiseed_mode_comparison_pick_place_v3.png
 images/td_baseline/multiseed_mode_comparison_reach_v3.png
-images/td_baseline/seed_switching_analysis.png
-... and 55 more
+images/td_baseline/paper_hero_10approach.png
+... and 58 more
 ```
 ### Read one with:
 ```
