@@ -86,7 +86,7 @@ On pick-place-v3 (where no seeds learn at 100k steps), Spearman stays near zero 
 | TD-PER $\alpha$=0.1 | 2 (123, 7) | 40% | 144.6 +/- 258.0 | ~0 |
 | TD-PER $\alpha$=0.6 | 0 | 0% | 228.3 +/- 377.0 | +0.01 |
 
-![5-mode comparison on reach-v3 — uniform and RND-PER tie at 3/5, TD-PER at default alpha is catastrophic (0/5)](../images/td_baseline/multiseed_mode_comparison_reach_v3.png){width=100%}
+![5-mode comparison on reach-v3 — uniform and RND-PER tie at 3/5, TD-PER at default alpha is catastrophic (0/5)](../../images/td_baseline/multiseed_mode_comparison_reach_v3.png){width=100%}
 
 ### Alpha sweep: tuning cannot save TD-PER
 
@@ -94,13 +94,13 @@ The Q-value explosion under default TD-PER ($\alpha$=0.6) is partly a tuning iss
 
 Critically, **Spearman correlation remains near zero across all alpha values.** The priority signal itself is uninformative — adjusting how aggressively you sample by it changes Q-dynamics but not signal quality.
 
-![Alpha sweep — alpha=0.3 ties uniform; both weaker and stronger are worse](../images/td_baseline/alpha_sweep_td_per.png){width=100%}
+![Alpha sweep — alpha=0.3 ties uniform; both weaker and stronger are worse](../../images/td_baseline/alpha_sweep_td_per.png){width=100%}
 
 ### Pick-place-v3: permanent information desert
 
 On a task where no seeds learn at 100k steps, all modes produce 0/5 learning. TD-error stays completely uncorrelated with oracle advantage (max |Spearman| = 0.03 for PER modes). Q-value instability is sporadic across *all* modes (not PER-specific) — seed 99 is systematically unstable regardless of replay strategy.
 
-![Pick-place-v3 — all modes 0/5, TD-error in permanent information desert](../images/td_baseline/multiseed_mode_comparison_pick_place_v3.png){width=100%}
+![Pick-place-v3 — all modes 0/5, TD-error in permanent information desert](../../images/td_baseline/multiseed_mode_comparison_pick_place_v3.png){width=100%}
 
 ### Why each signal fails
 
@@ -122,13 +122,13 @@ A striking finding: priority signals don't uniformly help or hurt — they redir
 
 **Seed 7: the robust learner.** Learns under all 4 modes tested — its initial random exploration trajectory naturally encounters reward regardless of replay strategy, suggesting seed-specific sensitivity is driven by the initial exploration trajectory's proximity to reward-bearing regions.
 
-![Seed-switching analysis — per-seed outcomes differ across priority regimes despite identical aggregate success rates](../images/td_baseline/seed_switching_analysis.png){width=100%}
+![Seed-switching analysis — per-seed outcomes differ across priority regimes despite identical aggregate success rates](../../images/td_baseline/seed_switching_analysis.png){width=100%}
 
-![State-space visitation under priority regimes — dense reward as exploration proxy](../images/td_baseline/state_visitation_analysis.png){width=100%}
+![State-space visitation under priority regimes — dense reward as exploration proxy](../../images/td_baseline/state_visitation_analysis.png){width=100%}
 
 ### Hero summary figure
 
-![6-panel hero summary: (a-b) Spearman correlation traces for both tasks; (c-d) Q-value dynamics showing PER feedback loop; (e) 5-mode bar chart; (f) regime breakdown](../images/td_baseline/td_per_summary.png){width=100%}
+![6-panel hero summary: (a-b) Spearman correlation traces for both tasks; (c-d) Q-value dynamics showing PER feedback loop; (e) 5-mode bar chart; (f) regime breakdown](../../images/td_baseline/td_per_summary.png){width=100%}
 
 **Figure 1.** Six-panel summary across two tasks (reach-v3, pick-place-v3), 5 seeds per condition. **(a)** reach-v3 Spearman $\rho$(|TD|, oracle advantage) — correlation near zero for 60-80% of training, rising only after learning starts. **(b)** pick-place-v3 — permanent information desert. **(c)** reach-v3 Q-dynamics — TD-PER causes 11x Q-value explosion. **(d)** pick-place-v3 Q-dynamics — instability is not PER-specific. **(e)** Mode comparison: no signal beats uniform. **(f)** Regime breakdown: TD-error aligned only 7-50% of training.
 
