@@ -16,6 +16,8 @@ checkpoints/
 *.png
 *.jpg
 !docs/**/*.png
+!images/**/*.png
+!images/**/*.jpg
 
 # OS / editor
 .DS_Store
