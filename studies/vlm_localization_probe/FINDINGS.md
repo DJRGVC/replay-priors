@@ -559,3 +559,81 @@ is a scene understanding task (VLM strength) rather than temporal precision (VLM
 Phi-4 even invents novel task-specific categories (crash, size_mismatch) beyond the
 predefined set. Next step: embed descriptions and cluster to test whether VLM-perceived
 failure modes can drive diversity-weighted replay prioritization (Proposal 4).
+
+---
+
+## Final Study Synthesis (Iteration 45)
+
+### Complete approach inventory (14 approaches tested)
+
+**Temporal approaches (6 tested, all failed):**
+
+1. Direct temporal prediction (K sweep K=4→32): MAE never below 41.9, dominated by positional bias
+2. CoT prompting: hurts weak models, partially substitutes annotation on strong — no net improvement
+3. Frame annotation: architecture-dependent (GPT-4o −30%, GPT-4o-mini +11%, Gemini ignored)
+4. Two-pass adaptive probing: coarse pass too noisy to guide refinement
+5. Random sampling: breaks clusters but doesn't improve accuracy
+6. Multi-format (grid tiling vs native multi-image): different bias patterns, no accuracy gain
+
+**Ensemble/meta approaches (3 tested, all failed):**
+
+7. 5-model BAEP ensemble: weak models dilute signal (MAE 51.2 > best individual 50.1)
+8. Selective 2-model pairing: marginal improvement (MAE 46.9, −6.4%) but model-selection-dependent
+9. Confidence gating (inter-model agreement): agreement ANTI-correlates with accuracy (r=+0.53)
+
+**Relative ranking (1 tested, failed):**
+
+10. Contrastive Episode Ranking: 100% primacy bias (11/11 picks Episode A)
+
+**Non-temporal approaches (4 tested, 2 viable):**
+
+11. Failure mode descriptions: ✓ VIABLE — η²=0.34–0.99, 100% unique, 6/6 categories
+12. TF-IDF clustering: failed — template syntax kills embedding (silhouette <0.12)
+13. Category-diversity replay (n=20): ≈ uniform at small sample sizes
+14. Category-diversity replay (N≥50 simulated): ✓ VIABLE — +5–8% GT coverage at realistic scales
+
+### The mechanistic story
+
+VLMs process multi-image inputs through architectures that allocate high-frequency-only
+positional encoding to temporal dimensions (MRoPE). This creates rapid attention decay
+across image positions, manifesting as stable within-model positional biases (center,
+start, end, grid-cell, primacy) that are structural, not random. No prompt engineering —
+CoT, annotation, sampling strategy — can overcome an architectural limitation.
+
+However, VLMs excel at scene understanding: identifying what objects are present, how
+they relate spatially, and what type of behavior the robot is exhibiting. This
+categorical understanding (6 failure types: never_reached, overshot, oscillated,
+wrong_direction, stuck, other) is genuinely informative — failure categories correlate
+with ground-truth failure timing (η²=0.34–0.99) because different failure modes have
+different temporal signatures.
+
+The annotation × task interaction (iter 31-32) provides the cleanest evidence: annotation
+shifts predictions toward mid-episode, which helps when GT is mid-distributed (reach-v3,
+−30%) but hurts when GT clusters at extremes (push-v3 early, +18%; pick-place-v3 late, +9%).
+This is bias-matching, not visual understanding.
+
+### Cross-model category stability (iter 43-44)
+
+Category labels are more stable within taxonomy-adherent models (GPT-4o-mini: bootstrap
+JSD 0.10±0.06) than creative models (Phi-4: JSD 0.20–0.24). Task drives category
+distribution more than model choice (within-Phi-4 cross-task JSD = 0.29 > cross-model
+JSD = 0.11). For practical deployment, GPT-4o-mini's strict taxonomy adherence is
+preferable to Phi-4's creative novel categories.
+
+### Implications for VLM-PER
+
+1. **Temporal VLM-PER is not viable** with current zero-shot VLMs. The signal is dominated
+   by positional bias that cannot be mitigated by prompt engineering.
+2. **Category-diversity replay is viable at scale (N≥50)** — uses VLM failure mode labels
+   to ensure diverse category coverage in replay batches. Cheap (1 API call per episode),
+   interpretable, and architecture-agnostic.
+3. **The binding constraint** is not temporal resolution but the upstream problem of
+   generating rollouts with meaningful failure diversity (same issue as td_baseline).
+4. **Fine-tuning** (à la AHA, FPC-VLA) would likely solve the temporal bias problem
+   but requires labeled data and training — a fundamentally different study.
+
+### Cost
+
+Total study cost: $0.80 (3 Claude Sonnet API calls in iter 1-3, all subsequent work on
+free APIs: GitHub Models, Google AI Studio, Groq). 60 rollouts, 9 models, 14 approaches,
+44 iterations.

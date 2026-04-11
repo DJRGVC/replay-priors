@@ -172,3 +172,10 @@ Change:     Created cross_model_category_analysis.py and plot_cross_model_analys
 Command:    python cross_model_category_analysis.py && python plot_cross_model_analysis.py
 Result:     **Cross-model JSD = 0.11** (moderate, confounded by task). Intra-model bootstrap JSD: GPT-4o-mini 0.10±0.06 (stable), Phi-4 0.20-0.24 (less stable, partly sample size). Severity bias: GPT never says "mild" (0/20), Phi-4 uses full scale (6/19 mild). JSD between Phi-4's own tasks (push vs pick-place) = 0.29 — higher than cross-model JSD (0.11), suggesting task drives distribution more than model. Two figures committed.
 Decision:   Same-rollout cross-model comparison remains the missing piece — need to wait ~20h for rate limits. Meanwhile, should write up final study synthesis or explore remaining proposals (3, 6, 7).
+
+## Iteration 45 — Study synthesis: landscape figure + final FINDINGS section  (2026-04-10T17:55Z)
+Hypothesis: With APIs blocked (~19.5h remaining), this is the right time for a synthesis iteration — consolidate all 44 iterations into a coherent narrative.
+Change:     (1) Created plot_study_synthesis.py — "approach landscape" figure showing all 14 tested approaches categorized by type and outcome (10 fail, 2 mixed, 2 viable). (2) Added final synthesis section to FINDINGS.md with complete approach inventory, mechanistic story, and implications. (3) Updated Quarto page (agents/vlm_probe.qmd) with iter 44 + 45 entries and updated description.
+Command:    python3 plot_study_synthesis.py (pure visualization, no API calls)
+Result:     Study synthesis complete. The narrative is clear: temporal approaches fail due to structural positional bias (MRoPE), non-temporal failure mode descriptions are viable at scale (N≥50). 14 approaches exhaustively tested, $0.80 total cost.
+Decision:   When APIs reset (~19.5h), run same-rollout cross-model comparison (the final missing experiment). Then consider writing a full experiment page for the complete study. Remaining proposals (3, 6, 7) are increasingly speculative — should ask Daniel whether to pursue them or declare the study complete.

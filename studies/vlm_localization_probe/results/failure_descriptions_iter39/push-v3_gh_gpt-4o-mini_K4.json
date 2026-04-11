@@ -37,7 +37,7 @@
   {
     "rollout": "rollout_007",
     "gt_failure_t": 10,
-    "error": "Rate limited after 5 retries"
+    "error": "Command '['gh', 'auth', 'token']' returned non-zero exit status 1."
   },
   {
     "rollout": "rollout_008",
