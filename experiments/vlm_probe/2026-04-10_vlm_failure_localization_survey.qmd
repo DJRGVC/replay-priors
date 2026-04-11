@@ -75,7 +75,7 @@ We organize the 14 approaches into five categories:
 
 ### Overview: 14 approaches, 10 failed, 2 mixed, 2 viable
 
-![Study synthesis landscape. Each cell represents one approach, colored by outcome: red = failed, yellow = mixed, green = viable. The left half (temporal/ensemble/ranking) is entirely red/yellow; the right half (non-temporal) contains both viable approaches.](../images/vlm_probe/study_synthesis_landscape.png){width=100%}
+![Study synthesis landscape. Each cell represents one approach, colored by outcome: red = failed, yellow = mixed, green = viable. The left half (temporal/ensemble/ranking) is entirely red/yellow; the right half (non-temporal) contains both viable approaches.](../../images/vlm_probe/study_synthesis_landscape.png){width=100%}
 
 ### 1. Baseline model comparison (K=8, reach-v3)
 
@@ -110,7 +110,7 @@ Tested K $\in$ {4, 8, 16, 32} across three models:
   fixated at t=49), K=16 best tolerance accuracy (40% $\pm$20, 6 unique
   predictions)
 
-![K sweep across three models. More frames diversify predictions (lower variance) but don't improve bias. The effect is model-dependent.](../images/vlm_probe/k_sweep_gpt4o_comparison.png){width=80%}
+![K sweep across three models. More frames diversify predictions (lower variance) but don't improve bias. The effect is model-dependent.](../../images/vlm_probe/k_sweep_gpt4o_comparison.png){width=80%}
 
 ### 3. CoT $\times$ annotation interaction: substitutability
 
@@ -149,7 +149,7 @@ entirely on where GT failures cluster:
 See [full bias-matching write-up](2026-04-10_annotation_bias_matching.qmd)
 for the complete methodology and per-prediction data.
 
-![Annotation effect across 3 tasks and 2 models. Annotation helps when GT is mid-distributed (reach-v3) but hurts when GT clusters at extremes.](../images/vlm_probe/annotation_task_model_interaction.png){width=100%}
+![Annotation effect across 3 tasks and 2 models. Annotation helps when GT is mid-distributed (reach-v3) but hurts when GT clusters at extremes.](../../images/vlm_probe/annotation_task_model_interaction.png){width=100%}
 
 ### 5. Ensemble methods: weak models dilute signal
 
@@ -170,7 +170,7 @@ they converge on shared positional biases, not the true failure timestep.
 Optimal gate: "never use VLM" --- uniform dominates on both KL (1.56 vs 2.04)
 and overlap (21.7% vs 8.7%).
 
-![Confidence gating analysis. Agreement is an anti-signal: high agreement means models converge on shared bias, not truth.](../images/vlm_probe/confidence_gating_annotated.png){width=80%}
+![Confidence gating analysis. Agreement is an anti-signal: high agreement means models converge on shared bias, not truth.](../../images/vlm_probe/confidence_gating_annotated.png){width=80%}
 
 ### 7. Contrastive Episode Ranking: primacy bias
 
@@ -181,7 +181,7 @@ alternative to absolute temporal prediction. GPT-4o-mini, K=4, 11 pairs:
 trials (binomial $P < 0.001$). Accuracy of 63.6% = base rate. Zero signal
 above chance.
 
-![CER primacy bias. The model always selects the first-presented episode regardless of GT ordering.](../images/vlm_probe/cer_primacy_bias.png){width=80%}
+![CER primacy bias. The model always selects the first-presented episode regardless of GT ordering.](../../images/vlm_probe/cer_primacy_bias.png){width=80%}
 
 ### 8. Failure mode descriptions: first positive signal
 
@@ -197,7 +197,7 @@ VLM failure descriptions show high diversity across 3 tasks:
 - **Categories predict GT timing**: $\eta^2$ = 0.34 (reach), 0.58 (push),
   0.99 (pick-place) --- all large effects
 
-![Failure description analysis. VLMs produce genuinely diverse failure mode categories that correlate with ground-truth timing.](../images/vlm_probe/failure_description_analysis_iter39.png){width=100%}
+![Failure description analysis. VLMs produce genuinely diverse failure mode categories that correlate with ground-truth timing.](../../images/vlm_probe/failure_description_analysis_iter39.png){width=100%}
 
 ### 9. Category-diversity replay: viable at scale
 
@@ -209,7 +209,7 @@ frequency) vs uniform:
 - **At N$\geq$50 (simulated)**: consistently beats uniform. Coverage
   improvement +5--8%, entropy improvement up to +0.40
 
-![Category-diversity replay simulation at realistic scales (N=50--1000). The effect is real but requires N>20 to overcome sampling noise.](../images/vlm_probe/category_diversity_scale_iter42.png){width=80%}
+![Category-diversity replay simulation at realistic scales (N=50--1000). The effect is real but requires N>20 to overcome sampling noise.](../../images/vlm_probe/category_diversity_scale_iter42.png){width=80%}
 
 ### 10. Cross-model category stability
 
@@ -225,7 +225,7 @@ Cross-model JSD = 0.11 (moderate, confounded by different tasks). Task drives
 category distribution more than model choice (within-Phi-4 cross-task JSD =
 0.29 > cross-model JSD = 0.11).
 
-![Cross-model category distributions. GPT-4o-mini adheres strictly to taxonomy; Phi-4 invents novel categories.](../images/vlm_probe/cross_model_categories_iter43.png){width=100%}
+![Cross-model category distributions. GPT-4o-mini adheres strictly to taxonomy; Phi-4 invents novel categories.](../../images/vlm_probe/cross_model_categories_iter43.png){width=100%}
 
 ## Discussion
 
