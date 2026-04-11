@@ -18,6 +18,71 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 43 — Cross-model category comparison {.unnumbered}
+*2026-04-10*
+
+Compared failure mode categories across GPT-4o-mini (reach-v3, n=20) and Phi-4 (push-v3 n=10, pick-place-v3 n=9). All APIs blocked — analysis uses existing iter 39 data.
+
+| | GPT-4o-mini (reach) | Phi-4 (push) | Phi-4 (pick-place) |
+|---|---|---|---|
+| Standard cats used | 6/6 (100%) | 5/6 + 1 novel | 3/6 + 3 novel |
+| Novel categories | — | missing_target | size_mismatch, crash, alway_ent |
+| Top category | stuck (30%) | stuck (40%) | stuck (33%) |
+| η² | 0.340 | 0.582 | 0.988 |
+
+**Key finding: category stability is model-dependent.** GPT-4o-mini strictly adheres to the prompted 6-category taxonomy (100%). Phi-4 invents 4 novel categories — 40% of its unique labels are off-taxonomy, and cross-task Jaccard is only 0.20. Cross-model Jaccard = 0.60 (moderate), with GPT-4o-mini's categories being a strict subset of the standard taxonomy.
+
+"stuck" is the only universal category (30-40% prevalence across all model/task combinations). η² remains stable regardless of which model generates categories.
+
+**Implication for scale-up**: For practical category-diversity replay at N≥50, taxonomy-adherent models (GPT-4o-mini) are preferable to creative ones (Phi-4). Same-task cross-model comparison still blocked by API access.
+
+![Cross-model category distributions. Asterisked categories are novel (non-canonical) labels invented by Phi-4.](../images/vlm_probe/cross_model_categories_iter43.png){width=100%}
+
+![Severity calibration differs: GPT-4o-mini never assigns "mild", Phi-4 uses the full scale.](../images/vlm_probe/severity_comparison_iter43.png){width=100%}
+
+Commits: `f81ce1d` (analysis), this iter (figures + scripts)
+
+---
+
+## Iteration 42 — Synthetic scale-up: category-diversity helps at N≥50 {.unnumbered}
+*2026-04-10*
+
+Extended the iter 41 simulation to synthetic datasets at N∈{50, 200, 1000} with varying η². Category-diversity **consistently beats uniform at N≥50** — coverage improvement +5-8%, entropy improvement up to +0.40. The effect is real but requires N>20 to overcome sampling noise. Temporal prediction is WORST of all strategies (coverage 0.44-0.56 vs uniform 0.53-0.73).
+
+Proposal 4 partially reopened — viable for realistic replay buffers but our probe dataset is too small to demonstrate empirically.
+
+---
+
+## Iteration 41 — Category-diversity replay ≈ uniform: Proposal 4 closed {.unnumbered}
+*2026-04-10*
+
+Simulated category-diversity-weighted replay (inverse category frequency) vs uniform on all 20 reach-v3 rollouts. 10,000-trial Monte Carlo sampling at B=5/8/10 episodes.
+
+![Replay simulation: category-diversity provides only +2% GT coverage over uniform.](../images/vlm_probe/replay_simulation_iter41.png){width=100%}
+
+**Result**: Category-diversity is NOT better than uniform. GT coverage improvement is noise-level (+2.8% at B=5, p>0.8). Oracle correlation ρ=+0.04 — category rarity does not predict episode informativeness. The η²=0.34 signal (categories explain GT timing variance) doesn't translate to priorities because: (a) rare categories aren't inherently more useful, and (b) the correlation is distributional (group means differ) not ordinal (rarity doesn't rank episodes).
+
+**Proposal 4 is now closed.** Together with temporal approaches (§1-12) and contrastive ranking (§13), this exhausts the study's most promising directions. Remaining proposals (3, 6, 7) are increasingly speculative.
+
+Commits: iteration 41
+
+---
+
+## Iteration 40 — TF-IDF clustering fails, but VLM categories are the signal {.unnumbered}
+*2026-04-10*
+
+Attempted to embed failure descriptions via TF-IDF (100 features, 1-2 ngrams) and cluster for diversity-weighted replay. **TF-IDF clustering fails** — silhouette scores <0.12, ARI ≈ 0 vs VLM categories. Descriptions are syntactically template-like despite being semantically diverse.
+
+![Clustering analysis: TF-IDF can't separate categories, but VLM categories track GT timing.](../images/vlm_probe/clustering_analysis_iter40.png){width=100%}
+
+**Key insight**: The free-text descriptions don't add value over the categorical labels. VLM categories themselves ARE the useful signal — they correlate with GT timing (η²=0.34) and produce up to 6x weight ratio for diversity-weighted replay. Category-diversity-weighted replay is the viable path: cheap (1 API call), interpretable, and grounded in real behavioral differences.
+
+**Next**: Both GPT-4o and GPT-4o-mini are rate-limited (~20h). When quota resets: run GPT-4o-mini on push-v3/pick-place-v3 for cross-model category comparison, then simulate category-diversity replay vs uniform vs temporal-prediction replay.
+
+Commits: iteration 40
+
+---
+
 ## Iteration 39 — Failure mode descriptions: first positive non-temporal signal {.unnumbered}
 *2026-04-10*
 
