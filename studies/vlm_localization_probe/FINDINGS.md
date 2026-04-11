@@ -636,4 +636,25 @@ preferable to Phi-4's creative novel categories.
 
 Total study cost: $0.80 (3 Claude Sonnet API calls in iter 1-3, all subsequent work on
 free APIs: GitHub Models, Google AI Studio, Groq). 60 rollouts, 9 models, 14 approaches,
-44 iterations.
+47 iterations.
+
+### Consolidated database (iter 47)
+
+All 360 individual predictions consolidated into `results/consolidated_database.json`
+with per-condition aggregates in `results/summary_table.json` (31 unique conditions).
+
+---
+
+## Study Status: COMPLETE (Iteration 47, 2026-04-10)
+
+This study is declared complete per agreement with the human collaborator. The
+consolidated database, experiment write-up, Quarto pages, and this findings document
+constitute the full record. The same-rollout cross-model comparison (the one remaining
+experiment) and proposals 3/6/7 are explicitly deferred — not lost, but not prioritized.
+
+**What would reopen this study:**
+
+1. Access to fine-tunable VLMs (solves the positional bias root cause)
+2. Semi-trained policy rollouts (enables phase-segmented replay, Proposal 6)
+3. A training loop integration that could validate category-diversity replay empirically
+4. New VLM architectures that address temporal encoding limitations (post-MRoPE)

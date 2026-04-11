@@ -1,26 +1,32 @@
 # fix_plan.md — experiment queue for vlm_probe
 #
-# Pruned at iter_041 compaction. Completed tasks removed, forward-looking only.
+# Study declared COMPLETE at iter 47 (2026-04-10) per human agreement.
 
-- [ ] Occasionally add relevant literature to Discord for Daniel to review.
 - [ ] Budget: $0. DO NOT use Anthropic API key (costs real money). Use only free APIs.
 
-# --- Active work: Proposal 4 (Failure Mode Clustering) ---
-# TF-IDF embedding failed (iter_040). VLM categories are the viable signal.
-- [x] Proposal 4 Step 1: Description collection — DONE iter_039. 3 tasks, 2 models, high diversity (η²=0.34-0.99).
-- [x] Proposal 4 Step 2: TF-IDF clustering — DONE iter_040. FAILED (silhouette<0.12). Categories > embeddings.
-- [x] Proposal 4 Step 3: Category-diversity simulation — iter_041 (n=20: ≈uniform), iter_042 scale-up (N≥50: +5-8% coverage). Viable at realistic buffer sizes.
-- [~] Proposal 4 Step 4: Cross-model category comparison — PARTIAL (iter 43). GPT-4o-mini vs Phi-4 on different tasks done (Jaccard=0.60, Phi-4 invents 4 novel cats). Same-task comparison blocked by API auth.
+# --- COMPLETED: VLM Failure Localization Probe ---
+# 47 iterations, 14 approaches, 9 models, 3 tasks, $0.80 total cost.
+# All temporal approaches fail (positional bias). Non-temporal failure mode
+# descriptions viable at N≥50. Full write-up on Quarto.
+- [x] Baseline model comparison (9 models)
+- [x] K sweep (4/8/16/32)
+- [x] CoT × annotation factorial (GPT-4o, GPT-4o-mini)
+- [x] Bias-matching mechanism (3 tasks)
+- [x] Ensemble/gating/CER (all failed)
+- [x] Failure mode descriptions (positive signal, η²=0.34-0.99)
+- [x] Category-diversity replay simulation (viable at N≥50)
+- [x] Cross-model category stability (JSD analysis)
+- [x] Consolidated results database (360 predictions, 31 conditions)
+- [x] Full experiment write-up on Quarto
+- [x] Study synthesis with landscape figure
 
-# --- Remaining proposals ---
-- [ ] Proposal 3: Task-Adaptive Annotation — annotation format search space, task-conditioned selection.
-- [ ] Proposal 6: Phase-Segmented Replay — categorical phase labels. Needs semi-trained policy.
-- [ ] Proposal 7: Retrospective Failure Narration — narration specificity as priority signal. Most speculative.
+# --- DEFERRED (not prioritized) ---
+# These remain if the study is reopened:
+# - Same-rollout cross-model comparison (blocked by APIs at study close)
+# - Proposal 3: Task-Adaptive Annotation
+# - Proposal 6: Phase-Segmented Replay (needs semi-trained policy)
+# - Proposal 7: Retrospective Failure Narration
 
-# --- Quota-gated experiments (run when available) ---
-- [ ] Gemini-3-flash-preview CoT completion (need n≥9, have n=3)
-- [ ] Gemini-2.5-flash annotation test (still 503)
-- [ ] Groq Llama 4 Scout (needs GROQ_API_KEY)
-- [ ] Cohere aya-vision-32b (1000 req/month, native multi-image)
-- [ ] Integrate TD-baseline results into HTML report
-
+# --- NEXT DIRECTION ---
+# Awaiting guidance from Daniel on what to work on next.
+- [ ] Ask Daniel for next research direction

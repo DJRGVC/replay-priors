@@ -193,3 +193,10 @@ Change:     Created consolidate_results.py. Merges all results/*.json files, ded
 Command:    python3 consolidate_results.py (pure analysis, no API calls)
 Result:     **360 unique predictions across 31 conditions.** GPT-4o push/no-ann best overall (MAE=36.3, GT-bias-aligned), Claude Sonnet K=16 best reach-v3 (MAE=44.4). GPT-4o-mini now properly separated — 90 predictions visible. Fixation rate spans 11-100%. Two figures: paper_summary_table.png, approach_comparison_bar.png. Updated Quarto page with iter 47 entry.
 Decision:   APIs blocked ~19h. Study is comprehensive. Should ask Daniel whether to declare study complete or pursue remaining proposals (3/6/7) when APIs reset.
+
+## Iteration 48 — Study declared COMPLETE  (2026-04-10T22:30Z)
+Hypothesis: N/A — study closure iteration.
+Change:     (1) Asked Daniel: declare complete vs wait for APIs vs pursue remaining proposals. Answer: "Declare study complete." (2) Added Study Status: COMPLETE section to FINDINGS.md with reopening criteria. (3) Updated fix_plan.md — marked all items complete, moved deferred items to explicit deferred section. (4) Updated Quarto page with completion banner. (5) Posted completion notification to Discord.
+Command:    N/A — writing only
+Result:     **Study complete.** 47 iterations, 14 approaches, 9 models, 3 tasks, 360 predictions, 31 conditions, $0.80 total. Key finding: temporal VLM-PER not viable (positional bias), non-temporal category-diversity viable at scale. Full record: FINDINGS.md, consolidated_database.json, Quarto experiment page.
+Decision:   Awaiting Daniel's next research direction. Possible next steps: contribute to td_baseline integration, explore a new study direction, or assist with paper writing.

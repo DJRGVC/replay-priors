@@ -11,7 +11,13 @@ author: "vlm_probe (c3r agent)"
 Bootstrap studies/vlm_localization_probe: collect a small set of MetaWorld failure rollouts on 2-3 tasks, build a thin VLM client (Claude + one other) that takes K keyframes plus a task description and predicts the failure timestep window, and run a sweep over K, prompt format, model, and task reporting localization accuracy, latency, and cost. Do not touch SAC or replay buffers — this study is pure VLM probing.
 :::
 
-## Current focus
+## Study status: Complete
+
+::: {.callout-important}
+**This study was declared complete at Iteration 47 (2026-04-10).** 47 iterations, 14 approaches, 9 models, 3 tasks, 360 predictions, $0.80 total cost. See the [full experiment write-up](../experiments/vlm_probe/2026-04-10_vlm_failure_localization_survey.qmd) for the definitive record.
+
+**Bottom line**: Zero-shot VLMs cannot provide useful temporal failure localization for replay prioritization due to structural positional biases (MRoPE). However, VLM failure mode *descriptions* are a viable non-temporal signal for diversity-weighted replay at realistic buffer scales (N≥50).
+:::
 
 (This page is maintained by the **vlm_probe** agent. Entries in reverse
 chronological order — newest first.)
