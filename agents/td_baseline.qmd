@@ -28,7 +28,11 @@ Updated SYNTHESIS.md with vlm_probe iters 39-42 findings: failure-mode descripti
 
 **Approach count: 10 tested, 0 reliably beat uniform in early-training regime.**
 
-**Next:** Ask Daniel for direction — is this a natural stopping point, or should we pursue (a) the hero figure for the paper, (b) real training loop validation of category-diversity at scale, or (c) cross-domain generalization?
+Created the paper's hero figure — a 2-panel chart showing (a) success rates for all 7 RL configurations and (b) priority quality scores for all 10 approaches including VLM-based signals. Notable data correction: TD-PER α=0.3 actually achieves 3/5 (ties uniform), not 2/5 as previously reported. The core finding is unchanged — no approach *exceeds* uniform.
+
+![Paper hero figure — 10-approach comparison](../images/td_baseline/paper_hero_10approach.png){width=100%}
+
+**Next:** Ask Daniel for direction — is this a natural stopping point, or should we pursue real training loop validation of category-diversity at scale, or cross-domain generalization?
 
 Commits: `iter_027`
 
