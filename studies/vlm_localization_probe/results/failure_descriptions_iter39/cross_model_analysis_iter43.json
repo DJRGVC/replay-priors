@@ -1,0 +1,103 @@
+{
+  "description_stats": [
+    {
+      "label": "reach-v3 / GPT-4o-mini",
+      "n": 20,
+      "mean_desc_words": 19.3,
+      "std_desc_words": 2.1,
+      "mean_visual_cues": 4.0,
+      "unique_descriptions": 20,
+      "unique_words": 110,
+      "novel_categories": [],
+      "category_distribution": {
+        "stuck": 6,
+        "never_reached": 4,
+        "other": 4,
+        "overshot": 3,
+        "wrong_direction": 2,
+        "oscillated": 1
+      }
+    },
+    {
+      "label": "push-v3 / Phi-4",
+      "n": 10,
+      "mean_desc_words": 24.3,
+      "std_desc_words": 17.3,
+      "mean_visual_cues": 2.5,
+      "unique_descriptions": 10,
+      "unique_words": 88,
+      "novel_categories": [
+        "missing_target"
+      ],
+      "category_distribution": {
+        "stuck": 4,
+        "other": 2,
+        "oscillated": 1,
+        "wrong_direction": 1,
+        "never_reached": 1,
+        "missing_target": 1
+      }
+    },
+    {
+      "label": "pick-place-v3 / Phi-4",
+      "n": 9,
+      "mean_desc_words": 20.6,
+      "std_desc_words": 7.2,
+      "mean_visual_cues": 2.2,
+      "unique_descriptions": 9,
+      "unique_words": 75,
+      "novel_categories": [
+        "alway_ent",
+        "crash",
+        "size_mismatch"
+      ],
+      "category_distribution": {
+        "stuck": 3,
+        "other": 2,
+        "overshot": 1,
+        "size_mismatch": 1,
+        "crash": 1,
+        "alway_ent": 1
+      }
+    }
+  ],
+  "cross_model_jsd_confounded": 0.11364690801549931,
+  "category_overlap": {
+    "gpt_categories": [
+      "never_reached",
+      "oscillated",
+      "other",
+      "overshot",
+      "stuck",
+      "wrong_direction"
+    ],
+    "phi_categories": [
+      "alway_ent",
+      "crash",
+      "missing_target",
+      "never_reached",
+      "oscillated",
+      "other",
+      "overshot",
+      "size_mismatch",
+      "stuck",
+      "wrong_direction"
+    ],
+    "intersection": [
+      "never_reached",
+      "oscillated",
+      "other",
+      "overshot",
+      "stuck",
+      "wrong_direction"
+    ],
+    "jaccard": 0.6
+  },
+  "novel_categories": [
+    "alway_ent",
+    "crash",
+    "missing_target",
+    "size_mismatch"
+  ],
+  "note": "JSD is confounded by task differences. Same-rollout comparison needed for deconfounding."
+}

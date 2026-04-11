@@ -36,6 +36,12 @@ Compared failure mode categories across GPT-4o-mini (reach-v3, n=20) and Phi-4 (
 
 **Implication for scale-up**: For practical category-diversity replay at N≥50, taxonomy-adherent models (GPT-4o-mini) are preferable to creative ones (Phi-4). Same-task cross-model comparison still blocked by API access.
 
+![Cross-model category distributions. Asterisked categories are novel (non-canonical) labels invented by Phi-4.](../images/vlm_probe/cross_model_categories_iter43.png){width=100%}
+
+![Severity calibration differs: GPT-4o-mini never assigns "mild", Phi-4 uses the full scale.](../images/vlm_probe/severity_comparison_iter43.png){width=100%}
+
+Commits: `f81ce1d` (analysis), this iter (figures + scripts)
+
 ---
 
 ## Iteration 42 — Synthetic scale-up: category-diversity helps at N≥50 {.unnumbered}
