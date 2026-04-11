@@ -13,6 +13,24 @@ Decision:   The baseline study is now comprehensively finished. Five independent
             change WHICH seeds learn?) as this could reveal something about exploration
             diversity under different priority regimes.
 
+## Iteration 27 — Negative result paper outline + synthesis update  (2026-04-11T02:00:00Z)
+Hypothesis: A structured paper outline will crystallize the convergent negative result
+            (10 approaches, 0 beat uniform) into a publishable narrative.
+Change:     Created PAPER_OUTLINE.md with full section structure (Abstract through
+            Appendices), figure inventory, and data release plan. Updated SYNTHESIS.md
+            with vlm_probe iters 39-42 findings (failure descriptions η²=0.34-0.99,
+            category-diversity ≈ uniform at small n, helps at N≥50 only). Updated
+            approach count from 8→10. Updated Quarto page with new entry.
+Command:    N/A (writing/synthesis only, no training or API calls)
+Result:     Paper outline covers 10 approaches across 3 independent failure mechanisms.
+            Estimated ~10 pages main text + 3-4 appendix. 6 existing figures reusable,
+            3-4 new figures needed (hero comparison bar chart, failure mechanism diagram).
+            SYNTHESIS.md now reflects all findings through vlm_probe iter 42.
+Decision:   Ask Daniel for direction: (a) create the hero comparison figure for the
+            paper (10-approach bar chart), (b) pursue real training loop validation of
+            category-diversity at scale, (c) cross-domain generalization, or (d) this
+            is a natural stopping point and we should focus on writing.
+
 ## Iteration 26 — Synthesis update: CER failure closes contrastive ranking  (2026-04-11T01:15:00Z)
 Hypothesis: Integrating vlm_probe iter 38 CER findings will close the contrastive
             ranking open question and strengthen the "8 approaches, 0 beat uniform"

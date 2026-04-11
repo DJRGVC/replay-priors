@@ -158,7 +158,28 @@ timestep slots) to *between-episode* (first-presented preference). The RLHF pair
 comparison analogy fails because RLHF models are fine-tuned on comparison data; off-
 the-shelf VLMs default to position heuristics on unfamiliar visual comparison tasks.
 
-### 2e. Revised assessment
+### 2e. Failure-mode descriptions: first positive non-temporal signal (vlm_probe iters 39-42)
+
+VLM failure-mode *descriptions* (free-text, not timestamps) show genuine signal:
+6/6 failure categories used across 3 tasks, 100% unique descriptions, strong
+category→GT-failure-time association (η²=0.34 reach, 0.58 push, 0.99 pick-place).
+This is the first VLM signal that leverages scene understanding over temporal precision.
+
+However, **translating this to replay priority is hard at small scale:**
+- TF-IDF clustering fails (silhouette <0.12) — descriptions are syntactically
+  template-like despite semantic diversity (vlm_probe iter 40).
+- Category-diversity replay ≈ uniform at n=10-20: Monte Carlo simulation shows
+  only +2.8% GT coverage improvement at B=5 (vlm_probe iter 41).
+- **Synthetic scale-up reveals the effect is real but requires N≥50:** at N=200,
+  category-diversity consistently beats uniform on coverage (+0.047) and entropy
+  (+0.40) (vlm_probe iter 42).
+
+The implication: failure-mode clustering is viable for buffers with 50+ episodes
+but not for the early-training regime where prioritization matters most. By the
+time the buffer has 50+ episodes, the agent has already passed the critical
+exploration bottleneck.
+
+### 2f. Revised assessment
 
 The iter-006 assessment that VLMs provide a "qualitatively different kind of signal"
 was **too optimistic**. While VLM judgments are indeed critic-independent and available
@@ -167,10 +188,12 @@ from step 0, they are dominated by positional bias and produce priorities that a
 promise is top-20% overlap (+12% above uniform for Sonnet K=8), but this comes at the
 cost of catastrophic misses that create harmful priority peaks far from true failure.
 
-**Approaches tested and failed:** direct temporal localization (9 models), K sweeps,
-CoT prompting, frame annotation, ensemble debiasing, confidence gating, and now
-pairwise contrastive ranking. The path forward cannot be "better temporal localization"
-or "better comparison" — it must sidestep temporal reasoning entirely.
+**Approaches tested and failed/limited:** direct temporal localization (9 models),
+K sweeps, CoT prompting, frame annotation, ensemble debiasing, confidence gating,
+pairwise contrastive ranking, and category-diversity replay. The only positive VLM
+signal (failure-mode descriptions, η²=0.34-0.99) requires N≥50 episodes to translate
+into replay benefit — too late for the critical early-training regime. **10 approaches
+tested, 0 reliably beat uniform in the regime that matters.**
 
 ## 3. Literature Connections
 
@@ -257,9 +280,10 @@ cannot *localize temporally*.
    above always-A baseline. Positional bias extends from within-episode to between-
    episode comparison.
 
-2. **Can VLM failure mode descriptions (text, not timestamps) create diversity-
-   weighted replay that outperforms uniform?** This is the last untested non-temporal
-   direction that leverages VLM scene understanding.
+2. ~~Can VLM failure mode descriptions create diversity-weighted replay that
+   outperforms uniform?~~ → **Partially answered** (vlm_probe iters 39-42).
+   Category-diversity ≈ uniform at small n (10-20), but helps at N≥50 in simulation.
+   Not practical for early-training regime. Requires real training loop validation.
 
 3. **Is the uniform dominance result specific to MetaWorld's sparse binary reward
    structure, or does it generalize to other sparse-reward domains?**
@@ -292,9 +316,9 @@ cannot *localize temporally*.
 
 1. ~~Contrastive episode ranking~~ → **Closed** (vlm_probe iter 38, primacy bias).
 
-2. **Failure mode clustering / phase segmentation:** The only untested non-temporal
-   VLM direction. Use VLM *descriptions* of failure (text, not timestamps) to cluster
-   episodes by failure mode and prioritize under-represented modes for diversity.
+2. **Failure mode clustering at scale:** Category-diversity replay shows promise at
+   N≥50 in simulation (vlm_probe iter 42) but fails at small n. Needs real training
+   loop validation to determine if the effect survives online learning dynamics.
 
 3. **Negative result write-up:** The convergent finding (8 approaches tested, 0 beat
    uniform) is itself publishable as a cautionary benchmark paper.
@@ -304,10 +328,13 @@ cannot *localize temporally*.
 
 ---
 
-*This synthesis was last updated by `agent/td_baseline` (iter_026) combining:*
+*This synthesis was last updated by `agent/td_baseline` (iter_027) combining:*
 - *TD-error baseline: 40 runs (5 seeds × {uniform, TD-PER×3α, RPE-PER, RND-PER, Adaptive} × 2 tasks)*
-- *VLM probe: 9 models × 3 tasks × 10+ interventions (38 iterations)*
+- *VLM probe: 9 models × 3 tasks × 10+ interventions (42 iterations)*
 - *Additional analyses: seed-switching (iter_023), state-space visitation (iter_024),*
-  *CER primacy bias (vlm_probe iter_038)*
+  *CER primacy bias (vlm_probe iter_038), failure descriptions (vlm_probe iter_039),*
+  *category-diversity simulation (vlm_probe iters 041-042)*
 - *Cross-study synthesis figure: `figures/cross_study_synthesis.png` (iter_025)*
-- *Approach count: 8 tested (5 RL signals + VLM temporal + ensemble/gating + CER), 0 beat uniform*
+- *Approach count: 10 tested (5 RL signals + VLM temporal + ensemble/gating + CER +*
+  *category-diversity), 0 reliably beat uniform in early-training regime*
+- *Paper outline: `PAPER_OUTLINE.md` (iter_027)*
