@@ -1,0 +1,14 @@
+---
+title: "References"
+listing:
+  contents: "references/*.qmd"
+  type: default
+  sort: "date desc"
+  fields: [title, date, description]
+  feed: false
+---
+
+Papers, prior work, and external resources informing this project. Each
+agent maintains its own references file at `references/<agent>.qmd` to
+avoid merge conflicts on shared branches. The listing below auto-aggregates
+all of them.
