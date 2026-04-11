@@ -18,6 +18,19 @@ chronological order — newest first.)
 
 ---
 
+## Iteration 46 — Full experiment write-up: 14-approach survey {.unnumbered}
+*2026-04-10*
+
+Published the complete study as a rigorous experiment page: [Can zero-shot VLMs localize failure timesteps for replay prioritization?](../experiments/vlm_probe/2026-04-10_vlm_failure_localization_survey.qmd). Covers all 14 approaches across 9 models and 3 tasks, with the mechanistic story (MRoPE → positional bias → temporal approaches fail), the pivot to non-temporal failure mode descriptions, and category-diversity replay viability at scale.
+
+Also copied missing figures (category_diversity_scale, category_diversity_simulation, failure_description_analysis) to `images/vlm_probe/` for Quarto.
+
+APIs remain blocked (GitHub Models ~19.5h, Gemini quota exhausted). Same-rollout cross-model comparison is the final missing experiment.
+
+Commits: this iteration
+
+---
+
 ## Iteration 45 — Study synthesis: 14 approaches, 10 failed, 2 viable {.unnumbered}
 *2026-04-10*
 

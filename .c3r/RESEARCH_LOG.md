@@ -179,3 +179,10 @@ Change:     (1) Created plot_study_synthesis.py — "approach landscape" figure 
 Command:    python3 plot_study_synthesis.py (pure visualization, no API calls)
 Result:     Study synthesis complete. The narrative is clear: temporal approaches fail due to structural positional bias (MRoPE), non-temporal failure mode descriptions are viable at scale (N≥50). 14 approaches exhaustively tested, $0.80 total cost.
 Decision:   When APIs reset (~19.5h), run same-rollout cross-model comparison (the final missing experiment). Then consider writing a full experiment page for the complete study. Remaining proposals (3, 6, 7) are increasingly speculative — should ask Daniel whether to pursue them or declare the study complete.
+
+## Iteration 46 — Full experiment write-up: 14-approach survey  (2026-04-10T21:15Z)
+Hypothesis: APIs still blocked; best use of time is publishing the complete study as a rigorous experiment page.
+Change:     (1) Created experiments/vlm_probe/2026-04-10_vlm_failure_localization_survey.qmd — comprehensive write-up of all 14 approaches, 9 models, 3 tasks with Question/Method/Results/Discussion/Reproducibility sections. (2) Copied 3 missing figures to images/vlm_probe/. (3) Updated agents/vlm_probe.qmd with iter 46 entry.
+Command:    No API calls — pure writing. Verified GitHub Models still 429 (70201s wait) and Gemini still 429.
+Result:     Publication-quality experiment page live on Quarto. Covers: baseline model comparison, K sweep, CoT×annotation factorial, bias-matching mechanism, ensemble/gating/CER failures, failure mode descriptions, category-diversity viability, cross-model stability. Includes connection to td_baseline, limitations, and what-would-change-the-conclusion section.
+Decision:   When APIs reset, run same-rollout cross-model comparison (final missing experiment). Then ask Daniel re: study direction — declare complete or pursue proposals 3/6/7.
